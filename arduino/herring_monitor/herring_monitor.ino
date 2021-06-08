@@ -1,38 +1,7 @@
-// Control Pins
-#define RST   11
-#define CLK   12
-#define RW    38
-
-// Data Pins
-#define D0    10
-#define D1    9
-#define D2    8
-#define D3    7
-#define D4    6
-#define D5    5
-#define D6    4
-#define D7    3
-
-// Address Pins
-#define A0    22
-#define A1    23
-#define A2    24
-#define A3    25
-#define A4    26
-#define A5    27
-#define A6    28
-#define A7    29
-#define A8    30
-#define A9    31
-#define A10   32
-#define A11   33
-#define A12   34
-#define A13   35
-#define A14   36
-#define A15   37
+#include "herring_pins.h"
 
 bool running = false;
-bool clock_state = LOW;
+bool clock_state = false;
 
 void cycle(int count)
 {
@@ -123,7 +92,7 @@ void setup() {
   pinMode(RST, OUTPUT);
   pinMode(RW, INPUT);
 
-  // Data Pins - start as outputs
+  // Data Pins
   pinMode(D0, INPUT);
   pinMode(D1, INPUT);
   pinMode(D2, INPUT);
