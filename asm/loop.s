@@ -1,10 +1,9 @@
     .org $8000
 
-    lda #$01
-    sta $1000
+    ldx %01010101
 
 main_loop:
-    inc $1000
+    inx
     jmp main_loop
 
     .org $fffc

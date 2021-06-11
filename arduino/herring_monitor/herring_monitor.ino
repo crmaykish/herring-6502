@@ -1,17 +1,39 @@
 #include "herring_pins.h"
 
-bool running = false;
+//#include <LiquidCrystal.h>
+
+#define CLOCK_DELAY 200
+
+//const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+//LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
+
+bool running = true;
 bool clock_state = false;
 
-void cycle(int count)
+//char lcd_line_1[16];
+//char lcd_line_2[16];
+
+void cycle(int count, int wait)
 {
   for (int i = 0; i < count; i++)
   {
     digitalWrite(CLK, LOW);
-    delay(50);
+    delay(wait);
     digitalWrite(CLK, HIGH);
-    delay(50);
+    delay(wait);
   }
+}
+
+void reset()
+{
+  Serial.println("Resetting");
+  digitalWrite(RST, LOW);
+  delay(100);
+
+  cycle(1, 50);
+
+  digitalWrite(RST, HIGH);
+  delay(100);
 }
 
 void printState()
@@ -68,6 +90,22 @@ void printState()
   D += d6 << 6;
   D += d7 << 7;
 
+  char rw = 'R';
+
+  if (digitalRead(RW) == LOW)
+  {
+    rw = 'W';
+  }
+
+//  sprintf(lcd_line_1, "ADDR: %04X", A);
+//  sprintf(lcd_line_2, "DATA: %02X      %c", D, rw);
+  
+//  lcd.clear();
+//  lcd.setCursor(0,0);
+//  lcd.print(lcd_line_1);
+//  lcd.setCursor(0,1);
+//  lcd.print(lcd_line_2);
+
   Serial.print("ADDR: ");
   Serial.print(A, HEX);
 
@@ -86,7 +124,8 @@ void printState()
   Serial.println();
 }
 
-void setup() {
+void setup()
+{
   // Control Pins
   pinMode(CLK, OUTPUT);
   pinMode(RST, OUTPUT);
@@ -123,11 +162,20 @@ void setup() {
   digitalWrite(RST, HIGH);
   digitalWrite(CLK, HIGH);
 
+//  lcd.begin(16, 2);
+
+//  lcd.clear();
+
   // Start serial monitor
   Serial.begin(115200);
+
+  reset();
+
+  running = true;
 }
 
-void loop() {
+void loop()
+{
   if (Serial.available() > 0)
   {
     String command = Serial.readStringUntil('\n');
@@ -146,18 +194,12 @@ void loop() {
     }
     else if (command.equals("RESET"))
     {
-      Serial.println("Resetting");
-      digitalWrite(RST, LOW);
-      delay(10);
-      digitalWrite(RST, HIGH);
-      delay(10);
-
-      cycle(7);
+      reset();
     }
     else if (!running)
     {
       Serial.println("Cycling");
-      cycle(1);
+      cycle(1, CLOCK_DELAY);
       printState();
     }
   }
@@ -175,7 +217,7 @@ void loop() {
 
     digitalWrite(CLK, clock_state);
 
-    delay(100);
+    delay(CLOCK_DELAY);
 
     printState();
   }

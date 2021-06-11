@@ -151,26 +151,26 @@ void loop() {
     {
       digitalWrite(RDY, LOW);
       
-      bool highCommandBit = (data_in & 0b10000000) >> 7;
-      bool lowCommandBit = (data_in & 0b01000000) >> 6;
+      // bool highCommandBit = (data_in & 0b10000000) >> 7;
+      // bool lowCommandBit = (data_in & 0b01000000) >> 6;
 
-      if (highCommandBit && lowCommandBit)
-      {
-        Serial.println("Clearing framebuffer");
-        
-        // Clear the framebuffer
-        for (int i = 0; i < 64; i++)
-        {
-          for (int j = 0; j < 32; j++)
-          {
-            framebuffer[i][j] = 0;
-          }
-        }
-
-        matrix.fillScreen(matrix.Color333(0, 0, 0));
-
-        return;
-      }
+//      if (highCommandBit && lowCommandBit)
+//      {
+//        Serial.println("Clearing framebuffer");
+//        
+//        // Clear the framebuffer
+//        for (int i = 0; i < 64; i++)
+//        {
+//          for (int j = 0; j < 32; j++)
+//          {
+//            framebuffer[i][j] = 0;
+//          }
+//        }
+//
+//        matrix.fillScreen(matrix.Color333(0, 0, 0));
+//
+//        return;
+//      }
       
       uint8_t row = addr_in % 32;
       uint8_t column = addr_in / 32;
