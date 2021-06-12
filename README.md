@@ -1,22 +1,25 @@
-# herring-6502
+# Herring 6502
 8-bit computer based on the W65C02 CPU and a mix of modern hardware
 
-## Design Notes
+## Boards
 
-### Boards
+1. Motherboard: Power and main bus fed to all daughterboards (passive circuitry)
+2. CPU Board: W65C02 CPU and crystal oscillator, switch between single step and free-run modes
+3. ROM Board: Holds a single 32kb EEPROM chip
+4. RAM Board: Holds a single 32kb SRAM chip
+5. Display Board: Memory-mapped control of a large RGB LED matrix acting as a display
+6. Input Board: ATmega32U4 translating USB keyboard signals to input for the W65C02 databus
+7. Debug Board: ATmega644p MCU watching the address bus, data bus, and control signals. Controls the clock via serial commands
 
-1. Motherboard: Power and main bus
-2. CPU and clock: switch between free-run and single-step mode
-3. ROM (32k): $8000-$FFFF
-4. RAM (32k): $0000-$7FFF
-5. Video: FPGA controlling LED panel
-6. Debug Board: Output Address and Data lines to LCD display and LEDs
+## Memory Map
 
-Note: address mapping is going to be a pain
+0x0000 - 0x7FFF : RAM (32k)
+0x8000 - 0xBFFF : I/O
+0xC000 - 0xFFFF : ROM (16k)
 
-### Bus Pins
+## Main Bus Pins
 
-From left to right
+The motherboard and daughterboards are connected with a 36 pin single-row connector with the following pinout:
 
 1. VCC
 2. GND
@@ -29,7 +32,6 @@ From left to right
 8. A10
 9. A9
 10. A8
-
 11. A7
 12. A6
 13. A5
@@ -56,3 +58,10 @@ From left to right
 32. NMIB
 33. SYNC
 34. RWB
+35. N/C
+36. N/C
+
+
+## Notes
+
+1. Use pin 35 and 36 as address decoder pins? Are two pins enough? RAM, ROM, Video, Input? Additional boards could have their own address decoding if necessary
