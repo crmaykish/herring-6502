@@ -1,6 +1,8 @@
 # Herring 6502
 8-bit computer based on the W65C02 CPU and a mix of modern hardware
 
+![Herring 6502 Logo](/assets/images/logo_black_256.png)
+
 ## Boards
 
 1. Motherboard: Power and main bus fed to all daughterboards (passive circuitry)
