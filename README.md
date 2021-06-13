@@ -67,3 +67,4 @@ The motherboard and daughterboards are connected with a 36 pin single-row connec
 ## Notes
 
 1. Use pin 35 and 36 as address decoder pins? Are two pins enough? RAM, ROM, Video, Input? Additional boards could have their own address decoding if necessary
+2. Add an AND gate to the RAM R/W pin and CLK to only write on the clock pulse (seems to be working without it at low speed, but may cause errors at full speed)
