@@ -6,22 +6,45 @@
 
 ## Boards
 
-1. Motherboard: Power and main bus fed to all daughterboards (passive circuitry)
-2. CPU Board: W65C02 CPU and crystal oscillator, switch between single step and free-run modes
-3. ROM Board: Holds a single 32kb EEPROM chip
-4. RAM Board: Holds a single 32kb SRAM chip
-5. Display Board: Memory-mapped control of a large RGB LED matrix acting as a display
-6. I/O Board: W65C22 VIA chip exposing two 8-bit GPIO ports
-7. Debug Board: ATmega644p MCU watching the address bus, data bus, and control signals. Controls the clock via serial commands
+### Motherboard
+
+- Power and main bus fed to all daughterboards (passive circuitry)
+- 5v and 3.3v regulators via raw input or 5v USB in
+
+### CPU Board
+
+- W65C02 CPU and crystal oscillator, switch between single step and free-run modes
+
+### ROM Board
+
+- Holds a single 32kb EEPROM chip
+
+### RAM Board
+
+- Holds a single 32kb SRAM chip
+- Red LED turns off when writing to RAM
+
+### Display Board
+
+- Memory-mapped control of a large RGB LED matrix acting as a display
+
+### I/O Board
+
+- W65C22 VIA chip exposing two 8-bit GPIO ports
+
+### Debug Board
+
+- ATmega644p MCU watching the address bus, data bus, and control signals
+- Controls the clock via serial commands
 
 ## Memory Map
 
-| Device | Start | End | Bytes | A15 | A14 | A13 | 35 | 36 |
-| ------ | ----- | --- | ----- | --- | --- | --- | -- | -- |
-| RAM | 0x0000 | 0x7FFF | 0x8000 | 0 | X | X | 0 | 0 |
-| VIA | 0x8000 | 0x9FFF | 0x2000 | 1 | 0 | 0 | 0 | 1 |
-| Video | 0xA000 | 0xBFFF | 0x2000 | 1 | 0 | 1 | 1 | 0 |
-| ROM | 0xC000 | 0xFFFF | 0x4000 | 1 | 1 | X | 1 | 1 |
+| Device | Start  | End    | Bytes  | A15 | A14 | A13 | 35  | 36  |
+| ------ | ------ | ------ | ------ | --- | --- | --- | --- | --- |
+| RAM    | 0x0000 | 0x7FFF | 0x8000 | 0   | X   | X   | 0   | 0   |
+| VIA    | 0x8000 | 0x9FFF | 0x2000 | 1   | 0   | 0   | 0   | 1   |
+| Video  | 0xA000 | 0xBFFF | 0x2000 | 1   | 0   | 1   | 1   | 0   |
+| ROM    | 0xC000 | 0xFFFF | 0x4000 | 1   | 1   | X   | 1   | 1   |
 
 ## Main Bus Pins
 

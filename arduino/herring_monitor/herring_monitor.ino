@@ -26,7 +26,7 @@
 #define CLK 13
 #define RW 14
 
-#define CLOCK_DELAY 200
+#define CLOCK_DELAY 10
 
 typedef struct
 {
