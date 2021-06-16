@@ -39,12 +39,12 @@
 
 ## Memory Map
 
-| Device | Start  | End    | Bytes  | A15 | A14 | A13 | 35  | 36  |
+| Device | Start  | End    | Bytes  | A15 | A14 | A13 | Y   | Z   |
 | ------ | ------ | ------ | ------ | --- | --- | --- | --- | --- |
-| RAM    | 0x0000 | 0x7FFF | 0x8000 | 0   | X   | X   | 0   | 0   |
-| VIA    | 0x8000 | 0x9FFF | 0x2000 | 1   | 0   | 0   | 0   | 1   |
-| Video  | 0xA000 | 0xBFFF | 0x2000 | 1   | 0   | 1   | 1   | 0   |
-| ROM    | 0xC000 | 0xFFFF | 0x4000 | 1   | 1   | X   | 1   | 1   |
+| RAM    | 0x0000 | 0x3FFF | 0x4000 | 0   | X   | X   | 0   | 0   |
+| VIA    | 0x4000 | 0x5FFF | 0x2000 | 1   | 0   | 0   | 0   | 1   |
+| Video  | 0x6000 | 0x7FFF | 0x2000 | 1   | 0   | 1   | 1   | 0   |
+| ROM    | 0x8000 | 0xFFFF | 0x8000 | 1   | 1   | X   | 1   | 1   |
 
 ## Main Bus Pins
 

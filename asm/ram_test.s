@@ -1,4 +1,7 @@
-    .org $8000
+RESET_VECTOR = $FFFC
+ROM_START = $8000
+
+    .org ROM_START
 
 init:
     lda #01
@@ -17,6 +20,6 @@ loop:
     jmp loop
 
 reset_vector:
-    .org $fffc
-    .word $8000
+    .org RESET_VECTOR
+    .word ROM_START
     .word $0000
