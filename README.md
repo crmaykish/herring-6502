@@ -93,3 +93,4 @@ The motherboard and daughterboards are connected with a 36 pin single-row connec
 ## Notes
 
 1. Add an AND gate to the RAM R/W pin and CLK to only write on the clock pulse (seems to be working without it at low speed, but may cause errors at full speed)
+2. Something is wrong with the high bits on VIA port A, pins are reversed or not connected or something
