@@ -26,21 +26,32 @@
 #define CLK 13
 #define RW 14
 
-#define CLOCK_DELAY 10
+// WARNING: At some point, the serial monitor will no longer be able to keep up with the clock speed
+// and will start missing changes on the buses
+
+#define DEFAULT_CLOCK_SPEED_HZ 100
+
+#define SERIAL_BAUDRATE 250000
 
 typedef struct
 {
     bool Running;
     bool ReadWrite;
     uint16_t AddressBus;
+    uint16_t PrevAddressBus;
     uint8_t DataBus;
+    uint8_t PrevDataBus;
+    unsigned int ClockSpeed;
 } CPU_6502_t;
 
 static CPU_6502_t cpu = {
     .Running = false,
     .ReadWrite = false,
     .AddressBus = 0x0000,
-    .DataBus = 0x00};
+    .PrevAddressBus = 0x0000,
+    .DataBus = 0x00,
+    .PrevDataBus = 0x00,
+    .ClockSpeed = DEFAULT_CLOCK_SPEED_HZ};
 
 uint8_t reverse_bits(uint8_t b)
 {
@@ -63,8 +74,8 @@ void log(String s)
 
 void dump_cpu_state()
 {
-    sprintf(log_message, "ADDR: %04X | DATA: %02X | RW: %d", cpu.AddressBus, cpu.DataBus, cpu.ReadWrite);
-    log(log_message);
+      sprintf(log_message, "%04X | %02X | %d", cpu.AddressBus, cpu.DataBus, cpu.ReadWrite);
+      log(log_message);
 }
 
 void cpu_cycle(int count)
@@ -72,10 +83,13 @@ void cpu_cycle(int count)
     for (int i = 0; i < count; i++)
     {
         digitalWrite(CLK, LOW);
-        delay(CLOCK_DELAY);
+        delay(10);
         digitalWrite(CLK, HIGH);
-        delay(CLOCK_DELAY);
+        delay(10);
     }
+
+    cpu.PrevAddressBus = cpu.AddressBus;
+    cpu.PrevDataBus = cpu.DataBus;
 
     // Read the CPU buses
     cpu.AddressBus = (reverse_bits(PIN_ADDR_HIGH) << 8) + reverse_bits(PIN_ADDR_LOW);
@@ -85,11 +99,12 @@ void cpu_cycle(int count)
 
 void cpu_reset()
 {
-    cpu_cycle(1);
     log("Resetting 65C02...");
     digitalWrite(RST, LOW);
+    delay(10);
     cpu_cycle(1);
     digitalWrite(RST, HIGH);
+    delay(10);
 }
 
 void setup()
@@ -109,7 +124,7 @@ void setup()
     pinMode(RW, INPUT);
 
     // Start serial monitor
-    Serial.begin(115200);
+    Serial.begin(250000);
 
     cpu_reset();
 }
@@ -124,16 +139,43 @@ void loop()
         {
             log("Run");
             cpu.Running = true;
+            tone(CLK, cpu.ClockSpeed);
         }
         else if (command.equals("STOP"))
         {
             log("Stop");
             cpu.Running = false;
-            digitalWrite(CLK, LOW);
+            noTone(CLK);
+            digitalWrite(CLK, HIGH);
         }
         else if (command.equals("RESET"))
         {
             cpu_reset();
+        }
+        else if (command.equals("SLOW"))
+        {
+          cpu.ClockSpeed = 40;
+          log("Clock set to 40Hz");
+        }
+        else if (command.equals("MEDIUM"))
+        {
+          cpu.ClockSpeed = 500;
+          log("Clock set to 500Hz");
+        }
+        else if (command.equals("FAST"))
+        {
+          cpu.ClockSpeed = 20000;
+          log("Clock set to 20kHz");
+        }
+        else if (command.equals("TURBO"))
+        {
+          cpu.ClockSpeed = 100000;
+          log("Clock set to 100kHz");
+        }
+        else if (command.equals("MAX"))
+        {
+          cpu.ClockSpeed = 500000;
+          log("Clock set to 500kHz");
         }
         else if (!cpu.Running)
         {
@@ -144,7 +186,7 @@ void loop()
 
     if (cpu.Running)
     {
-        cpu_cycle(1);
+        cpu_cycle(0);
         dump_cpu_state();
     }
 }
