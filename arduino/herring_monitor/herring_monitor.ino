@@ -29,7 +29,7 @@
 // WARNING: At some point, the serial monitor will no longer be able to keep up with the clock speed
 // and will start missing changes on the buses
 
-#define DEFAULT_CLOCK_SPEED_HZ 100
+#define DEFAULT_CLOCK_SPEED_HZ 40
 
 #define SERIAL_BAUDRATE 250000
 
@@ -45,7 +45,7 @@ typedef struct
 } CPU_6502_t;
 
 static CPU_6502_t cpu = {
-    .Running = false,
+    .Running = true,
     .ReadWrite = false,
     .AddressBus = 0x0000,
     .PrevAddressBus = 0x0000,
@@ -101,10 +101,10 @@ void cpu_reset()
 {
     log("Resetting 65C02...");
     digitalWrite(RST, LOW);
-    delay(10);
+    delay(100);
     cpu_cycle(1);
     digitalWrite(RST, HIGH);
-    delay(10);
+    delay(100);
 }
 
 void setup()
@@ -126,6 +126,7 @@ void setup()
     // Start serial monitor
     Serial.begin(250000);
 
+    tone(CLK, cpu.ClockSpeed);
     cpu_reset();
 }
 
