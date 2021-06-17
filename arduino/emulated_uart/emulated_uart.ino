@@ -28,26 +28,48 @@ bool in_ready = false;
 bool submit_low = false;
 bool submit_high = false;
 
+byte buffer_out[256];
+uint8_t buffer_out_index = 0;
+bool out_ready = false;
+bool out_ack = false;
+
 bool is_ascii(byte b)
 {
     return (b == 10) || (b >= 32 && b <= 127);
 }
 
+void data_bus_mode(uint8_t mode)
+{
+    pinMode(D0, mode);
+    pinMode(D1, mode);
+    pinMode(D2, mode);
+    pinMode(D3, mode);
+    pinMode(D4, mode);
+    pinMode(D5, mode);
+    pinMode(D6, mode);
+    pinMode(D7, mode);
+}
+
+void byte_to_bus(byte b)
+{
+    digitalWrite(D0, b & 0x1);
+    digitalWrite(D1, (b & 0x10) >> 1);
+    digitalWrite(D1, (b & 0x100) >> 2);
+    digitalWrite(D1, (b & 0x1000) >> 3);
+    digitalWrite(D1, (b & 0x10000) >> 4);
+    digitalWrite(D1, (b & 0x100000) >> 5);
+    digitalWrite(D1, (b & 0x1000000) >> 6);
+    digitalWrite(D1, (b & 0x10000000) >> 7);
+}
+
 void setup()
 {
+    data_bus_mode(INPUT);
+
     pinMode(ADDR0, INPUT);
     pinMode(ADDR1, INPUT);
     pinMode(ADDR2, INPUT);
     pinMode(ADDR3, INPUT);
-
-    pinMode(D0, INPUT);
-    pinMode(D1, INPUT);
-    pinMode(D2, INPUT);
-    pinMode(D3, INPUT);
-    pinMode(D4, INPUT);
-    pinMode(D5, INPUT);
-    pinMode(D6, INPUT);
-    pinMode(D7, INPUT);
 
     pinMode(Y, INPUT);
     pinMode(Z, INPUT);
@@ -60,6 +82,19 @@ void setup()
 
 void loop()
 {
+    if (Serial.available() > 1)
+    {
+        if (buffer_out_index < sizeof(buffer_out))
+        {
+            buffer_out[buffer_out_index] = Serial.read();
+            buffer_out_index++;
+        }
+        else
+        {
+            Serial.println("DEBUG: Buffer is full.");
+        }
+    }
+
     if (!digitalRead(Y) && digitalRead(Z))
     {
         // Read buses
@@ -83,6 +118,8 @@ void loop()
 
             if (AddressBus == 0x00)
             {
+                data_bus_mode(INPUT);
+
                 if (is_ascii(DataBus)) // TODO: This is hacky, binary data should be acceptable, but we're getting garbage data from somewhere
                 {
                     buffer_in = DataBus;
@@ -106,7 +143,11 @@ void loop()
             // 3. Write the byte to the serial port
             if (in_ready && submit_low && submit_high)
             {
-                Serial.write(buffer_in);
+                if (buffer_out_index == 0)
+                {
+                    
+                }
+                Serial.write(buffer_out);
 
                 buffer_in = 0;
                 in_ready = false;
@@ -116,7 +157,17 @@ void loop()
         }
         else
         {
-            // TODO: CPU is reading from UART
+            if (AddressBus == 0x10)
+            {
+                // CPU is requesting a byte
+                data_bus_mode(OUTPUT);
+                byte_to_bus(0xAB);
+            }
+
+            if (AddressBus == 0x11)
+            {
+                // CPU acks the byte
+            }
         }
     }
 }
