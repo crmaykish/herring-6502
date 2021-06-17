@@ -14,7 +14,7 @@ LCD_RW = %0000010
 LCD_E =  %0000100
 
 LCD_CMD_INIT = %00110000            ; Set LCD to 8-bit, two-line, 5x8 font
-LCD_DISP_SETTINGS = %00001110       ; Display on, cursor on, blink off
+LCD_DISP_SETTINGS = %00001100       ; Display on, cursor on, blink off
 LCD_CMD_CLEAR = %00000001           ; Clear the display
 LCD_CMD_HOME = %00000010            ; Return cursor to home position
 
