@@ -29,9 +29,9 @@
 // WARNING: At some point, the serial monitor will no longer be able to keep up with the clock speed
 // and will start missing changes on the buses
 
-#define DEFAULT_CLOCK_SPEED_HZ 40
+#define DEFAULT_CLOCK_SPEED_HZ 1000
 
-#define SERIAL_BAUDRATE 115200
+#define SERIAL_BAUDRATE 250000
 
 typedef struct
 {
