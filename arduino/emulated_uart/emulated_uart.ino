@@ -19,12 +19,19 @@
 #define RW A2
 #define CLK A3
 
-static byte AddressBus = 0x0;
-static byte DataBus = 0x0;
+byte AddressBus = 0x0;
+byte DataBus = 0x0;
 
-static byte buffer_in = 0x0;
-static byte command_in = 0x0;
-static bool in_ready = false;
+byte buffer_in = 0x0;
+bool in_ready = false;
+
+bool submit_low = false;
+bool submit_high = false;
+
+bool is_ascii(byte b)
+{
+    return (b == 10) || (b >= 32 && b <= 127);
+}
 
 void setup()
 {
@@ -55,8 +62,6 @@ void loop()
 {
     if (!digitalRead(Y) && digitalRead(Z))
     {
-        // Chip is enabled
-
         // Read buses
         DataBus = digitalRead(D0);
         DataBus += (digitalRead(D1) << 1);
@@ -74,34 +79,39 @@ void loop()
 
         if (!digitalRead(RW))
         {
-            // CPU is writing to UART
+            // 1. Watch for a data value
 
-            // Command/data decoding
-            switch (AddressBus)
+            if (AddressBus == 0x00)
             {
-            case 0x00:
-                buffer_in = DataBus;
-                in_ready = true;
-                break;
-            case 0x01:
-                command_in = DataBus;
-            default:
-                break;
+                if (is_ascii(DataBus)) // TODO: This is hacky, binary data should be acceptable, but we're getting garbage data from somewhere
+                {
+                    buffer_in = DataBus;
+                    in_ready = true;
+                }
             }
 
-            if (in_ready && command_in == 0b01010101)
+            // 2. Watch for the command to go low and then high
+            if (in_ready)
             {
-                // Write the charater
-                // TODO: This is a hack to drop non-ASCII characters, but why are we still getting them at all?
-                if ((buffer_in >= 32 && buffer_in <= 126) || buffer_in == 10)
+                if (AddressBus == 0x01 && DataBus == 0x00)
                 {
-                    Serial.write(buffer_in);
+                    submit_low = true;
                 }
+                if (AddressBus == 0x01 && DataBus == 0x01)
+                {
+                    submit_high = true;
+                }
+            }
 
-                // Clear the buffers
-                buffer_in = 0x00;
-                command_in = 0x00;
+            // 3. Write the byte to the serial port
+            if (in_ready && submit_low && submit_high)
+            {
+                Serial.write(buffer_in);
+
+                buffer_in = 0;
                 in_ready = false;
+                submit_low = false;
+                submit_high = false;
             }
         }
         else

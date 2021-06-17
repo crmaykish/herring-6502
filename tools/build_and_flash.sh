@@ -1,13 +1,25 @@
 #!/bin/sh
 
-echo "Assembling program..."
-vasm6502_oldstyle -Fbin -dotdir asm/ram_test.s
+set -e
 
-echo "Programming EEPROM..."
+SERIAL_PORT="/dev/ttyACM0"
 
-python3 ~/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.py -d /dev/ttyACM0 -w -l 30 -f a.out
+echo "### ASSEMBLER ###"
+vasm6502_oldstyle -Fbin -dotdir $1
 
-echo "Programming finished."
+BIN_SIZE=$(wc -c < a.out)
 
-python3 ~/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.py -d /dev/ttyACM0 -r -l 30
+echo "### HEX DUMP ####"
+hexdump -C a.out
 
+echo "### FLASHING ROM ###"
+python3 /home/colin/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.py -d $SERIAL_PORT -w -l $BIN_SIZE -f a.out
+
+echo "### READ FLASH ###"
+python3 /home/colin/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.py -d $SERIAL_PORT -r -l $BIN_SIZE
+
+rm a.out
+
+echo "### DONE ###"
+
+set +e
