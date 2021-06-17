@@ -31,7 +31,7 @@
 
 #define DEFAULT_CLOCK_SPEED_HZ 40
 
-#define SERIAL_BAUDRATE 250000
+#define SERIAL_BAUDRATE 115200
 
 typedef struct
 {
@@ -74,8 +74,8 @@ void log(String s)
 
 void dump_cpu_state()
 {
-      sprintf(log_message, "%04X | %02X | %d", cpu.AddressBus, cpu.DataBus, cpu.ReadWrite);
-      log(log_message);
+    sprintf(log_message, "%04X | %02X | %d", cpu.AddressBus, cpu.DataBus, cpu.ReadWrite);
+    log(log_message);
 }
 
 void cpu_cycle(int count)
@@ -124,7 +124,7 @@ void setup()
     pinMode(RW, INPUT);
 
     // Start serial monitor
-    Serial.begin(250000);
+    Serial.begin(SERIAL_BAUDRATE);
 
     tone(CLK, cpu.ClockSpeed);
     cpu_reset();
@@ -155,32 +155,34 @@ void loop()
         }
         else if (command.equals("SLOW"))
         {
-          cpu.ClockSpeed = 40;
-          log("Clock set to 40Hz");
+            cpu.ClockSpeed = 40;
+            log("Clock set to 40Hz");
         }
         else if (command.equals("MEDIUM"))
         {
-          cpu.ClockSpeed = 500;
-          log("Clock set to 500Hz");
+            cpu.ClockSpeed = 500;
+            log("Clock set to 500Hz");
         }
         else if (command.equals("FAST"))
         {
-          cpu.ClockSpeed = 20000;
-          log("Clock set to 20kHz");
+            cpu.ClockSpeed = 20000;
+            log("Clock set to 20kHz");
         }
         else if (command.equals("TURBO"))
         {
-          cpu.ClockSpeed = 100000;
-          log("Clock set to 100kHz");
+            cpu.ClockSpeed = 100000;
+            log("Clock set to 100kHz");
         }
         else if (command.equals("MAX"))
         {
-          cpu.ClockSpeed = 500000;
-          log("Clock set to 500kHz");
+            cpu.ClockSpeed = 500000;
+            log("Clock set to 500kHz");
         }
         else if (!cpu.Running)
         {
             cpu_cycle(1);
+
+            // Print the buses after each cycle when single-stepping
             dump_cpu_state();
         }
     }
@@ -188,6 +190,11 @@ void loop()
     if (cpu.Running)
     {
         cpu_cycle(0);
-        dump_cpu_state();
+
+        if (cpu.AddressBus != cpu.PrevAddressBus || cpu.DataBus != cpu.PrevDataBus)
+        {
+            // Only print the buses if something has changed
+            dump_cpu_state();
+        }
     }
 }
