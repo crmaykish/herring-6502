@@ -1,5 +1,5 @@
 /**
- * @file herring_monitor.ino
+ * @file bus_mon.ino
  * @author Colin Maykish
  * @brief Serial Monitor for the Herring 6502 computer system
  * Reads the data and address buses and controls the clock and reset pins for the 6502
