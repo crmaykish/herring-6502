@@ -70,6 +70,6 @@ lcd_print:
     sta LCD_CTRL
     rts
 
-    .org RESET_VECTOR
-    .word ROM_START
-    .word $0000
+    ; .org RESET_VECTOR
+    ; .word ROM_START
+    ; .word $0000
