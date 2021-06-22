@@ -23,6 +23,8 @@ void setup()
     cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
     cpu_6502_reset(&cpu);
     cpu_6502_run(&cpu);
+
+    log("Monitor Ready.");
 }
 
 void loop()
@@ -43,31 +45,32 @@ void loop()
         }
         else if (command.equals("RESET"))
         {
+            log("Reset");
             cpu_6502_reset(&cpu);
         }
         else if (command.equals("SLOW"))
         {
-            cpu.ClockSpeed = 40;
+            cpu_6502_set_clock(&cpu, 40);
             log("Clock set to 40Hz");
         }
         else if (command.equals("MEDIUM"))
         {
-            cpu.ClockSpeed = 500;
+            cpu_6502_set_clock(&cpu, 500);
             log("Clock set to 500Hz");
         }
         else if (command.equals("FAST"))
         {
-            cpu.ClockSpeed = 20000;
+            cpu_6502_set_clock(&cpu, 20000);
             log("Clock set to 20kHz");
         }
         else if (command.equals("TURBO"))
         {
-            cpu.ClockSpeed = 100000;
+            cpu_6502_set_clock(&cpu, 100000);
             log("Clock set to 100kHz");
         }
         else if (command.equals("MAX"))
         {
-            cpu.ClockSpeed = 500000;
+            cpu_6502_set_clock(&cpu, 500000);
             log("Clock set to 500kHz");
         }
         else if (!cpu.Running)
@@ -76,6 +79,7 @@ void loop()
 
             // Print the buses after each cycle when single-stepping
             cpu_6502_dump(&cpu, log_message);
+            log(log_message);
         }
     }
 
@@ -89,6 +93,7 @@ void loop()
         {
             // Only print the buses if something has changed
             cpu_6502_dump(&cpu, log_message);
+            log(log_message);
         }
     }
 }
