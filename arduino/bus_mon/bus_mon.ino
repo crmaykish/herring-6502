@@ -10,47 +10,61 @@
  */
 
 // Pin Definitions
-#define PORT_ADDR_HIGH PORTB
-#define PORT_ADDR_LOW PORTA
-#define PORT_DATA PORTC
+#define PORT_ADDR_HIGH PORTA
+#define PORT_ADDR_LOW PORTC
+#define PORT_DATA PORTF
+#define PORT_CTRL PORTK
 
-#define PIN_ADDR_HIGH PINB
-#define PIN_ADDR_LOW PINA
-#define PIN_DATA PINC
+#define PIN_ADDR_HIGH PINA
+#define PIN_ADDR_LOW PINC
+#define PIN_DATA PINF
+#define PIN_CTRL PINK
 
-#define DDR_ADDR_HIGH DDRB
-#define DDR_ADDR_LOW DDRA
-#define DDR_DATA DDRC
+#define DDR_ADDR_HIGH DDRA
+#define DDR_ADDR_LOW DDRC
+#define DDR_DATA DDRF
+#define DDR_CTRL DDRK
 
-#define RST 12
-#define CLK 13
-#define RW 14
+#define RST_OUT 13
+#define CLK_OUT 11
+
+// Control flag indices
+#define RESB_IN 7
+#define RDY_IN 6
+#define IRQB_IN 5
+#define PHI2_IN 4
+#define MLB_IN 3
+#define NMIB_IN 2
+#define SYNC_IN 1
+#define RWB_IN 0
 
 // WARNING: At some point, the serial monitor will no longer be able to keep up with the clock speed
 // and will start missing changes on the buses
 
 #define DEFAULT_CLOCK_SPEED_HZ 40
 
-#define SERIAL_BAUDRATE 250000
+#define SERIAL_BAUDRATE 115200
 
 typedef struct
 {
     bool Running;
-    bool ReadWrite;
     uint16_t AddressBus;
     uint16_t PrevAddressBus;
     uint8_t DataBus;
     uint8_t PrevDataBus;
+    uint8_t PrevControlFlags;
+    uint8_t ControlFlags;
     unsigned int ClockSpeed;
 } CPU_6502_t;
 
 static CPU_6502_t cpu = {
     .Running = true,
-    .ReadWrite = false,
     .AddressBus = 0x0000,
     .PrevAddressBus = 0x0000,
     .DataBus = 0x00,
     .PrevDataBus = 0x00,
+    .PrevControlFlags = 0x00,
+    .ControlFlags = 0x00,
     .ClockSpeed = DEFAULT_CLOCK_SPEED_HZ};
 
 uint8_t reverse_bits(uint8_t b)
@@ -74,7 +88,17 @@ void log(String s)
 
 void dump_cpu_state()
 {
-    sprintf(log_message, "%04X | %02X | %d", cpu.AddressBus, cpu.DataBus, cpu.ReadWrite);
+    sprintf(log_message, "%04X | %02X | %d%d%d%d%d%d%d%d",
+            cpu.AddressBus,
+            cpu.DataBus,
+            (cpu.ControlFlags & 0b10000000) >> 7,
+            (cpu.ControlFlags & 0b1000000) >> 6,
+            (cpu.ControlFlags & 0b100000) >> 5,
+            (cpu.ControlFlags & 0b10000) >> 4,
+            (cpu.ControlFlags & 0b1000) >> 3,
+            (cpu.ControlFlags & 0b100) >> 2,
+            (cpu.ControlFlags & 0b10) >> 1,
+            cpu.ControlFlags & 0b1);
     log(log_message);
 }
 
@@ -82,51 +106,51 @@ void cpu_cycle(int count)
 {
     for (int i = 0; i < count; i++)
     {
-        digitalWrite(CLK, LOW);
+        digitalWrite(CLK_OUT, LOW);
         delay(10);
-        digitalWrite(CLK, HIGH);
+        digitalWrite(CLK_OUT, HIGH);
         delay(10);
     }
 
     cpu.PrevAddressBus = cpu.AddressBus;
     cpu.PrevDataBus = cpu.DataBus;
+    cpu.PrevControlFlags = cpu.ControlFlags;
 
     // Read the CPU buses
-    cpu.AddressBus = (reverse_bits(PIN_ADDR_HIGH) << 8) + reverse_bits(PIN_ADDR_LOW);
-    cpu.DataBus = reverse_bits(PIN_DATA);
-    cpu.ReadWrite = digitalRead(RW);
+    cpu.AddressBus = (reverse_bits(PIN_ADDR_HIGH) << 8) + PIN_ADDR_LOW;
+    cpu.DataBus = PIN_DATA;
+    cpu.ControlFlags = PIN_CTRL;
 }
 
 void cpu_reset()
 {
     log("Resetting 65C02...");
-    digitalWrite(RST, LOW);
+    digitalWrite(RST_OUT, LOW);
     delay(100);
     cpu_cycle(1);
-    digitalWrite(RST, HIGH);
+    digitalWrite(RST_OUT, HIGH);
     delay(100);
 }
 
 void setup()
 {
     // Control Pins
-    pinMode(CLK, OUTPUT);
-    pinMode(RST, OUTPUT);
-    pinMode(RW, INPUT);
+    pinMode(CLK_OUT, OUTPUT);
+    pinMode(RST_OUT, OUTPUT);
 
-    // Set address and data buses as inputs
+    // Set address, data, and control buses to inputs
     DDR_ADDR_HIGH |= 0x00;
     DDR_ADDR_LOW |= 0x00;
     DDR_DATA |= 0x00;
+    DDR_CTRL |= 0x00;
 
-    pinMode(RST, OUTPUT);
-    pinMode(CLK, OUTPUT);
-    pinMode(RW, INPUT);
+    pinMode(RST_OUT, OUTPUT);
+    pinMode(CLK_OUT, OUTPUT);
 
     // Start serial monitor
     Serial.begin(SERIAL_BAUDRATE);
 
-    tone(CLK, cpu.ClockSpeed);
+    tone(CLK_OUT, cpu.ClockSpeed);
     cpu_reset();
 }
 
@@ -140,14 +164,14 @@ void loop()
         {
             log("Run");
             cpu.Running = true;
-            tone(CLK, cpu.ClockSpeed);
+            tone(CLK_OUT, cpu.ClockSpeed);
         }
         else if (command.equals("STOP"))
         {
             log("Stop");
             cpu.Running = false;
-            noTone(CLK);
-            digitalWrite(CLK, HIGH);
+            noTone(CLK_OUT);
+            digitalWrite(CLK_OUT, HIGH);
         }
         else if (command.equals("RESET"))
         {
@@ -191,7 +215,9 @@ void loop()
     {
         cpu_cycle(0);
 
-        if (cpu.AddressBus != cpu.PrevAddressBus || cpu.DataBus != cpu.PrevDataBus)
+        if (cpu.AddressBus != cpu.PrevAddressBus ||
+            cpu.DataBus != cpu.PrevDataBus ||
+            cpu.ControlFlags != cpu.PrevControlFlags)
         {
             // Only print the buses if something has changed
             dump_cpu_state();
