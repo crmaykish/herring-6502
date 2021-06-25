@@ -5,10 +5,10 @@ set -e
 SERIAL_PORT="/dev/ttyACM0"
 
 echo "### ASSEMBLER ###"
-vasm6502_oldstyle -Fbin -dotdir $1
+~/vasm6502_oldstyle -Fbin -dotdir $1
 
 BIN_SIZE=$(wc -c < a.out)
-ROM_START=49152
+ROM_START=49152 # 0xC000
 
 echo "### HEX DUMP ####"
 hexdump -C a.out
