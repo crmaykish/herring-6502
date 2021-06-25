@@ -74,15 +74,15 @@ void cpu_6502_set_clock(CPU_6502_t *cpu, unsigned int clock_speed)
 
 void cpu_6502_dump(CPU_6502_t *cpu, char *buffer)
 {
-    sprintf(buffer, "%04X | %02X | %d%d%d%d%d%d%d%d",
+    sprintf(buffer, "%04X | %02X | %c",
             cpu->AddressBus,
             cpu->DataBus,
-            (cpu->ControlFlags & (1 << 7)) >> 7,
-            (cpu->ControlFlags & (1 << 6)) >> 6,
-            (cpu->ControlFlags & (1 << 5)) >> 5,
-            (cpu->ControlFlags & (1 << 4)) >> 4,
-            (cpu->ControlFlags & (1 << 3)) >> 3,
-            (cpu->ControlFlags & (1 << 2)) >> 2,
-            (cpu->ControlFlags & (1 << 1)) >> 1,
-            cpu->ControlFlags & 1);
+//            (cpu->ControlFlags & (1 << 7)) >> 7,
+//            (cpu->ControlFlags & (1 << 6)) >> 6,
+//            (cpu->ControlFlags & (1 << 5)) >> 5,
+//            (cpu->ControlFlags & (1 << 4)) >> 4,
+//            (cpu->ControlFlags & (1 << 3)) >> 3,
+//            (cpu->ControlFlags & (1 << 2)) >> 2,
+//            (cpu->ControlFlags & (1 << 1)) >> 1,
+            (cpu->ControlFlags & 1) ? 'R' : 'W');
 }
