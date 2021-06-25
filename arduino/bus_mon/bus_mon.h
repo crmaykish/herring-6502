@@ -33,7 +33,7 @@
 #define SYNC_IN 1
 #define RWB_IN 0
 
-#define DEFAULT_CLOCK_SPEED_HZ 500
+#define DEFAULT_CLOCK_SPEED_HZ 40
 
 #define SERIAL_BAUDRATE 115200
 
