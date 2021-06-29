@@ -23,6 +23,8 @@
 #define RST_OUT 13
 #define CLK_OUT 11
 #define BE_OUT 48
+#define RWB_OUT A8
+#define RDY_OUT A14
 
 #define SD_SELECT 49
 
@@ -37,7 +39,7 @@
 // #define SYNC_IN 1
 // #define RWB_IN 0
 
-#define RWB_OUT A8
+
 
 #define DEFAULT_CLOCK_SPEED_HZ 40
 

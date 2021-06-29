@@ -172,12 +172,12 @@ uint8_t read_ram(uint16_t addr)
     DDR_ADDR_HIGH = 0xFF;
     DDR_ADDR_LOW = 0xFF;
 
-    delay(10);
+    // delay(10);
 
     PORT_ADDR_LOW = (addr & 0xFF);
     PORT_ADDR_HIGH = reverse_bits((addr & 0xFF00) >> 8);
 
-    delay(10);
+    // delay(10);
     return PIN_DATA;
 }
 
@@ -190,24 +190,36 @@ void write_ram(uint16_t addr, uint8_t val)
     DDR_ADDR_HIGH = 0xFF;
     DDR_ADDR_LOW = 0xFF;
 
-    // Set data bus
-    PORT_DATA = val;
-
-    delay(20);
-
-    digitalWrite(CLK_OUT, HIGH);
-    digitalWrite(RWB_OUT, LOW);
-    delay(20);
-
-    // Set address bus
+    // Set address bus value
     PORT_ADDR_LOW = (addr & 0xFF);
     PORT_ADDR_HIGH = reverse_bits((addr & 0xFF00) >> 8);
 
-    delay(20);
+    // Set data bus value
+    PORT_DATA = val;
 
+    // delay(20);
+
+    digitalWrite(CLK_OUT, HIGH);
+    digitalWrite(RWB_OUT, LOW);
+    // delay(20);
+
+    digitalWrite(CLK_OUT, LOW);
     digitalWrite(RWB_OUT, HIGH);
-    delay(10);
+    // delay(10);
+
+    // Set data bus to input
+    DDR_DATA = 0x00;
+
+    //Set address bus to input
+    DDR_ADDR_HIGH = 0x00;
+    DDR_ADDR_LOW = 0x00;
 }
+
+// TODO: still some problems with writing to the RAM. Seems like the processor is getting in the way. BE and RDY don't seem to work as expected
+// Maybe just put a mosfet on the CPU's VCC pin
+// Probably also some issues with delays and pinmodes on the buses. That logic is a bit of a mess
+// Pinmodes are probably not all correct and we're getting weird floating values
+// This whole approach is kind of a hack anyway. Just get a serial monitor running on the CPU and we don't have to do any of this Arduino nonsense!
 
 void setup()
 {
@@ -218,6 +230,9 @@ void setup()
     // BUS ENABLE OFF
     pinMode(BE_OUT, OUTPUT);
     digitalWrite(BE_OUT, LOW);
+
+    pinMode(RDY_OUT, OUTPUT);
+    digitalWrite(RDY_OUT, LOW);
 
     // Start serial monitor
     Serial.begin(SERIAL_BAUDRATE);
@@ -357,12 +372,16 @@ void loop()
             DDR_ADDR_HIGH = 0x00;
             DDR_ADDR_LOW = 0x00;
 
+            pinMode(RWB_OUT, INPUT);
+            pinMode(RDY_OUT, INPUT_PULLUP);
             digitalWrite(BE_OUT, HIGH);
+            digitalWrite(RDY_OUT, HIGH);
         }
         else if (command.equals("busoff"))
         {
             Serial.println("BE off");
             digitalWrite(BE_OUT, LOW);
+            digitalWrite(RDY_OUT, LOW);
         }
         else if (!cpu.Running)
         {
