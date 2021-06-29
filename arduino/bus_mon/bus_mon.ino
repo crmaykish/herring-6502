@@ -44,6 +44,64 @@ void list_files()
     curr.close();
 }
 
+void memclear(uint16_t addr, uint16_t bytes)
+{
+    uint16_t total_bytes = 0;
+
+    while (total_bytes <= bytes)
+    {
+        write_ram(addr + total_bytes, 0x00);
+        total_bytes++;
+    }
+
+    Serial.println("Done");
+}
+
+void memdump(uint16_t addr)
+{
+    uint16_t total_bytes = 0;
+
+    while (total_bytes < (0xFF) && addr <= 0xFFFF)
+    {
+        Serial.print(addr + total_bytes, HEX);
+        Serial.print("  ");
+
+        for (int i = 0; i < 16; i++)
+        {
+            Serial.print(read_ram(addr + total_bytes + i), HEX);
+
+            if (i == 7)
+            {
+                Serial.print("  ");
+            }
+            else
+            {
+                Serial.print(" ");
+            }
+        }
+
+        Serial.print("  |");
+
+        for (int i = 0; i < 16; i++)
+        {
+            uint8_t r = read_ram(addr + total_bytes + i);
+            if (r >= 32 && r < 127)
+            {
+                Serial.write(r);
+            }
+            else
+            {
+                Serial.print(".");
+            }
+        }
+        Serial.println("|");
+
+        total_bytes += 16;
+    }
+
+    Serial.println("Done");
+}
+
 void hexdump(String filename)
 {
     uint8_t file[16];
@@ -233,6 +291,14 @@ void loop()
 
             hexdump(filename);
         }
+        else if (command.substring(0, 7).equals("memdump"))
+        {
+            char addr[5];
+            command.substring(8, 13).toCharArray(addr, 5);
+            uint16_t A = (uint16_t)strtol(addr, NULL, 16);
+
+            memdump(A);
+        }
         else if (command.substring(0, 2).equals("rd"))
         {
             char addr[5];
@@ -261,6 +327,24 @@ void loop()
             Serial.println();
 
             write_ram(A, D);
+        }
+        else if (command.substring(0, 8).equals("memclear"))
+        {
+            char addr[5];
+            char count[5];
+            command.substring(9, 13).toCharArray(addr, 5);
+            uint16_t A = (uint16_t)strtol(addr, NULL, 16);
+
+            command.substring(14, 19).toCharArray(count, 5);
+            uint8_t D = (uint8_t)strtol(count, NULL, 16);
+
+            Serial.print("Clear: ");
+            Serial.print(D, HEX);
+            Serial.print(" bytes, starting at ");
+            Serial.print(A, HEX);
+            Serial.println();
+
+            memclear(A, D);
         }
         else if (command.equals("buson"))
         {
