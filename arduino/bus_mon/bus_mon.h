@@ -26,14 +26,16 @@
 #define SD_SELECT 49
 
 // Control flag indices
-#define RESB_IN 7
-#define RDY_IN 6
-#define IRQB_IN 5
-#define PHI2_IN 4
-#define MLB_IN 3
-#define NMIB_IN 2
-#define SYNC_IN 1
-#define RWB_IN 0
+// #define RESB_IN 7
+// #define RDY_IN 6
+// #define IRQB_IN 5
+// #define PHI2_IN 4
+// #define MLB_IN 3
+// #define NMIB_IN 2
+// #define SYNC_IN 1
+// #define RWB_IN 0
+
+#define RWB_OUT A8
 
 #define DEFAULT_CLOCK_SPEED_HZ 40
 

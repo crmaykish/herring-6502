@@ -105,18 +105,68 @@ void hexdump(String filename)
     curr.close();
 }
 
+uint8_t read_ram(uint16_t addr)
+{
+    // Set data bus to input
+    DDR_DATA = 0x00;
+
+    //Set address bus to output
+    DDR_ADDR_HIGH = 0xFF;
+    DDR_ADDR_LOW = 0xFF;
+
+    delay(10);
+
+    PORT_ADDR_LOW = (addr & 0xFF);
+    PORT_ADDR_HIGH = reverse_bits((addr & 0xFF00) >> 8);
+
+    delay(10);
+    return PIN_DATA;
+}
+
+void write_ram(uint16_t addr, uint8_t val)
+{
+    // Set data bus to output
+    DDR_DATA = 0xFF;
+
+    //Set address bus to output
+    DDR_ADDR_HIGH = 0xFF;
+    DDR_ADDR_LOW = 0xFF;
+
+    // Set data bus
+    PORT_DATA = val;
+
+    delay(20);
+
+    digitalWrite(CLK_OUT, HIGH);
+    digitalWrite(RWB_OUT, LOW);
+    delay(20);
+
+    // Set address bus
+    PORT_ADDR_LOW = (addr & 0xFF);
+    PORT_ADDR_HIGH = reverse_bits((addr & 0xFF00) >> 8);
+
+    delay(20);
+
+    digitalWrite(RWB_OUT, HIGH);
+    delay(10);
+}
+
 void setup()
 {
+    // RW set to HIGH (read)
+    pinMode(RWB_OUT, OUTPUT);
+    digitalWrite(RWB_OUT, HIGH);
+
     // Start serial monitor
     Serial.begin(SERIAL_BAUDRATE);
 
     sd_connected = SD.begin(SD_SELECT);
 
-    delay(200);
+    // delay(200);
 
-    cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
-    cpu_6502_reset(&cpu);
-    cpu_6502_run(&cpu);
+    // cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
+    // cpu_6502_reset(&cpu);
+    // cpu_6502_run(&cpu);
 
     log("Monitor Ready.");
 }
@@ -181,6 +231,35 @@ void loop()
 
             hexdump(filename);
         }
+        else if (command.substring(0, 2).equals("rd"))
+        {
+            char addr[5];
+            command.substring(3, 7).toCharArray(addr, 5);
+            uint16_t A = (uint16_t)strtol(addr, NULL, 16);
+
+            Serial.print(A, HEX);
+            Serial.print(": ");
+            Serial.print(read_ram(A), HEX);
+            Serial.println();
+        }
+        else if (command.substring(0, 2).equals("wr"))
+        {
+            char addr[5];
+            char val[3];
+            command.substring(3, 7).toCharArray(addr, 5);
+            uint16_t A = (uint16_t)strtol(addr, NULL, 16);
+
+            command.substring(8, 10).toCharArray(val, 3);
+            uint8_t D = (uint8_t)strtol(val, NULL, 16);
+
+            Serial.print("write: ");
+            Serial.print(D, HEX);
+            Serial.print(" to ");
+            Serial.print(A, HEX);
+            Serial.println();
+
+            write_ram(A, D);
+        }
         else if (!cpu.Running)
         {
             cpu_6502_cycle(&cpu, 1);
@@ -191,19 +270,19 @@ void loop()
         }
     }
 
-    if (cpu.Running)
-    {
-        cpu_6502_cycle(&cpu, 0);
+    // if (cpu.Running)
+    // {
+    //     cpu_6502_cycle(&cpu, 0);
 
-        if (cpu.AddressBus != cpu.PrevAddressBus ||
-            cpu.DataBus != cpu.PrevDataBus ||
-            cpu.ControlFlags != cpu.PrevControlFlags)
-        {
-            // Only print the buses if something has changed
-            cpu_6502_dump(&cpu, log_message);
-            log(log_message);
-        }
-    }
+    //     if (cpu.AddressBus != cpu.PrevAddressBus ||
+    //         cpu.DataBus != cpu.PrevDataBus ||
+    //         cpu.ControlFlags != cpu.PrevControlFlags)
+    //     {
+    //         // Only print the buses if something has changed
+    //         cpu_6502_dump(&cpu, log_message);
+    //         log(log_message);
+    //     }
+    // }
 }
 
 void log(String s)
