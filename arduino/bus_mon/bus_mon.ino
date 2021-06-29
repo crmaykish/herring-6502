@@ -9,16 +9,108 @@
  * @copyright Copyright (c) 2021
  */
 
+#include <SPI.h>
+#include <SD.h>
 #include "bus_mon.h"
 #include "cpu_6502.h"
 
+bool sd_connected = false;
+
 CPU_6502_t cpu = {0};
-char log_message[64] = {0};
+char log_message[256] = {0};
+
+File sd_root;
+File curr;
+
+void list_files()
+{
+    if (!sd_connected)
+    {
+        log("No SD card");
+        return;
+    }
+
+    sd_root = SD.open("/");
+    curr = sd_root.openNextFile();
+
+    while (curr)
+    {
+        Serial.println(curr.name());
+        // Serial.println(curr.size());
+        curr = sd_root.openNextFile();
+    }
+
+    sd_root.close();
+    curr.close();
+}
+
+void hexdump(String filename)
+{
+    uint8_t file[16];
+
+    if (!sd_connected)
+    {
+        log("No SD card");
+        return;
+    }
+
+    curr = SD.open(filename);
+
+    if (!curr)
+    {
+        log("No such file");
+        return;
+    }
+
+    uint16_t total_bytes = 0;
+
+    while (curr.available())
+    {
+        int b = curr.readBytes(file, 16);
+
+        Serial.print(total_bytes, HEX);
+        Serial.print("  ");
+
+        total_bytes += b;
+
+        for (int i = 0; i < b; i++)
+        {
+            Serial.print(file[i], HEX);
+            if (i == 7)
+            {
+                Serial.print("  ");
+            }
+            else
+            {
+                Serial.print(" ");
+            }
+        }
+
+        Serial.print("  |");
+
+        for (int i = 0; i < b; i++)
+        {
+            if (file[i] >= 32 && file[i] < 127)
+            {
+                Serial.write(file[i]);
+            }
+            else
+            {
+                Serial.print(".");
+            }
+        }
+        Serial.println("|");
+    }
+
+    curr.close();
+}
 
 void setup()
 {
     // Start serial monitor
     Serial.begin(SERIAL_BAUDRATE);
+
+    sd_connected = SD.begin(SD_SELECT);
 
     delay(200);
 
@@ -74,6 +166,20 @@ void loop()
         {
             cpu_6502_set_clock(&cpu, 500000);
             log("Clock set to 500kHz");
+        }
+        else if (command.equals("ls"))
+        {
+            list_files();
+        }
+        else if (command.substring(0, 7).equals("hexdump"))
+        {
+            char filename[255];
+            command.substring(8, 255 + 8).toCharArray(filename, 255);
+
+            Serial.print("Hexdump: ");
+            Serial.println(filename);
+
+            hexdump(filename);
         }
         else if (!cpu.Running)
         {

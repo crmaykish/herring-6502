@@ -23,6 +23,8 @@
 #define RST_OUT 13
 #define CLK_OUT 11
 
+#define SD_SELECT 49
+
 // Control flag indices
 #define RESB_IN 7
 #define RDY_IN 6
