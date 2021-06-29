@@ -157,15 +157,17 @@ void setup()
     pinMode(RWB_OUT, OUTPUT);
     digitalWrite(RWB_OUT, HIGH);
 
+    // BUS ENABLE OFF
+    pinMode(BE_OUT, OUTPUT);
+    digitalWrite(BE_OUT, LOW);
+
     // Start serial monitor
     Serial.begin(SERIAL_BAUDRATE);
 
     sd_connected = SD.begin(SD_SELECT);
 
-    // delay(200);
-
-    // cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
-    // cpu_6502_reset(&cpu);
+    cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
+    cpu_6502_reset(&cpu);
     // cpu_6502_run(&cpu);
 
     log("Monitor Ready.");
@@ -260,6 +262,24 @@ void loop()
 
             write_ram(A, D);
         }
+        else if (command.equals("buson"))
+        {
+            Serial.println("BE on");
+
+            // Set data bus to input
+            DDR_DATA = 0x00;
+
+            //Set address bus to input
+            DDR_ADDR_HIGH = 0x00;
+            DDR_ADDR_LOW = 0x00;
+
+            digitalWrite(BE_OUT, HIGH);
+        }
+        else if (command.equals("busoff"))
+        {
+            Serial.println("BE off");
+            digitalWrite(BE_OUT, LOW);
+        }
         else if (!cpu.Running)
         {
             cpu_6502_cycle(&cpu, 1);
@@ -270,19 +290,19 @@ void loop()
         }
     }
 
-    // if (cpu.Running)
-    // {
-    //     cpu_6502_cycle(&cpu, 0);
+    if (cpu.Running)
+    {
+        cpu_6502_cycle(&cpu, 0);
 
-    //     if (cpu.AddressBus != cpu.PrevAddressBus ||
-    //         cpu.DataBus != cpu.PrevDataBus ||
-    //         cpu.ControlFlags != cpu.PrevControlFlags)
-    //     {
-    //         // Only print the buses if something has changed
-    //         cpu_6502_dump(&cpu, log_message);
-    //         log(log_message);
-    //     }
-    // }
+        if (cpu.AddressBus != cpu.PrevAddressBus ||
+            cpu.DataBus != cpu.PrevDataBus ||
+            cpu.ControlFlags != cpu.PrevControlFlags)
+        {
+            // Only print the buses if something has changed
+            cpu_6502_dump(&cpu, log_message);
+            log(log_message);
+        }
+    }
 }
 
 void log(String s)
