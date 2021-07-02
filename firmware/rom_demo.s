@@ -1,5 +1,4 @@
-RESET_VECTOR = $FFFC
-ROM_START = $8000
+    .include herring.s
     
     .org ROM_START
 
@@ -9,6 +8,6 @@ main_loop:
     inx
     jmp main_loop
 
-    .org RESET_VECTOR
-    .word ROM_START
-    .word $0000
+    ; .org RESET_VECTOR
+    ; .word ROM_START
+    ; .word $0000

@@ -13,13 +13,13 @@ init:
     lda #$FF
     sta DDRB
 
-    lda #%00000101
+    lda #%01010101
 
 loop:
     sta PORTB
     rol
     jmp loop
 
-    .org RESET_VECTOR
-    .word ROM_START
-    .word $0000
+    ; .org RESET_VECTOR
+    ; .word ROM_START
+    ; .word $0000
