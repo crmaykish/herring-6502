@@ -164,8 +164,8 @@ void loop()
         }
         else if (command.equals("MAX"))
         {
-            cpu_6502_set_clock(&cpu, 500000);
-            log("Clock set to 500kHz");
+            cpu_6502_set_clock(&cpu, 1000000);
+            log("Clock set to 1MHz");
         }
         else if (command.equals("ls"))
         {
