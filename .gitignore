@@ -2,3 +2,7 @@
 a.out
 .vscode/arduino.json
 *.o
+*.s
+*.map
+*.lst
+*.bin

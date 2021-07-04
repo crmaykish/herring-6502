@@ -1,5 +1,5 @@
 C_SOURCES = monitor.c
-ASM_SOURCES = zeropage.asm startup.asm
+ASM_SOURCES = zeropage.asm startup.asm acia.asm
 
 %.o: %.c
 	cc65 --cpu 6502 -O -t none -o $(@:.o=.s) $<
@@ -15,3 +15,4 @@ monitor.bin: $(ASM_SOURCES:.s65=.o) $(C_SOURCES:.c=.o)
 
 clean:
 	rm -f monitor.bin *.s *.o *.lst *.map
+

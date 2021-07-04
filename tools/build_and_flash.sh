@@ -4,11 +4,10 @@ set -e
 
 SERIAL_PORT="/dev/ttyACM0"
 
-echo "### ASSEMBLING ###"
-ca65 --cpu 6502 -t none -o ${1}.o ${1}
-ld65 -C firmware/herring.cfg ${1}.o -m fw.map
+echo "### ASSEMBLER ###"
+~/vasm6502_oldstyle -Fbin -dotdir $1
 
-BIN_SIZE=$(grep -m 1 "CODE" fw.map | grep -Po 'Size=\K[^"]*' | cut -d " " -f 1)
+BIN_SIZE=$(wc -c < a.out)
 ROM_START=49152 # 0xC000
 
 echo "### HEX DUMP ####"
@@ -20,10 +19,7 @@ python3 /home/colin/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.p
 echo "### READ FLASH ###"
 python3 /home/colin/Workspace/AT28C-EEPROM-Programmer-Arduino/at28c_programmer.py -d $SERIAL_PORT -r -l $BIN_SIZE -o $ROM_START
 
-echo "### CLEANUP ###"
 rm a.out
-rm firmware/*.o
-rm fw.map
 
 echo "### DONE ###"
 

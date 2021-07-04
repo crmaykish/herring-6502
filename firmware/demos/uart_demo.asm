@@ -1,11 +1,4 @@
-    .setcpu "6502"
-    .include "herring.s"
-
-    .segment "VECTORS"
-
-    .word init
-
-    .code
+    .include "herring.asm"
 
 init:
     ; Reset ACIA
