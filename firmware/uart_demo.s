@@ -1,6 +1,11 @@
-    .include herring.s
+    .setcpu "6502"
+    .include "herring.s"
 
-    .org ROM_START
+    .segment "VECTORS"
+
+    .word init
+
+    .code
 
 init:
     ; Reset ACIA
@@ -32,3 +37,4 @@ loop:
     inx
 
     jmp loop
+    
