@@ -1,6 +1,5 @@
-.vscode/c_cpp_properties.json
+.vscode
 a.out
-.vscode/arduino.json
 *.o
 *.s
 *.map
