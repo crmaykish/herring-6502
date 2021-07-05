@@ -1,5 +1,5 @@
 C_SOURCES = monitor.c
-ASM_SOURCES = zeropage.asm startup.asm acia.asm
+ASM_SOURCES = zeropage.asm crt0.asm acia.asm via.asm
 
 VIA_DEMO_SOURCE = demos/via_demo.asm
 
@@ -13,10 +13,10 @@ VIA_DEMO_SOURCE = demos/via_demo.asm
 all: monitor.bin via_demo.bin
 
 monitor.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
-	cl65 -C herring.cfg -m herring.map -o $@ $^
+	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib
 
 via_demo.bin: $(VIA_DEMO_SOURCE:.asm=.o)
-	cl65 -C herring.cfg -m herring.map -o $@ $^
+	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib
 
 clean:
 	rm -f *.bin *.s *.o *.lst *.map

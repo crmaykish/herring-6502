@@ -1,16 +1,15 @@
-#include "acia.h"
+#include "via.h"
 
 int main()
 {
-    ACIA_Init();
+    char c = 0;
+
+    VIA_Init();
 
     for (;;)
     {
-        ACIA_Write('C');
-        ACIA_Write('o');
-        ACIA_Write('l');
-        ACIA_Write('i');
-        ACIA_Write('n');
+        VIA_Write(c);
+        c++;
     }
 
     return 0;
