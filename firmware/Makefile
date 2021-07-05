@@ -1,5 +1,5 @@
 C_SOURCES = monitor.c
-ASM_SOURCES = zeropage.asm crt0.asm acia.asm via.asm
+ASM_SOURCES = zeropage.asm crt0.asm acia.asm
 
 VIA_DEMO_SOURCE = demos/via_demo.asm
 
