@@ -14,6 +14,9 @@
 
     .word init
 
+    ; TODO: missing vectors? does that change anything?
+    ; Seems like it's randomly jumping around, maybe the ram or stack is misconfigured?
+
     .segment "STARTUP"
 
 init:

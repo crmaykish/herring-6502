@@ -1,5 +1,7 @@
     .include "herring.asm"
 
+    .org $8000
+
 init:
     ; Reset ACIA
     lda #0

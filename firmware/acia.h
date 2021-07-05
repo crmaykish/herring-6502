@@ -3,7 +3,6 @@
 
 extern void ACIA_Init();
 
-// TODO: fastcall
-extern void ACIA_Write(char c);
+extern void __fastcall__ ACIA_Write(char c);
 
 #endif

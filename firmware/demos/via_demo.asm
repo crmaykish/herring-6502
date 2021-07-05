@@ -1,25 +1,38 @@
-ROM_START = $8000
-RESET_VECTOR = $FFFC
+    .setcpu "6502"
+    
+    PORTB = $4000
+    PORTA = $4001
+    DDRB = $4002
+    DDRA = $4003
 
-PORTB = $4000
-PORTA = $4001
-DDRB = $4002
-DDRA = $4003
+    .segment "VECTORS"
 
-    .org ROM_START
+    .word nmi
+    .word reset
+    .word irq
 
-init:
+    .data
+
+    .code
+
+reset:
+    jmp main
+
+nmi:
+    rti
+
+irq:
+    rti
+
+main:
+init_via:
     ; Set all pins in port B to output
     lda #$FF
     sta DDRB
 
-    lda #%01010101
-
+    lda #%01
+    clc
 loop:
     sta PORTB
     rol
     jmp loop
-
-    ; .org RESET_VECTOR
-    ; .word ROM_START
-    ; .word $0000
