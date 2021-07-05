@@ -1,9 +1,9 @@
 #include "via.h"
 
+static unsigned char c = 0;
+
 int main()
 {
-    char c = 0;
-
     VIA_Init();
 
     for (;;)
