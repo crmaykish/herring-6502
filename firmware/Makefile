@@ -1,7 +1,5 @@
 C_SOURCES = monitor.c
-ASM_SOURCES = zeropage.asm crt0.asm acia.asm
-
-VIA_DEMO_SOURCE = demos/via_demo.asm
+ASM_SOURCES = zeropage.asm crt0.asm
 
 %.o: %.c
 	cc65 --cpu 6502 -O -t none -o $(@:.o=.s) $<
@@ -13,9 +11,6 @@ VIA_DEMO_SOURCE = demos/via_demo.asm
 all: monitor.bin via_demo.bin
 
 monitor.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
-	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib
-
-via_demo.bin: $(VIA_DEMO_SOURCE:.asm=.o)
 	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib
 
 clean:
