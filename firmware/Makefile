@@ -1,4 +1,4 @@
-C_SOURCES = monitor.c
+C_SOURCES = monitor.c acia.c
 ASM_SOURCES = zeropage.asm crt0.asm
 
 %.o: %.c
