@@ -22,8 +22,6 @@
 
 int main()
 {
-    // TODO: why do some of the stdlib calls fail? Is the cc65 lib missing something? Is my memory config messed up?
-
     unsigned addr = 0;
     unsigned char data = 0;
     char message[32] = {0};
@@ -43,53 +41,11 @@ int main()
 
         if (serial_buffer[0] == 'r' && serial_buffer[1] == 'd')
         {
-            ACIA_WriteLine("READ");
-
-            if (serial_buffer[3] > '9')
-            {
-                addr += ((serial_buffer[3] - 55) << 0xC);
-            }
-            else
-            {
-                addr += ((serial_buffer[3] - '0') << 0xC);
-            }
-
-            if (serial_buffer[4] > '9')
-            {
-                addr += ((serial_buffer[4] - 55) << 0x8);
-            }
-            else
-            {
-                addr += ((serial_buffer[4] - '0') << 0x8);
-            }
-
-            if (serial_buffer[5] > '9')
-            {
-                addr += ((serial_buffer[5] - 55) << 0x4);
-            }
-            else
-            {
-                addr += ((serial_buffer[5] - '0') << 0x4);
-            }
-
-            if (serial_buffer[6] > '9')
-            {
-                addr += (serial_buffer[6] - 55);
-            }
-            else
-            {
-                addr += (serial_buffer[6] - '0');
-            }
-
+            addr = (unsigned)strtol(serial_buffer + 2, NULL, 16);
             data = PEEK(addr);
 
-            // TODO: doesn't fully print with addresses < 0x1000, probably not clearing all of the nulls in the string
-
-            utoa(addr, message, 16);
-            message[4] = ':';
-            message[5] = ' ';
-            utoa(data, message + 6, 16);
-            message[8] = 0;
+            // Note: sprintf is pretty slow
+            sprintf(message, "%04X: %02X\n", addr, data);
 
             ACIA_WriteLine(message);
         }
