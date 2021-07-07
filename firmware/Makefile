@@ -8,7 +8,7 @@ ASM_SOURCES = zeropage.asm crt0.asm
 %.o: %.asm
 	ca65 --cpu 6502 -o $@ -l $(@:.o=.lst) $<
 
-all: monitor.bin via_demo.bin
+all: monitor.bin
 
 monitor.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
 	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib

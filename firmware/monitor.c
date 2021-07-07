@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <peekpoke.h>
 
@@ -35,8 +37,6 @@ static void ACIA_Init()
     POKE(ACIA_CONTROL, 0x1E);
 }
 
-// TODO: fast calls
-
 static void ACIA_Write(char c)
 {
     while ((PEEK(ACIA_STATUS) & 0x10) == 0)
@@ -54,15 +54,19 @@ static void ACIA_NewLine()
     ACIA_Write('\r');
 }
 
-static void ACIA_WriteLine(char *message)
+static void ACIA_WriteBuffer(char *buffer)
 {
     unsigned char i = 0;
-    while (message[i] != 0)
+    while (buffer[i] != 0)
     {
-        ACIA_Write(message[i]);
+        ACIA_Write(buffer[i]);
         i++;
     }
+}
 
+static void ACIA_WriteLine(char *message)
+{
+    ACIA_WriteBuffer(message);
     ACIA_NewLine();
 }
 
@@ -103,7 +107,9 @@ static void ACIA_ReadLine()
 
 int main()
 {
-    unsigned char i = 0;
+    unsigned addr = 0;
+    unsigned char data = 0;
+    char message[32] = {0};
 
     ACIA_Init();
 
@@ -115,24 +121,78 @@ int main()
         ACIA_Write(' ');
 
         ACIA_ReadLine();
-
         ACIA_Write('\n');
-        ACIA_WriteLine(serial_buffer);
 
-        // TODO: strncmp is blowing up
-        // if (strncmp(serial_buffer, "peek", 4))
-        // {
-        //     ACIA_WriteLine("PEEKING");
-        // }
-        // else if (strncmp(serial_buffer, "poke", 4))
-        // {
-        //     ACIA_WriteLine("POKING");
-        // }
+        if (serial_buffer[0] == 'r' && serial_buffer[1] == 'd')
+        {
+            ACIA_WriteLine("READ");
 
-        // Clear the serial buffer
+            if (serial_buffer[3] > '9')
+            {
+                addr += ((serial_buffer[3] - 55) << 0xC);
+            }
+            else
+            {
+                addr += ((serial_buffer[3] - '0') << 0xC);
+            }
+
+            if (serial_buffer[4] > '9')
+            {
+                addr += ((serial_buffer[4] - 55) << 0x8);
+            }
+            else
+            {
+                addr += ((serial_buffer[4] - '0') << 0x8);
+            }
+
+            if (serial_buffer[5] > '9')
+            {
+                addr += ((serial_buffer[5] - 55) << 0x4);
+            }
+            else
+            {
+                addr += ((serial_buffer[5] - '0') << 0x4);
+            }
+
+            if (serial_buffer[6] > '9')
+            {
+                addr += (serial_buffer[6] - 55);
+            }
+            else
+            {
+                addr += (serial_buffer[6] - '0');
+            }
+
+            data = PEEK(addr);
+
+            // TODO: doesn't fully print with addresses < 0x1000, probably not clearing all of the nulls in the string
+
+            utoa(addr, message, 16);
+            message[4] = ':';
+            message[5] = ' ';
+            utoa(data, message + 6, 16);
+            message[8] = 0;
+
+            ACIA_WriteLine(message);
+        }
+        else if (serial_buffer[0] == 'w' && serial_buffer[1] == 'r')
+        {
+            ACIA_WriteLine("WRITE");
+        }
+        else if (serial_buffer[0] == 'j' && serial_buffer[1] == 'p')
+        {
+            ACIA_WriteLine("JUMP");
+        }
+        else
+        {
+            ACIA_WriteLine("Unknown command");
+        }
+
+        // Clear the buffers
         memset(serial_buffer, 0, SERIAL_BUFFER_SIZE);
-
-        i = 0;
+        memset(message, 0, 32);
+        addr = 0;
+        data = 0;
     }
 
     return 0;
