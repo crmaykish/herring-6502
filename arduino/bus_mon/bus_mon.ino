@@ -154,8 +154,8 @@ void loop()
         }
         else if (command.equals("FAST"))
         {
-            cpu_6502_set_clock(&cpu, 20000);
-            log("Clock set to 20kHz");
+            cpu_6502_set_clock(&cpu, 50000);
+            log("Clock set to 50kHz");
         }
         else if (command.equals("TURBO"))
         {
