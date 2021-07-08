@@ -1,3 +1,4 @@
+#include <string.h>
 #include <peekpoke.h>
 #include "acia.h"
 
@@ -82,4 +83,9 @@ void ACIA_ReadLine()
 unsigned char *ACIA_GetBuffer()
 {
     return serial_buffer;
+}
+
+void ACIA_ClearBuffer()
+{
+    memset(serial_buffer, 0, SERIAL_BUFFER_SIZE);
 }

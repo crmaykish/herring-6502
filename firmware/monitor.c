@@ -20,6 +20,8 @@
 //     POKE(VIA_PORTB, c);
 // }
 
+static char program[99][40];
+
 int main()
 {
     unsigned addr = 0;
@@ -31,10 +33,15 @@ int main()
 
     ACIA_WriteLine("><(((°> Welcome to Herring 6502! ><(((°>");
 
+    ACIA_WriteLine("Initializing interpreter memory...");
+
+    memset(program, 0, sizeof(char) * 99 * 40);
+
+    ACIA_WriteLine("Ready!");
+
     for (;;)
     {
-        ACIA_Write('>');
-        ACIA_Write(' ');
+        ACIA_WriteBuffer("> ");
 
         ACIA_ReadLine();
         ACIA_Write('\n');
@@ -57,13 +64,42 @@ int main()
         {
             ACIA_WriteLine("JUMP");
         }
+        else if (serial_buffer[0] == 's' && serial_buffer[1] == 'p')
+        {
+            sprintf(message, "%d bytes", _heapmemavail());
+            ACIA_WriteLine(message);
+        }
+        else if (serial_buffer[0] >= '0' && serial_buffer[0] <= '9')
+        {
+            // Treat this as a line of code
+
+            // data is the line number
+            data = (unsigned char)strtol(serial_buffer, NULL, 10);
+
+            strncpy(program[data], serial_buffer + 2, SERIAL_BUFFER_SIZE - 3);
+        }
+        else if (serial_buffer[0] == 'p' && serial_buffer[1] == 'r')
+        {
+            // Print the program code
+            unsigned char i = 0;
+            for (i; i < 99; i++)
+            {
+                if (program[i][0] != 0)
+                {
+                    itoa(i, message, 10);
+                    ACIA_WriteBuffer(message);
+                    ACIA_Write(' ');
+                    ACIA_WriteLine(program[i]);
+                }
+            }
+        }
         else
         {
             ACIA_WriteLine("Unknown command");
         }
 
         // Clear the buffers
-        memset(serial_buffer, 0, SERIAL_BUFFER_SIZE);
+        
         memset(message, 0, 32);
         addr = 0;
         data = 0;
