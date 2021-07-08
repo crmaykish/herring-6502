@@ -1,6 +1,8 @@
 #ifndef ACIA_H
 #define ACIA_H
 
+#include <stdbool.h>
+
 #define ACIA_DATA 0x6000
 #define ACIA_STATUS 0x6001
 #define ACIA_COMMAND 0x6002
@@ -15,6 +17,7 @@ void ACIA_WriteBuffer(char *buffer);
 void ACIA_WriteLine(char *message);
 void ACIA_NewLine();
 
+bool ACIA_DataAvailable();
 unsigned char ACIA_Read();
 void ACIA_ReadLine();
 

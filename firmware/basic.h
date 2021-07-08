@@ -1,6 +1,7 @@
 #ifndef BASIC_H
 #define BASIC_H
 
+#include <stdbool.h>
 #include "herring.h"
 
 #define BASIC_MAX_LINES 0xFF
@@ -20,7 +21,14 @@ void BASIC_Erase();
 // Store a command to the program memory at line
 void BASIC_Store(byte line_num, byte *command);
 
-// Execute the stored program code
-void BASIC_Run();
+// Reset the program counter
+void BASIC_ResetPC();
+
+// Execute the BASIC instruction at the current program counter
+// and set the program counter to the appropriate next instruction
+bool BASIC_Cycle();
+
+// Interpret a single BASIC instruction
+bool BASIC_Interpret(byte *command);
 
 #endif BASIC_H

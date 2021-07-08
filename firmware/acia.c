@@ -45,6 +45,11 @@ void ACIA_WriteLine(char *message)
     ACIA_NewLine();
 }
 
+bool ACIA_DataAvailable()
+{
+    return ((PEEK(ACIA_STATUS) & 0x08) != 0);
+}
+
 unsigned char ACIA_Read()
 {
     while ((PEEK(ACIA_STATUS) & 0x08) == 0)
