@@ -94,7 +94,7 @@ bool BASIC_Interpret(byte *command)
     // Get the instruction portion of the command (everything up to the first delimiter)
     instruction = strtok(line_buffer, " +-*/=");
 
-    if (strcmp(instruction, "print") == 0)
+    if (strncmp(instruction, "print", 5) == 0)
     {
         // Print anything between double quotes
 
@@ -105,18 +105,21 @@ bool BASIC_Interpret(byte *command)
         print_function(param1);
         print_function("\n\r");
     }
-    else if (strcmp(instruction, "goto") == 0)
+    else if (strncmp(instruction, "goto", 4) == 0)
     {
         param1 = strtok(NULL, " ");
         program_counter = (byte)atoi(param1);
     }
-    else if (strcmp(instruction, "end") == 0)
+    else if (strncmp(instruction, "end", 3) == 0)
     {
         return false;
     }
     else
     {
         // TODO: Is the command a variable assignment?
+
+
+        return false;
     }
 
     return true;
