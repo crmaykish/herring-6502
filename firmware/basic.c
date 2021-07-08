@@ -1,6 +1,12 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+#include <peekpoke.h>
 #include "basic.h"
+
+// TODO: Define some constant values to interesting areas of memory that are accessible through BASIC
+// Environment variables basically
+// rom_start, ram_start, BASIC program memory start, IO device shortcuts
 
 // BASIC "Memory"
 static byte program[BASIC_MAX_LINES][BASIC_LINE_LENGTH];
@@ -85,7 +91,7 @@ bool BASIC_Interpret(byte *command)
 {
     char *instruction;
     char *param1;
-    // char *param2;
+    char *param2;
     // char *param3;
 
     // Copy command to line_buffer. Since strok messes with the strings, we don't want to change program code
@@ -100,24 +106,49 @@ bool BASIC_Interpret(byte *command)
 
         // TODO: Perform variable substitution on the params
 
-        param1 = strtok(NULL, "\"");
+        param1 = strtok(NULL, "\""); // string to print
 
         print_function(param1);
         print_function("\n\r");
     }
     else if (strncmp(instruction, "goto", 4) == 0)
     {
-        param1 = strtok(NULL, " ");
+        param1 = strtok(NULL, " "); // line number
         program_counter = (byte)atoi(param1);
     }
     else if (strncmp(instruction, "end", 3) == 0)
     {
         return false;
     }
+    else if (strncmp(instruction, "peek", 4) == 0)
+    {
+        word addr;
+        byte data;
+
+        param1 = strtok(NULL, " "); // memory address in hex
+
+        addr = (word)strtol(param1, NULL, 16);
+        data = PEEK(addr);
+
+        sprintf(line_buffer, "%02X\n\r", data);
+        print_function(line_buffer);
+    }
+    else if (strncmp(instruction, "poke", 4) == 0)
+    {
+        word addr;
+        byte data;
+
+        param1 = strtok(NULL, " "); // memory address in hex
+        param2 = strtok(NULL, " "); // data value in hex
+
+        addr = (word)strtol(param1, NULL, 16);
+        data = (byte)strtol(param2, NULL, 16);
+
+        POKE(addr, data);
+    }
     else
     {
         // TODO: Is the command a variable assignment?
-
 
         return false;
     }
