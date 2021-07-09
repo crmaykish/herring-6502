@@ -3,6 +3,7 @@
 #include <string.h>
 #include "herring.h"
 #include "acia.h"
+#include "via.h"
 #include "basic.h"
 
 // Message output buffer
@@ -51,6 +52,8 @@ void Parse_Command()
 void main()
 {
     command = ACIA_GetBuffer();
+
+    VIA_Init(0xFF, 0xFF);
 
     ACIA_Init();
     BASIC_Init(ACIA_WriteBuffer);

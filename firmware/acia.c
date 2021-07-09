@@ -1,5 +1,6 @@
 #include <string.h>
 #include <peekpoke.h>
+#include "herring.h"
 #include "acia.h"
 
 static unsigned char serial_buffer_idx = 0;
@@ -7,20 +8,20 @@ static unsigned char serial_buffer[SERIAL_BUFFER_SIZE];
 
 void ACIA_Init()
 {
-    POKE(ACIA_STATUS, 0x00);
-    POKE(ACIA_COMMAND, 0x0B);
-    POKE(ACIA_CONTROL, 0x1E);
+    POKE(ACIA1_STATUS, 0x00);
+    POKE(ACIA1_COMMAND, 0x0B);
+    POKE(ACIA1_CONTROL, 0x1E);
 }
 
 void ACIA_Write(char c)
 {
-    while ((PEEK(ACIA_STATUS) & 0x10) == 0)
+    while ((PEEK(ACIA1_STATUS) & 0x10) == 0)
     {
         // Wait for ACIA Tx ready flag
     }
 
     // Write the character to the ACIA
-    POKE(ACIA_DATA, c);
+    POKE(ACIA1_DATA, c);
 }
 
 void ACIA_NewLine()
@@ -47,17 +48,17 @@ void ACIA_WriteLine(char *message)
 
 bool ACIA_DataAvailable()
 {
-    return ((PEEK(ACIA_STATUS) & 0x08) != 0);
+    return ((PEEK(ACIA1_STATUS) & 0x08) != 0);
 }
 
 unsigned char ACIA_Read()
 {
-    while ((PEEK(ACIA_STATUS) & 0x08) == 0)
+    while ((PEEK(ACIA1_STATUS) & 0x08) == 0)
     {
         // Wait for ACIA Rx data
     }
 
-    return PEEK(ACIA_DATA);
+    return PEEK(ACIA1_DATA);
 }
 
 void ACIA_ReadLine()

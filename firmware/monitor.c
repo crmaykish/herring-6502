@@ -4,22 +4,6 @@
 #include <peekpoke.h>
 #include "acia.h"
 
-// #define VIA_PORTA 0x4001
-// #define VIA_PORTB 0x4000
-// #define VIA_DDRA 0x4003
-// #define VIA_DDRB 0x4002
-
-// static void VIA_Init()
-// {
-//     // Set all pins on Port B to outputs
-//     POKE(VIA_DDRB, 0xFF);
-// }
-
-// static void VIA_Write(char c)
-// {
-//     POKE(VIA_PORTB, c);
-// }
-
 static char program[99][40];
 
 int main()
