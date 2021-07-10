@@ -11,7 +11,7 @@ ASM_SOURCES = zeropage.asm crt0.asm
 all: interp.bin
 
 interp.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
-	cl65 -C herring.cfg -m herring.map -o $@ $^ herring.lib
+	cl65 --verbose -C herring.cfg -m herring.map -o $@ $^ herring.lib
 
 clean:
 	rm -f *.bin *.s *.o *.lst *.map
