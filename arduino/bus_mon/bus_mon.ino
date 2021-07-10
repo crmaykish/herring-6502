@@ -149,37 +149,13 @@ void loop()
         }
         else if (command.equals("MEDIUM"))
         {
-            cpu_6502_set_clock(&cpu, 500);
-            log("Clock set to 500Hz");
+            cpu_6502_set_clock(&cpu, 1000);
+            log("Clock set to 1000Hz");
         }
         else if (command.equals("FAST"))
         {
             cpu_6502_set_clock(&cpu, 50000);
             log("Clock set to 50kHz");
-        }
-        else if (command.equals("TURBO"))
-        {
-            cpu_6502_set_clock(&cpu, 100000);
-            log("Clock set to 100kHz");
-        }
-        else if (command.equals("MAX"))
-        {
-            cpu_6502_set_clock(&cpu, 1000000);
-            log("Clock set to 1MHz");
-        }
-        else if (command.equals("ls"))
-        {
-            list_files();
-        }
-        else if (command.substring(0, 7).equals("hexdump"))
-        {
-            char filename[255];
-            command.substring(8, 255 + 8).toCharArray(filename, 255);
-
-            Serial.print("Hexdump: ");
-            Serial.println(filename);
-
-            hexdump(filename);
         }
         else if (!cpu.Running)
         {
@@ -202,6 +178,12 @@ void loop()
             // Only print the buses if something has changed
             cpu_6502_dump(&cpu, log_message);
             log(log_message);
+
+            if (cpu.AddressBus == 0xFFFF)
+            {
+                log("BREAK");
+                cpu_6502_stop(&cpu);
+            }
         }
     }
 }

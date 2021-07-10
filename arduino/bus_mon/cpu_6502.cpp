@@ -55,10 +55,10 @@ void cpu_6502_stop(CPU_6502_t *cpu)
 void cpu_6502_reset(CPU_6502_t *cpu)
 {
     digitalWrite(cpu->ResetPin, LOW);
-    delay(100);
+    delay(200);
     cpu_6502_cycle(cpu, 1);
     digitalWrite(cpu->ResetPin, HIGH);
-    delay(100);
+    delay(200);
 }
 
 void cpu_6502_set_clock(CPU_6502_t *cpu, unsigned int clock_speed)
