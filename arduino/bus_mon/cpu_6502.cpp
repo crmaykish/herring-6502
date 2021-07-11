@@ -19,12 +19,12 @@ void cpu_6502_init(CPU_6502_t *cpu, unsigned int clock_pin, unsigned int reset_p
     DDR_CTRL |= 0x00;
 
     // Set the interupt pins to outputs
-//    DDR_CTRL |= (1 << IRQB_IN);
-//    DDR_CTRL |= (1 << NMIB_IN);
-//
-//    // Set both interupt pins high
-//    PIN_CTRL |= (1 << IRQB_IN);
-//    PIN_CTRL |= (1 << NMIB_IN);
+    DDR_CTRL |= (1 << IRQB_IN);
+    DDR_CTRL |= (1 << NMIB_IN);
+
+    // Set both interupt pins high
+    PIN_CTRL |= (1 << IRQB_IN);
+    PIN_CTRL |= (1 << NMIB_IN);
 }
 
 void cpu_6502_cycle(CPU_6502_t *cpu, unsigned int count)

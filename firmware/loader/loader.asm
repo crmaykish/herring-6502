@@ -1,20 +1,10 @@
     .setcpu "6502"
 
-    .include "acia.asm"
-    .include "via.asm"
-
     .segment "VECTORS"
 
     .word nmi
     .word reset
     .word irq
-
-; ### CONSTANTS ###
-
-; ### VARIABLES ###
-    .segment "ZEROPAGE"
-    
-; ### CODE ###
 
     .code
 
@@ -26,42 +16,32 @@ irq:
     rti
 
 main:
-    jsr via_init
-    jsr acia_init
-
-    ldx #0
-    stx serial_index
+    sei
+    jsr VIA_Init
+    jsr ACIA_Init
 
 main_loop:
-    ; check for serial input
-    jsr acia_poll_rx
-    beq no_serial_in
-    jsr store_serial
-    jsr buffer_check
+    jsr LOADER_ShowPrompt
+    jsr ACIA_Readline
+    jsr ACIA_NewLine
+    jsr ACIA_PrintLine
 
-no_serial_in:
-    stx VIA_PORTA
-    inx
+    ; TODO: Do something with the input command
+
+    jsr ACIA_ClearBuffer
 
     jmp main_loop
 
-store_serial:
-    lda ACIA_DATA
-    ldx serial_index
-    sta serial_buffer,x
-    inc serial_index
-    rts
+LOADER_ShowPrompt:
+    lda PROMPT
+    jsr ACIA_WriteByte
+    lda PROMPT+1
+    jsr ACIA_WriteByte
 
-buffer_check:
-    ldx serial_index
-    cpx #SERIAL_BUFFER_SIZE
-    bcs buf_full
-    rts
-buf_full:
-    jsr acia_write_buffer
-    jsr acia_write_newline
-    ldx #0
-    stx serial_index
-    rts
+; ### INCLUDES ### (includes at the bottom keep the reset vector consistent)
+    .include "acia.asm"
+    .include "via.asm"
 
-    
+; ### CONSTANTS ###
+; WELCOME: .byte "Herring 6502 ><(((°>", 0
+PROMPT: .byte "> ", 0

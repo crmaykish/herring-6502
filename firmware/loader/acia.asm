@@ -4,82 +4,123 @@
     ACIA_COMMAND = $DC02
     ACIA_CONTROL = $DC03
 
-    SERIAL_BUFFER_SIZE = 40
+    SERIAL_BUFFER_SIZE = 32
 
     CARRIAGE_RETURN = $0D
     LINE_FEED = $0A
 
 ; ### VARIABLES
     .segment "ZEROPAGE"
-    serial_buffer: .res SERIAL_BUFFER_SIZE
-    serial_index: .res 1
+    serialBuffer: .res SERIAL_BUFFER_SIZE
+    serialBufferIndex: .res 1
 
 ; ### SUBROUTINES ###
     .code
 
-; start the ACIA at 9600 baud
-acia_init:
+; ### PUBLIC API ###
+
+; Setup the ACIA at 9600 baud
+ACIA_Init:
     lda #$00
     sta ACIA_STATUS
     lda #$0B
     sta ACIA_COMMAND
     lda #$1E
     sta ACIA_CONTROL
-    lda #0
-    sta VIA_PORTA
-    sta VIA_PORTB
+
+    jsr ACIA_ClearBuffer
+
     rts
 
-; If ACIA Tx is ready, A is non-zero
-acia_poll_tx:
+; Read a byte from the serial port into A (blocking)
+ACIA_ReadByte:
     lda ACIA_STATUS
-    and #$10
+    and #$08
+    beq ACIA_ReadByte
+    lda ACIA_DATA
+    rts
+
+; Read into the serial buffer until a new line is seen or the max size is reached
+; Echo each byte back to the serial port
+; Note: does not store the carriage return character
+ACIA_Readline:
+    jsr ACIA_ReadByte
+    jsr ACIA_WriteByte
+    cmp #CARRIAGE_RETURN
+    beq acia_readline_done
+    jsr acia_store_byte
+    jmp ACIA_Readline
+acia_readline_done:
     rts
 
 ; Write A to the serial port (blocking)
-acia_write_blocking:
+ACIA_WriteByte:
     pha
-not_ready:
-    jsr acia_poll_tx
-    beq not_ready
+acia_tx_check:
+    lda ACIA_STATUS
+    and #$10
+    beq acia_tx_check
     pla
     sta ACIA_DATA
     rts
 
-; Write the buffer starting at A until '\n' or X bytes
-acia_write_buffer:
+; Write the entire buffer to the serial port
+ACIA_WriteBuffer:
     ldx #0
 acia_write_loop:
-    lda serial_buffer,x
-    jsr acia_write_blocking
+    lda serialBuffer,x
+    jsr ACIA_WriteByte
     inx
     cpx #SERIAL_BUFFER_SIZE
     bcc acia_write_loop
     rts
 
-; If ACIA Rx is ready, A is non-zero
-acia_poll_rx:
-    lda ACIA_STATUS
-    and #$08
+; Write the buffer as a string, ending with a newline
+ACIA_PrintLine:
+    ldx #0
+acia_printline_loop:
+    lda serialBuffer,x
+    beq acia_printline_done
+    jsr ACIA_WriteByte
+    inx
+    cpx #SERIAL_BUFFER_SIZE
+    bcc acia_printline_loop
+acia_printline_done:
+    jsr ACIA_NewLine
     rts
 
-; Read from the serial port until a byte is returned (blocking)
-acia_read_blocking:
-    jsr acia_poll_rx
-    beq acia_read_blocking
-    lda ACIA_DATA
-    rts
-
-; Read one byte from the serial port into A (non-blocking, make sure there's data there first)
-acia_read_nonblocking:
-    lda ACIA_DATA
-    rts
-
-acia_write_newline:
+; Write a newline to the serial port
+ACIA_NewLine:
     pha
     lda #LINE_FEED
-    jsr acia_write_blocking
+    jsr ACIA_WriteByte
     lda #CARRIAGE_RETURN
-    jsr acia_write_blocking
+    jsr ACIA_WriteByte
     pla
+    rts
+
+; clear the serial buffer
+ACIA_ClearBuffer:
+    pha
+    ldx #0
+    lda #0
+acia_clear_buffer_loop:
+    sta serialBuffer,x
+    inx
+    cpx #SERIAL_BUFFER_SIZE
+    bcs acia_clear_buffer_done
+    jmp acia_clear_buffer_loop
+acia_clear_buffer_done:
+    ldx #0
+    stx serialBufferIndex
+    pla
+    rts
+
+; ### PRIVATE SUBROUTINES ###
+
+; Store A into the serial buffer and increment the index
+acia_store_byte:
+    ldx serialBufferIndex
+    sta serialBuffer,x
+    inc serialBufferIndex
     rts

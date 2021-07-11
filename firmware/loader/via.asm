@@ -5,9 +5,20 @@
 
     .code
 
-; Set all the pins to output
-via_init:
+; Setup the VIA
+VIA_Init:
+    ; Set all the pins to outputs
     lda #$FF
     sta VIA_DDRA
     sta VIA_DDRB
+    jsr VIA_Clear
+    rts
+
+VIA_Clear:
+    pha
+    ; Clear all the pins
+    lda #0
+    sta VIA_PORTA
+    sta VIA_PORTB
+    pla
     rts
