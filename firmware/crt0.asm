@@ -10,14 +10,14 @@
 
 .segment "VECTORS"
 
-    .addr $FFFF
+    .addr $DEAD
     .addr _init
-    .addr $FFFF
+    .addr $BEEF
 
 .segment  "STARTUP"
 
 _init:   
-          sei
+          SEI
           LDX     #$FF                 ; Initialize stack pointer to $01FF
           TXS
           CLD                          ; Clear decimal mode
