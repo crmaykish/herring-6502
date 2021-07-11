@@ -154,8 +154,8 @@ void loop()
         }
         else if (command.equals("FAST"))
         {
-            cpu_6502_set_clock(&cpu, 50000);
-            log("Clock set to 50kHz");
+            cpu_6502_set_clock(&cpu, 100000);
+            log("Clock set to 100kHz");
         }
         else if (!cpu.Running)
         {
