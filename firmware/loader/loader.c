@@ -10,42 +10,6 @@
 
 extern void run_loaded_code();
 
-byte ACIA_Read()
-{
-    while ((peek(ACIA1_STATUS) & ACIA_READY_RX) == 0)
-    {
-    }
-
-    return peek(ACIA1_DATA);
-}
-
-void __fastcall__ ACIA_Write(char c)
-{
-    while ((peek(ACIA1_STATUS) & ACIA_READY_TX) == 0)
-    {
-        // Wait for ACIA Tx ready flag
-    }
-
-    // Write the character to the ACIA
-    poke(ACIA1_DATA, c);
-}
-
-void ACIA_NewLine()
-{
-    ACIA_Write('\n');
-    ACIA_Write('\r');
-}
-
-void __fastcall__ ACIA_WriteBuffer(char *buffer)
-{
-    unsigned char i = 0;
-    while (buffer[i] != 0)
-    {
-        ACIA_Write(buffer[i]);
-        i++;
-    }
-}
-
 int main()
 {
     word program_index = 0;

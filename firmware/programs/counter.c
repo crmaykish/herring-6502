@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "herring.h"
+#include "via.h"
 
 #define COUNTER_LIMIT 500
 

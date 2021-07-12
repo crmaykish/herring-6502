@@ -1,22 +1,7 @@
 #ifndef HERRING_H
 #define HERRING_H
 
-/* ########## MEMORY MAP ########## */
-
-// Via 1 (parallel port)
-#define VIA1_PORTB 0xC400
-#define VIA1_PORTA 0xC401
-#define VIA1_DDRB 0xC402
-#define VIA1_DDRA 0xC403
-
-// ACIA 1 (serial port)
-#define ACIA1_DATA 0xDC00
-#define ACIA1_STATUS 0xDC01
-#define ACIA1_COMMAND 0xDC02
-#define ACIA1_CONTROL 0xDC03
-
-#define ACIA_READY_RX 0x08
-#define ACIA_READY_TX 0x10
+#include <stdbool.h>
 
 /* ########## COMMANDS ########## */
 
