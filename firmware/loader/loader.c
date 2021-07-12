@@ -4,6 +4,10 @@
 #define PROGRAM_RAM_START 0x1000
 #define PROGRAM_RAM_SIZE 0xB000
 
+#define STATE_NOT_LOADING 0
+#define STATE_LOADING 1
+#define STATE_RUNNING 2
+
 extern void run_loaded_code();
 
 byte ACIA_Read()
@@ -48,8 +52,7 @@ int main()
     byte start_count = 0;
     byte end_count = 0;
     byte input = 0;
-    byte loading = 0;
-    byte running = 0;
+    byte state = STATE_NOT_LOADING;
 
     // Init VIA
     poke(VIA1_DDRA, 0xFF);
@@ -65,67 +68,74 @@ int main()
 
     ACIA_WriteBuffer("Waiting for input...\n\r");
 
-    // TODO: This is actually working, but * is valid data and it's getting ignored in the loading
-
     while (1)
     {
         input = ACIA_Read();
 
-        if (input == '*')
+        if (state == STATE_NOT_LOADING)
         {
-            start_count++;
-        }
-        else if (input == '!')
-        {
-            end_count++;
-        }
-        else
-        {
-            start_count = 0;
-            end_count = 0;
-        }
+            // Watch for start pattern
 
-        if (start_count == 3)
-        {
-            ACIA_WriteBuffer("Loading program...\n\r");
-            loading = 1;
-            running = 0;
-            start_count = 0;
-        }
-
-        if (end_count == 3)
-        {
-            loading = 0;
-            running = 1;
-            start_count = 0;
-            end_count = 0;
-        }
-
-        if (loading && input != '*' && input != '!')
-        {
-            // ACIA_Write(input);
-            // sprintf(buffer, "%d %02X\n\r", i, input);
-            // ACIA_WriteBuffer(buffer);
-
-            poke(PROGRAM_RAM_START + program_index, input);
-
-            program_index++;
-        }
-
-        else if (running)
-        {
-            int i = 0;
-            for (i; i < program_index; i++)
+            if (input == '*')
             {
-                if (peek(PROGRAM_RAM_START + i) >= 32 && peek(PROGRAM_RAM_START + i) < 127)
+                start_count++;
+
+                if (start_count == 3)
                 {
-                    ACIA_Write(peek(PROGRAM_RAM_START + i));
-                }
-                else
-                {
-                    ACIA_Write('.');
+                    state = STATE_LOADING;
+
+                    ACIA_WriteBuffer("Loading program...\n\r");
                 }
             }
+            else
+            {
+                start_count = 0;
+            }
+        }
+        else if (state == STATE_LOADING)
+        {
+            // Store incoming data
+
+            poke(PROGRAM_RAM_START + program_index, input);
+            program_index++;
+
+            // Watch for end pattern
+
+            if (input == '!')
+            {
+                end_count++;
+
+                if (end_count == 3)
+                {
+                    int i = 0;
+
+                    state = STATE_RUNNING;
+
+                    ACIA_WriteBuffer("Loading complete.\n\r");
+
+                    for (i; i < program_index; i++)
+                    {
+                        if (peek(PROGRAM_RAM_START + i) >= 32 && peek(PROGRAM_RAM_START + i) < 127)
+                        {
+                            ACIA_Write(peek(PROGRAM_RAM_START + i));
+                        }
+                        else
+                        {
+                            ACIA_Write('.');
+                        }
+                    }
+
+                    ACIA_WriteBuffer("\n\rPress enter to run.\n\r");
+                }
+            }
+            else
+            {
+                end_count = 0;
+            }
+        }
+        else if (state = STATE_RUNNING)
+        {
+            // Run the loaded program
             ACIA_WriteBuffer("\n\rRunning program!\n\r");
             run_loaded_code();
         }
