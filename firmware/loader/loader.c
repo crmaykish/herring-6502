@@ -66,7 +66,7 @@ int main()
     poke(ACIA1_COMMAND, 0x0B);
     poke(ACIA1_CONTROL, 0x1E);
 
-    ACIA_WriteBuffer("Waiting for input...\n\r");
+    ACIA_WriteBuffer("\n\rWaiting for input...\n\r");
 
     while (1)
     {
