@@ -19,9 +19,9 @@ byte ACIA_Read()
     return peek(ACIA1_DATA);
 }
 
-void ACIA_Write(char c)
+void __fastcall__ ACIA_Write(char c)
 {
-    while ((peek(ACIA1_STATUS) & 0x10) == 0)
+    while ((peek(ACIA1_STATUS) & ACIA_READY_TX) == 0)
     {
         // Wait for ACIA Tx ready flag
     }
@@ -36,7 +36,7 @@ void ACIA_NewLine()
     ACIA_Write('\r');
 }
 
-void ACIA_WriteBuffer(char *buffer)
+void __fastcall__ ACIA_WriteBuffer(char *buffer)
 {
     unsigned char i = 0;
     while (buffer[i] != 0)
@@ -111,6 +111,13 @@ int main()
 
                     state = STATE_RUNNING;
 
+                    // Clear the last three bytes of the program (!!! back to FFs)
+                    poke(PROGRAM_RAM_START + program_index - 1, 0xFF);
+                    poke(PROGRAM_RAM_START + program_index - 2, 0xFF);
+                    poke(PROGRAM_RAM_START + program_index - 3, 0xFF);
+
+                    program_index -= 3;
+
                     ACIA_WriteBuffer("Loading complete.\n\r");
 
                     for (i; i < program_index; i++)
@@ -136,7 +143,7 @@ int main()
         else if (state = STATE_RUNNING)
         {
             // Run the loaded program
-            ACIA_WriteBuffer("\n\rRunning program!\n\r");
+            ACIA_WriteBuffer("\n\rRunning program.\n\r");
             run_loaded_code();
         }
     }

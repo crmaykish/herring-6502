@@ -9,7 +9,7 @@ void cpu_6502_init(CPU_6502_t *cpu, unsigned int clock_pin, unsigned int reset_p
     cpu->ResetPin = reset_pin;
     cpu->ClockSpeed = DEFAULT_CLOCK_SPEED_HZ;
 
-    pinMode(cpu->ClockPin, OUTPUT);
+    pinMode(cpu->ClockPin, INPUT);
     pinMode(cpu->ResetPin, OUTPUT);
 
     // Set address, data, and control buses to inputs

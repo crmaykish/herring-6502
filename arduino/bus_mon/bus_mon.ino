@@ -116,7 +116,7 @@ void setup()
 
     cpu_6502_init(&cpu, CLK_OUT, RST_OUT);
     cpu_6502_reset(&cpu);
-    cpu_6502_run(&cpu);
+//    cpu_6502_run(&cpu);
 
     log("Monitor Ready.");
 }

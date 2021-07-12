@@ -8,11 +8,11 @@ ASM_SOURCES = zeropage.asm crt0.asm run.asm
 %.o: %.asm
 	ca65 --cpu 6502 -o $@ -l $(@:.o=.lst) $<
 
-all: loader
+all: loader.bin
 
-loader: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
+loader.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
 	cl65 --verbose -C loader.cfg -m herring.map -o $@ $^ loader.lib
 
 clean:
-	rm -f *.bin *.s *.o *.lst *.map loader
+	rm -f *.bin *.s *.o *.lst *.map
 

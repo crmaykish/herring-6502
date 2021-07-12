@@ -3,7 +3,7 @@
 DEVICE=${1}
 FILE=${2}
 
-SLEEP_TIME=0.1
+SLEEP_TIME=0.01
 
 echo "Sending ${FILE} to ${DEVICE}"
 
@@ -19,12 +19,12 @@ sleep $SLEEP_TIME
 INDEX=0
 FILE_SIZE=$(wc -c <${FILE})
 
-echo $FILE_SIZE
+echo "Program size: "$FILE_SIZE" bytes"
 
 while [ $INDEX -lt $FILE_SIZE ]; do
-    echo $INDEX
+    echo "Write: "$INDEX
 
-    dd if=${FILE} of=${DEVICE} bs=1 count=1 skip=$INDEX 
+    dd if=${FILE} of=${DEVICE} status=none bs=1 count=1 skip=$INDEX 
 
     INDEX=$((INDEX + 1))
 

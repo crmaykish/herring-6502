@@ -3,10 +3,13 @@ SOURCES = blinky.asm
 %.o: %.asm
 	ca65 -o $@ -l $(@:.o=.lst) $<
 
-all: blinky
+all: blinky.bin serial_demo.bin
 
-blinky: $(SOURCES:.asm=.o)
+blinky.bin: $(SOURCES:.asm=.o)
+	cl65 -C programs.cfg -t none -o $@ $^
+
+serial_demo.bin: serial_demo.asm
 	cl65 -C programs.cfg -t none -o $@ $^
 
 clean:
-	rm -f blinky *.o *.lst
+	rm -f *.o *.lst *.bin
