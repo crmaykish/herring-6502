@@ -15,6 +15,9 @@
 #define ACIA1_COMMAND 0xDC02
 #define ACIA1_CONTROL 0xDC03
 
+#define ACIA_READY_RX 0x08
+#define ACIA_READY_TX 0x10
+
 /* ########## COMMANDS ########## */
 
 #define peek(addr) (*(byte *)(addr))
