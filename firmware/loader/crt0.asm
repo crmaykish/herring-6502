@@ -10,6 +10,7 @@
 
 .segment "VECTORS"
 
+    ; TODO: fix these interupt addresses
     .addr $DEAD
     .addr _init
     .addr $BEEF
