@@ -8,9 +8,7 @@
 
 void ParseCommand(char *buffer)
 {
-    // Get the instruction portion of the command (everything up to the first delimiter)
-
-    if (strncmp(buffer, "peek", 4) == 0)
+    if (strncmp(buffer, "memdump", 7) == 0)
     {
         word addr;
         byte data;
@@ -21,11 +19,16 @@ void ParseCommand(char *buffer)
         byte index = 0;
 
         // Convert address string to int
-        strncpy(addr_s, buffer + 5, 6);
+        strncpy(addr_s, buffer + 8, 6);
         addr = atoi(addr_s);
 
         for (j; j < 8; j++)
         {
+            itoa(addr + index, addr_s, 16);
+
+            ACIA_WriteBuffer(addr_s);
+            ACIA_WriteBuffer("  ");
+
             for (i; i < 16; i++)
             {
                 data = peek(addr + index);
@@ -51,8 +54,25 @@ void ParseCommand(char *buffer)
             ACIA_NewLine();
         }
     }
-    else if (strncmp(buffer, "poke", 4) == 0)
+
+    else if (strncmp(buffer, "cls", 3) == 0)
     {
+        byte i = 0;
+
+        for (i; i < 80; i++)
+        {
+            ACIA_NewLine();
+        }
+    }
+    else if (strncmp(buffer, "free", 4) == 0)
+    {
+        size_t free_ram = _heapmaxavail();
+
+        utoa(free_ram, buffer, 10);
+
+        ACIA_WriteBuffer("free ram: ");
+        ACIA_WriteBuffer(buffer);
+        ACIA_WriteBuffer(" bytes");
     }
 }
 
