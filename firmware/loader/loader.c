@@ -1,5 +1,7 @@
-#include "herring.h"
 #include <stdio.h>
+#include "herring.h"
+#include "acia.h"
+
 
 #define PROGRAM_RAM_START 0x1000
 #define PROGRAM_RAM_SIZE 0xB000
@@ -18,19 +20,9 @@ int main()
     byte input = 0;
     byte state = STATE_NOT_LOADING;
 
-    // Init VIA
-    poke(VIA1_DDRA, 0xFF);
-    poke(VIA1_DDRB, 0xFF);
-    // Clear VIA ports
-    poke(VIA1_PORTA, 0x00);
-    poke(VIA1_PORTB, 0x00);
-
-    // Init ACIA
-    poke(ACIA1_STATUS, 0x00);
-    poke(ACIA1_COMMAND, 0x0B);
-    poke(ACIA1_CONTROL, 0x1E);
-
-    ACIA_WriteBuffer("\n\rWaiting for input...\n\r");
+    ACIA_Init();
+    
+    ACIA_WriteBuffer("\n\rReady to load program.\n\r");
 
     while (1)
     {

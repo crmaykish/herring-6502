@@ -1,4 +1,4 @@
-C_SOURCES = loader.c
+C_SOURCES = loader.c ../acia.c
 ASM_SOURCES = zeropage.asm crt0.asm run.asm
 
 %.o: %.c

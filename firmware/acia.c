@@ -4,10 +4,10 @@ void ACIA_Init()
 {
     // Reset ACIA
     poke(ACIA1_STATUS, 0x00);
-    // ?
-    poke(ACIA1_COMMAND, 0x0B);
-    // Set baudrate to 9600
-    poke(ACIA1_CONTROL, 0x1E);
+    // // RTS low, transmit interupt disabled, receiver interupt disabled, DTR low
+    poke(ACIA1_COMMAND, 0x0B); 
+    // Set baudrate to 19200, 8 data bits, 1 stop bits
+    poke(ACIA1_CONTROL, 0b00011111);
 }
 
 byte ACIA_Read()

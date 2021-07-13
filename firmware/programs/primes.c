@@ -17,8 +17,6 @@ bool isPrime(unsigned long p)
     return true;
 }
 
-// TODO: this is resetting at 1277, why?
-
 int main()
 {
     unsigned long prime = 3;
