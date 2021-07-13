@@ -1,12 +1,10 @@
 #include <stdlib.h>
-#include <stdint.h>
-#include <stdbool.h>
 #include "herring.h"
 #include "acia.h"
 
-bool isPrime(uint16_t p)
+bool isPrime(unsigned long p)
 {
-    uint16_t i = 2;
+    unsigned long i = 2;
 
     for (i; i < p / 2; i++)
     {
@@ -23,7 +21,8 @@ bool isPrime(uint16_t p)
 
 int main()
 {
-    uint16_t prime = 3;
+    unsigned long prime = 3;
+    unsigned long count = 2;
     char prime_string[11];
 
     ACIA_Init();
@@ -31,13 +30,22 @@ int main()
     ACIA_WriteBuffer("prime numbers:");
     ACIA_NewLine();
 
-    while (true)
+    // Cheat and skip calculating two
+    ACIA_WriteBuffer("1: 2");
+    ACIA_NewLine();
+
+    while (1)
     {
         if ((isPrime(prime)))
         {
+            ultoa(count, prime_string, 10);
+            ACIA_WriteBuffer(prime_string);
+            ACIA_WriteBuffer(": ");
             ultoa(prime, prime_string, 10);
             ACIA_WriteBuffer(prime_string);
             ACIA_NewLine();
+
+            count++;
         }
 
         prime += 2;
