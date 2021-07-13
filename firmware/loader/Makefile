@@ -15,4 +15,5 @@ loader.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o)
 
 clean:
 	rm -f *.bin *.s *.o *.lst *.map
+	cd ../; rm -f *.bin *.s *.o *.lst *.map
 

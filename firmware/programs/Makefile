@@ -26,4 +26,5 @@ primes.bin: $(ASM_SOURCES:.asm=.o) $(C_SOURCES:.c=.o) primes.c
 	cl65 --include-dir ../include -C programs.cfg -o $@ $^ programs.lib
 
 clean:
-	rm -f *.o *.lst *.bin *.map *.s
+	rm -f *.bin *.s *.o *.lst *.map
+	cd ../; rm -f *.bin *.s *.o *.lst *.map
