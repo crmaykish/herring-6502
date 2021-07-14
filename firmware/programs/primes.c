@@ -20,7 +20,7 @@ bool isPrime(unsigned long p)
 int main()
 {
     unsigned long prime = 3;
-    unsigned long count = 2;
+    unsigned int count = 2;
     char prime_string[11];
 
     ACIA_Init();
@@ -36,7 +36,7 @@ int main()
     {
         if ((isPrime(prime)))
         {
-            ultoa(count, prime_string, 10);
+            utoa(count, prime_string, 10);
             ACIA_WriteBuffer(prime_string);
             ACIA_WriteBuffer(": ");
             ultoa(prime, prime_string, 10);
