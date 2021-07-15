@@ -10,11 +10,11 @@ echo "Sending ${FILE} to ${DEVICE}"
 stty 19200 -F ${DEVICE}
 
 echo -en '*' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 echo -en '*' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 echo -en '*' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 
 INDEX=0
 FILE_SIZE=$(wc -c <${FILE})
@@ -36,16 +36,16 @@ while [ $INDEX -lt $FILE_SIZE ]; do
         echo -n "-"
     fi
 
-    sleep $SLEEP_TIME
+    # sleep $SLEEP_TIME
 done
 
 echo "|"
 
 echo -en '!' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 echo -en '!' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 echo -en '!' >${DEVICE}
-sleep $SLEEP_TIME
+# sleep $SLEEP_TIME
 
 echo "Done!"
