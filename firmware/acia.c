@@ -24,7 +24,7 @@ byte ACIA_ReadLine(char *buffer, byte max, bool echo)
     byte bytes_read = 0;
     byte in = 0;
 
-    while (in != '\r' && bytes_read < max)
+    while (in != 0x0A && in != 0x0D && bytes_read < max)
     {
         in = ACIA_Read();
         

@@ -3,6 +3,11 @@
 
 #include <stdbool.h>
 
+/* ########## MEMORY ########## */
+#define PROGRAM_RAM 0x1000
+#define ROM 0xE000
+#define ROM_PROGRAM (ROM + 0x25)
+
 /* ########## COMMANDS ########## */
 
 #define peek(addr) (*(byte *)(addr))

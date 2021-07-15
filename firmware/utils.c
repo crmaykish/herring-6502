@@ -32,7 +32,8 @@ word IntegerValue(char *buffer)
     // count the number of digits in the string
     while (buffer[digits] != 0 &&
            buffer[digits] != 0x0D &&
-           buffer[digits] != 0x0A)
+           buffer[digits] != 0x0A &&
+           buffer[digits] != ' ')
     {
         digits++;
     }

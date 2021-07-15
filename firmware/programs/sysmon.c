@@ -53,35 +53,45 @@ void memdump(word addr)
 
 void ParseCommand(char *buffer)
 {
+    word addr;
+    byte data;
+
+    // byte addr_s[5];
+    byte data_s[3];
+
+    char *firstParam;
+    char *secondParam;
+
+    // Isolate the parameters
+    firstParam = strchr(buffer, ' ') + 1; // Note: first param includes the second param too
+    secondParam = strchr(firstParam, ' ') + 1;
+
     if (strncmp(buffer, "memdump", 7) == 0)
     {
-        word addr;
-
-        // Convert address string to int
-        addr = atoi(buffer + 8);
-
+        addr = IntegerValue(firstParam);
         memdump(addr);
     }
     else if (strncmp(buffer, "peek", 4) == 0)
     {
-        byte addr_s[6];
-        byte data_s[3];
-        byte data;
-        word addr;
-
-        addr = IntegerValue(buffer + 5);
-
-        itoa(addr, addr_s, 16);
-
-        ACIA_WriteBuffer(addr_s);
-        ACIA_WriteBuffer(": ");
-
-        data = peek(addr);
-        itoa(data, data_s, 16);
+        addr = IntegerValue(firstParam);
+        itoa(peek(addr), data_s, 16);
         ACIA_WriteBuffer(data_s);
     }
     else if (strncmp(buffer, "poke", 4) == 0)
     {
+        addr = IntegerValue(firstParam);
+        data = IntegerValue(secondParam);
+        poke(addr, data);
+    }
+    else if (strncmp(buffer, "reset", 5) == 0)
+    {
+        // Soft reset the system monitor
+        asm("jmp %w", PROGRAM_RAM);
+    }
+    else if (strncmp(buffer, "load", 4) == 0)
+    {
+        // Reset to the ROM loader program
+        asm("jmp %w", ROM_PROGRAM);
     }
     else if (strncmp(buffer, "cls", 3) == 0)
     {
