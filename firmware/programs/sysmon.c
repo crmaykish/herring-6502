@@ -46,8 +46,32 @@ void memdump(word addr)
 
             index++;
         }
+
         i = 0;
+
+        // Write the ASCII characters
+        ACIA_WriteBuffer("  |");
+        for (i; i < 16; i++)
+        {
+            data = peek(addr + index);
+
+            if (data < 0x32 || data > 126)
+            {
+                ACIA_Write('.');
+            }
+            else
+            {
+                ACIA_Write(data);
+            }
+
+            index++;
+        }
+        
+        ACIA_Write('|');
+
         ACIA_NewLine();
+
+        i = 0;
     }
 }
 
