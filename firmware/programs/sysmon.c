@@ -25,8 +25,8 @@ void memdump(word addr, byte rows)
     {
         itoa(addr + index, addr_s, 16);
 
-        ACIA_WriteBuffer(addr_s);
-        ACIA_WriteBuffer("  ");
+        ACIA_WriteBuffer(ACIA_TERM, addr_s);
+        ACIA_WriteBuffer(ACIA_TERM, "  ");
 
         for (i = 0; i < 16; i++)
         {
@@ -35,17 +35,17 @@ void memdump(word addr, byte rows)
 
             if (data < 0x10)
             {
-                ACIA_Write('0');
+                ACIA_Write(ACIA_TERM, '0');
             }
 
-            ACIA_WriteBuffer(data_s);
+            ACIA_WriteBuffer(ACIA_TERM, data_s);
 
             if (i == 7)
             {
-                ACIA_Write(' ');
+                ACIA_Write(ACIA_TERM, ' ');
             }
 
-            ACIA_Write(' ');
+            ACIA_Write(ACIA_TERM, ' ');
 
             index++;
         }
@@ -53,26 +53,26 @@ void memdump(word addr, byte rows)
         index -= 16;
 
         // Write the ASCII characters
-        ACIA_WriteBuffer("  |");
+        ACIA_WriteBuffer(ACIA_TERM, "  |");
         for (i = 0; i < 16; i++)
         {
             data = peek(addr + index);
 
             if (data >= 32 && data < 127)
             {
-                ACIA_Write(data);
+                ACIA_Write(ACIA_TERM, data);
             }
             else
             {
-                ACIA_Write('.');
+                ACIA_Write(ACIA_TERM, '.');
             }
 
             index++;
         }
 
-        ACIA_Write('|');
+        ACIA_Write(ACIA_TERM, '|');
 
-        ACIA_NewLine();
+        ACIA_NewLine(ACIA_TERM);
     }
 }
 
@@ -101,7 +101,7 @@ void ParseCommand(char *buffer)
     {
         addr = IntegerValue(firstParam);
         itoa(peek(addr), data_s, 16);
-        ACIA_WriteBuffer(data_s);
+        ACIA_WriteBuffer(ACIA_TERM, data_s);
     }
     else if (strncmp(buffer, "poke", 4) == 0)
     {
@@ -125,7 +125,7 @@ void ParseCommand(char *buffer)
 
         for (i; i < 40; i++)
         {
-            ACIA_NewLine();
+            ACIA_NewLine(ACIA_TERM);
         }
     }
     else if (strncmp(buffer, "free", 4) == 0)
@@ -134,9 +134,9 @@ void ParseCommand(char *buffer)
 
         utoa(free_ram, buffer, 10);
 
-        ACIA_WriteBuffer("Free RAM: ");
-        ACIA_WriteBuffer(buffer);
-        ACIA_WriteBuffer(" bytes");
+        ACIA_WriteBuffer(ACIA_TERM, "Free RAM: ");
+        ACIA_WriteBuffer(ACIA_TERM, buffer);
+        ACIA_WriteBuffer(ACIA_TERM, " bytes");
     }
 }
 
@@ -144,20 +144,20 @@ int main()
 {
     char buffer[40];
 
-    ACIA_Init();
+    ACIA_Init(ACIA_TERM);
 
-    ACIA_WriteBuffer("Herring 6502 ><(((°>");
-    ACIA_NewLine();
+    ACIA_WriteBuffer(ACIA_TERM, "Herring 6502 ><(((°>");
+    ACIA_NewLine(ACIA_TERM);
 
     while (true)
     {
-        ACIA_WriteBuffer("> ");
-        ACIA_ReadLine(buffer, 39, true);
-        ACIA_NewLine();
+        ACIA_WriteBuffer(ACIA_TERM, "> ");
+        ACIA_ReadLine(ACIA_TERM, buffer, 39, true);
+        ACIA_NewLine(ACIA_TERM);
 
         ParseCommand(buffer);
 
-        ACIA_NewLine();
+        ACIA_NewLine(ACIA_TERM);
 
         memset(buffer, 0, 40);
     }

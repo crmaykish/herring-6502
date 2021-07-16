@@ -88,7 +88,7 @@ int main()
 
     srand(6161);
 
-    ACIA_Init();
+    ACIA_Init(ACIA_TERM);
 
     poke(VIA1_DDRA, 0xFF);
     poke(VIA1_DDRB, 0xFF);
@@ -97,8 +97,8 @@ int main()
 
     ClearScreen();
 
-    ACIA_WriteBuffer("Ready to play!");
-    ACIA_NewLine();
+    ACIA_WriteBuffer(ACIA_TERM, "Ready to play!");
+    ACIA_NewLine(ACIA_TERM);
 
     // Create random bubbles
     for (i = 0; i < BUBBLE_COUNT; i++)
@@ -113,7 +113,7 @@ int main()
 
         if ((peek(ACIA1_STATUS) & ACIA_READY_RX))
         {
-            char c = ACIA_Read();
+            char c = ACIA_Read(ACIA_TERM);
 
             if (c == 'w')
             {

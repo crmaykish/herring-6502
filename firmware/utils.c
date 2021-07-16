@@ -6,7 +6,7 @@ void PrintInt(word w)
 {
     char int_s[5];
     itoa(w, int_s, 16);
-    ACIA_WriteBuffer(int_s);
+    ACIA_WriteBuffer(ACIA_TERM, int_s);
 }
 
 byte HexToInt(char hex)
