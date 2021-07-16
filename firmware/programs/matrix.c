@@ -9,15 +9,6 @@
 
 #define BUBBLE_COUNT 5
 
-void Delay(word w)
-{
-    word i = 0;
-    for (i; i < w; i++)
-    {
-        asm("nop");
-    }
-}
-
 void DrawPixel(byte x, byte y)
 {
     byte x_send = 0b10000000 | (x & 0b00111111);

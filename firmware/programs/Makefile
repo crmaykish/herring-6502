@@ -1,4 +1,5 @@
 ASM_SOURCES = zeropage.asm crt0.asm
+SYSMON_ASM_SOURCES = zeropage.asm crt0.asm ../spi.asm
 
 COUNTER_SOURCES = counter.c
 PRIMES_SOURCES = primes.c ../acia.c
@@ -23,7 +24,7 @@ serial_demo.bin: serial_demo.asm
 counter.bin: $(ASM_SOURCES:.asm=.o) $(COUNTER_SOURCES:.c=.o)
 	cl65 --include-dir ../include -C programs.cfg -o $@ $^ programs.lib
 
-sysmon.bin: $(ASM_SOURCES:.asm=.o) $(SYSMON_SOURCES:.c=.o)
+sysmon.bin: $(SYSMON_ASM_SOURCES:.asm=.o) $(SYSMON_SOURCES:.c=.o)
 	cl65 --include-dir ../include -C programs.cfg -o $@ $^ programs.lib
 
 primes.bin: $(ASM_SOURCES:.asm=.o) $(PRIMES_SOURCES:.c=.o)

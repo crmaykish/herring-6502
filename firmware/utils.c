@@ -50,3 +50,13 @@ word IntegerValue(char *buffer)
 
     return total;
 }
+
+void __fastcall__ Delay(word w)
+{
+    word i = 0;
+    while (i < w)
+    {
+        asm("nop");
+        i++;
+    }
+}

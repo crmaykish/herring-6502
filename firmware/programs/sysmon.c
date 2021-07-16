@@ -3,6 +3,7 @@
 #include "herring.h"
 #include "acia.h"
 #include "via.h"
+#include "spi.h"
 #include "utils.h"
 
 // Note: global variables mess with the reset vector and everything breaks...
@@ -66,7 +67,7 @@ void memdump(word addr)
 
             index++;
         }
-        
+
         ACIA_Write('|');
 
         ACIA_NewLine();
@@ -141,10 +142,17 @@ void ParseCommand(char *buffer)
 int main()
 {
     char buffer[40];
-
-    ACIA_Init();
+    byte spi_data = 0;
 
     ACIA_WriteBuffer("Herring 6502 ><(((°>");
+    ACIA_NewLine();
+
+    SPI_Init();
+
+    spi_data = SPI_ReadByte();
+
+    ACIA_WriteBuffer("SPI Byte: ");
+    PrintInt(spi_data);
     ACIA_NewLine();
 
     while (true)
