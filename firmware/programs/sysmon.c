@@ -7,25 +7,28 @@
 
 // Note: global variables mess with the reset vector and everything breaks...
 
-void memdump(word addr)
+void memdump(word addr, byte rows)
 {
     byte data;
     char data_s[3];
     char addr_s[6];
-    byte index = 0;
+    word index = 0;
     byte i = 0;
     byte j = 0;
 
-    // TODO: write ascii after the hexdump
+    if (rows == 0)
+    {
+        rows = 8;
+    }
 
-    for (j; j < 8; j++)
+    for (j; j < rows; j++)
     {
         itoa(addr + index, addr_s, 16);
 
         ACIA_WriteBuffer(addr_s);
         ACIA_WriteBuffer("  ");
 
-        for (i; i < 16; i++)
+        for (i = 0; i < 16; i++)
         {
             data = peek(addr + index);
             itoa(data, data_s, 16);
@@ -47,31 +50,29 @@ void memdump(word addr)
             index++;
         }
 
-        i = 0;
+        index -= 16;
 
         // Write the ASCII characters
         ACIA_WriteBuffer("  |");
-        for (i; i < 16; i++)
+        for (i = 0; i < 16; i++)
         {
             data = peek(addr + index);
 
-            if (data < 0x32 || data > 126)
+            if (data >= 32 && data < 127)
             {
-                ACIA_Write('.');
+                ACIA_Write(data);
             }
             else
             {
-                ACIA_Write(data);
+                ACIA_Write('.');
             }
 
             index++;
         }
-        
+
         ACIA_Write('|');
 
         ACIA_NewLine();
-
-        i = 0;
     }
 }
 
@@ -93,7 +94,8 @@ void ParseCommand(char *buffer)
     if (strncmp(buffer, "memdump", 7) == 0)
     {
         addr = IntegerValue(firstParam);
-        memdump(addr);
+        data = IntegerValue(secondParam);
+        memdump(addr, data);
     }
     else if (strncmp(buffer, "peek", 4) == 0)
     {
