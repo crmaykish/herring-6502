@@ -2,13 +2,16 @@
 #include "herring.h"
 #include "acia.h"
 
-
 #define PROGRAM_RAM_START 0x1000
 #define PROGRAM_RAM_SIZE 0xB000
 
 #define STATE_NOT_LOADING 0
 #define STATE_LOADING 1
 #define STATE_RUNNING 2
+
+// TODO: there's an issue with this loader on branches newer than 2f4ed9390f2c7f9e09d84b928ae09e6f10093400
+// It kind of works, but it does strange things loading sysmon and the VIA doesn't seem to work
+// Probably broke something when I refactored the serial port code
 
 extern void run_loaded_code();
 
@@ -20,13 +23,13 @@ int main()
     byte input = 0;
     byte state = STATE_NOT_LOADING;
 
-    ACIA_Init();
-    
-    ACIA_WriteBuffer("\n\rReady to load program.\n\r");
+    ACIA_Init(ACIA_TERM);
+
+    ACIA_WriteBuffer(ACIA_TERM, "\n\rReady to load program.\n\r");
 
     while (1)
     {
-        input = ACIA_Read();
+        input = ACIA_Read(ACIA_TERM);
 
         if (state == STATE_NOT_LOADING)
         {
@@ -40,7 +43,7 @@ int main()
                 {
                     state = STATE_LOADING;
 
-                    ACIA_WriteBuffer("Loading program...\n\r");
+                    ACIA_WriteBuffer(ACIA_TERM, "Loading program...\n\r");
                 }
             }
             else
@@ -74,21 +77,21 @@ int main()
 
                     program_index -= 3;
 
-                    ACIA_WriteBuffer("Loading complete.\n\r");
+                    ACIA_WriteBuffer(ACIA_TERM, "Loading complete.\n\r");
 
                     for (i; i < program_index; i++)
                     {
                         if (peek(PROGRAM_RAM_START + i) >= 32 && peek(PROGRAM_RAM_START + i) < 127)
                         {
-                            ACIA_Write(peek(PROGRAM_RAM_START + i));
+                            ACIA_Write(ACIA_TERM, peek(PROGRAM_RAM_START + i));
                         }
                         else
                         {
-                            ACIA_Write('.');
+                            ACIA_Write(ACIA_TERM, '.');
                         }
                     }
 
-                    ACIA_WriteBuffer("\n\rPress enter to run.\n\r");
+                    ACIA_WriteBuffer(ACIA_TERM, "\n\rPress enter to run.\n\r");
                 }
             }
             else
@@ -99,7 +102,7 @@ int main()
         else if (state = STATE_RUNNING)
         {
             // Run the loaded program
-            ACIA_WriteBuffer("\n\rRunning program.\n\r");
+            ACIA_WriteBuffer(ACIA_TERM, "\n\rRunning program.\n\r");
             run_loaded_code();
         }
     }
