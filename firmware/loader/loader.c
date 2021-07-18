@@ -9,6 +9,10 @@
 #define STATE_LOADING 1
 #define STATE_RUNNING 2
 
+// TODO: there's an issue with this loader on branches newer than 2f4ed9390f2c7f9e09d84b928ae09e6f10093400
+// It kind of works, but it does strange things loading sysmon and the VIA doesn't seem to work
+// Probably broke something when I refactored the serial port code
+
 extern void run_loaded_code();
 
 int main()
