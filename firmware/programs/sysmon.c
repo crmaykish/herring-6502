@@ -145,7 +145,6 @@ int main()
     char buffer[40];
     byte spi_data = 0;
     size_t free_ram;
-    
 
     ACIA_Init(ACIA_TERM);
 
@@ -172,9 +171,9 @@ int main()
 
     spi_data = SPI_ReadByte();
 
-    ACIA_WriteBuffer("SPI Byte: ");
+    ACIA_WriteBuffer(ACIA_TERM, "SPI Byte: ");
     PrintInt(spi_data);
-    ACIA_NewLine();
+    ACIA_NewLine(ACIA_TERM);
 
     while (true)
     {
