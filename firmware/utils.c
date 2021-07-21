@@ -6,6 +6,10 @@ void PrintInt(word w)
 {
     char int_s[5];
     itoa(w, int_s, 16);
+    if (w < 0x10)
+    {
+        ACIA_Write(ACIA_TERM, '0');
+    }
     ACIA_WriteBuffer(ACIA_TERM, int_s);
 }
 
