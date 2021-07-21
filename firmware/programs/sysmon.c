@@ -146,6 +146,7 @@ int main()
     byte spi_data = 0;
     byte i = 0;
     byte sd_init = 0;
+    word spi_index = 0;
     size_t free_ram;
 
     ACIA_Init(ACIA_TERM);
@@ -224,6 +225,28 @@ int main()
 
     ACIA_WriteBuffer(ACIA_TERM, "SD card initialized.");
     ACIA_NewLine(ACIA_TERM);
+
+    spi_data = SPI_SendCommand(SPI_COMMAND_17);
+
+    if (spi_data == 0)
+    {
+        ACIA_WriteBuffer(ACIA_TERM, "Reading block 0 of SD card...");
+        ACIA_NewLine(ACIA_TERM);
+    }
+
+    spi_data = 0xFF;
+
+    while (spi_data != 0xFE){
+        spi_data = SPI_ReadByte();
+    }
+
+    ACIA_WriteBuffer(ACIA_TERM, "Start reading block data\r\n");
+
+    for (spi_index = 0; spi_index < 512; spi_index++)
+    {
+        spi_data = SPI_ReadByte();
+        PrintInt(spi_data);
+    }
 
     while (true)
     {
