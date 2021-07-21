@@ -147,6 +147,7 @@ int main()
     byte i = 0;
     byte sd_init = 0;
     word spi_index = 0;
+    byte *spi_block;
     size_t free_ram;
 
     ACIA_Init(ACIA_TERM);
@@ -236,17 +237,63 @@ int main()
 
     spi_data = 0xFF;
 
-    while (spi_data != 0xFE){
+    while (spi_data != 0xFE)
+    {
         spi_data = SPI_ReadByte();
     }
+
+    spi_block = (byte *)malloc(512);
+    memset(spi_block, 0, 512);
 
     ACIA_WriteBuffer(ACIA_TERM, "Start reading block data\r\n");
 
     for (spi_index = 0; spi_index < 512; spi_index++)
     {
-        spi_data = SPI_ReadByte();
-        PrintInt(spi_data);
+        spi_block[spi_index] = SPI_ReadByte();
     }
+
+    // disable SPI chip select
+    poke(0xC401, 0b000000101);
+
+    ACIA_WriteBuffer(ACIA_TERM, "First sector:\r\n");
+
+    // memdump(spi_block, 32);
+
+    ACIA_NewLine(ACIA_TERM);
+
+    ACIA_WriteBuffer(ACIA_TERM, "Read partition table: \r\n");
+
+    ACIA_WriteBuffer(ACIA_TERM, "first byte: ");
+    PrintInt(spi_block[0x1BE]);
+
+    ACIA_WriteBuffer(ACIA_TERM, ", start CHS: ");
+    PrintInt(spi_block[0x1BE + 1]);
+    PrintInt(spi_block[0x1BE + 2]);
+    PrintInt(spi_block[0x1BE + 3]);
+
+    ACIA_WriteBuffer(ACIA_TERM, ", partition type: ");
+    PrintInt(spi_block[0x1BE + 4]);
+
+    ACIA_WriteBuffer(ACIA_TERM, ", end CHS: ");
+    PrintInt(spi_block[0x1BE + 5]);
+    PrintInt(spi_block[0x1BE + 6]);
+    PrintInt(spi_block[0x1BE + 7]);
+
+    ACIA_WriteBuffer(ACIA_TERM, ", relative LBA addr: ");
+    PrintInt(spi_block[0x1BE + 8]);
+    PrintInt(spi_block[0x1BE + 9]);
+    PrintInt(spi_block[0x1BE + 10]);
+    PrintInt(spi_block[0x1BE + 11]);
+
+    ACIA_WriteBuffer(ACIA_TERM, ", sectors long: ");
+    PrintInt(spi_block[0x1BE + 12]);
+    PrintInt(spi_block[0x1BE + 13]);
+    PrintInt(spi_block[0x1BE + 14]);
+    PrintInt(spi_block[0x1BE + 15]);
+
+    ACIA_NewLine(ACIA_TERM);
+
+    // TODO: reading additional blocks doesn't work correctly, response is C1/FF garbage, probably a clock issue again
 
     while (true)
     {
