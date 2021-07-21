@@ -6,5 +6,6 @@
 extern void SPI_Init();
 extern byte SPI_ReadByte();
 extern void __fastcall__ SPI_WriteByte(byte b);
+extern byte SPI_WaitResult();
 
 #endif

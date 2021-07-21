@@ -1,56 +1,75 @@
-    .export _SPI_Init, _SPI_ReadByte, _SPI_WriteByte
+    ; Adapted from (i.e. blatantly stolen from) https://github.com/gfoot/sdcard6502
 
-    MISO = %10000000
-    MOSI = %01000000
-    SCK =  %00100000
-    CS =   %00010000
+    .export _SPI_Init, _SPI_ReadByte, _SPI_WriteByte, _SPI_WaitResult
 
-    SPI_OUTPUT_PINS = MOSI | SCK | CS
+    SPI_PORT = $C401
+    SPI_DDR = $C403
 
-    SPI_DDR = $C400
-    SPI_PORT = $C402
+    CLK = %00000001
+    MISO = %00000010
+    MOSI = %00000100
+    CS = %00001000
 
     .segment "CODE"
 
 _SPI_Init:
-    lda #SPI_OUTPUT_PINS
+    ; Set the outputs
+    lda #(CS | MOSI | CLK)
     sta SPI_DDR
-    lda #CS | MOSI
-    ldx #160               ; toggle the clock 160 times, so 80 low-high transitions
-preinitloop:
-    eor #SCK
+    lda #(CS | MOSI)
+    ldx #160
+toggle_loop:
+    eor #CLK
     sta SPI_PORT
     dex
-    bne preinitloop
-
+    bne toggle_loop
     rts
 
 _SPI_ReadByte:
-    ldx #8                      ; we'll read 8 bits
-loop:
-
-    lda #MOSI                ; enable card (CS low), set MOSI (resting state), SCK low
+    ldx #8
+readloop:
+    lda #MOSI
     sta SPI_PORT
 
-    lda #MOSI | SCK       ; toggle the clock high
+    lda #(MOSI | CLK)
     sta SPI_PORT
 
-    lda SPI_PORT                   ; read next bit
+    lda SPI_PORT
     and #MISO
 
-    clc                         ; default to clearing the bottom bit
-    beq bitnotset              ; unless MISO was set
-    sec                         ; in which case get ready to set the bottom bit
+    clc
+    beq bitnotset
+    sec
 bitnotset:
-
-    tya                         ; transfer partial result from Y
-    rol                         ; rotate carry bit into read result
-    tay                         ; save partial result back to Y
-
-    dex                         ; decrement counter
-    bne loop                   ; loop if we need to read more bits
+    tya
+    rol
+    tay
+    dex
+    bne readloop
 
     rts
 
 _SPI_WriteByte:
+    ldx #8
+
+writeloop:
+    asl
+    tay
+    lda #0
+    bcc sendbit
+    ora #MOSI
+sendbit:
+    sta SPI_PORT
+    eor #CLK
+    sta SPI_PORT
+    tya
+    dex
+    bne writeloop
+
+    rts
+
+_SPI_WaitResult:
+    jsr _SPI_ReadByte
+    cmp #$FF
+    beq _SPI_WaitResult
     rts
