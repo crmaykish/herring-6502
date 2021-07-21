@@ -145,20 +145,21 @@ int main()
     char buffer[40];
     byte spi_data = 0;
     byte i = 0;
+    byte sd_init = 0;
     size_t free_ram;
 
     ACIA_Init(ACIA_TERM);
 
-    // ACIA_WriteBuffer(ACIA_TERM, "############################################################\r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, " _    _                _                 __ _____  ___ ___  \r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "                                __/ |                       \r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "System Monitor v0.1            |___/    github.com/crmaykish\r\n");
-    // ACIA_WriteBuffer(ACIA_TERM, "############################################################\r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "############################################################\r\n");
+    ACIA_WriteBuffer(ACIA_TERM, " _    _                _                 __ _____  ___ ___  \r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "                                __/ |                       \r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "System Monitor v0.1            |___/    github.com/crmaykish\r\n");
+    ACIA_WriteBuffer(ACIA_TERM, "############################################################\r\n");
 
     free_ram = _heapmaxavail();
     utoa(free_ram, buffer, 10);
@@ -171,25 +172,57 @@ int main()
     poke(VIA1_DDRB, 0xFF);
     poke(VIA1_PORTB, 0x00);
 
+    ACIA_WriteBuffer(ACIA_TERM, "Setting up SPI...");
+    ACIA_NewLine(ACIA_TERM);
+
     // SPI Stuff
     SPI_Init();
     spi_data = SPI_ReadByte();
+    poke(0xC401, 0b00001100);
 
-    ACIA_WriteBuffer(ACIA_TERM, "init Byte: ");
+    ACIA_WriteBuffer(ACIA_TERM, "Warmup Byte: ");
     PrintInt(spi_data);
     ACIA_NewLine(ACIA_TERM);
 
-    SPI_WriteByte(0x40);
-    SPI_WriteByte(0x00);
-    SPI_WriteByte(0x00);
-    SPI_WriteByte(0x00);
-    SPI_WriteByte(0x00);
-    SPI_WriteByte(0x95);
+    spi_data = SPI_SendCommand(SPI_COMMAND_0);
 
-    spi_data = SPI_WaitResult();
-
-    ACIA_WriteBuffer(ACIA_TERM, "command Byte: ");
+    ACIA_WriteBuffer(ACIA_TERM, "CMD_0 Byte: ");
     PrintInt(spi_data);
+    ACIA_NewLine(ACIA_TERM);
+
+    spi_data = SPI_SendCommand(SPI_COMMAND_8);
+
+    // ignore the 32-bit response
+    SPI_ReadByte();
+    SPI_ReadByte();
+    SPI_ReadByte();
+    SPI_ReadByte();
+
+    ACIA_WriteBuffer(ACIA_TERM, "CMD_8 Byte: ");
+    PrintInt(spi_data);
+    ACIA_NewLine(ACIA_TERM);
+
+    while (sd_init == 0)
+    {
+        spi_data = SPI_SendCommand(SPI_COMMAND_55);
+
+        ACIA_WriteBuffer(ACIA_TERM, "CMD_55 Byte: ");
+        PrintInt(spi_data);
+        ACIA_NewLine(ACIA_TERM);
+
+        spi_data = SPI_SendCommand(SPI_COMMAND_41);
+
+        ACIA_WriteBuffer(ACIA_TERM, "CMD_41 Byte: ");
+        PrintInt(spi_data);
+        ACIA_NewLine(ACIA_TERM);
+
+        if (spi_data == 0)
+        {
+            sd_init = 1;
+        }
+    }
+
+    ACIA_WriteBuffer(ACIA_TERM, "SD card initialized.");
     ACIA_NewLine(ACIA_TERM);
 
     while (true)

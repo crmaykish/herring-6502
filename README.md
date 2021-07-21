@@ -6,49 +6,30 @@
 
 ## Boards
 
-### Motherboard
-
-- Power and main bus fed to all daughterboards (passive circuitry)
-- 5v and 3.3v regulators via raw input or 5v USB in
+### Backplane
 
 ### CPU Board
+TODO
 
-- W65C02 CPU and crystal oscillator, switch between single step and free-run modes
+### Memory
+TODO
 
-### ROM Board
+### Parallel I/O
+TODO
 
-- Holds a single 32kb EEPROM chip
-
-### RAM Board
-
-- Holds a single 32kb SRAM chip
-- Red LED turns off when writing to RAM
-
-### Display Board
-
-- Memory-mapped control of a large RGB LED matrix acting as a display
-
-### I/O Board
-
-- W65C22 VIA chip exposing two 8-bit GPIO ports
+### Serial I/O
+TODO
 
 ### Debug Board
 
-- ATmega644p MCU watching the address bus, data bus, and control signals
-- Controls the clock via serial commands
+TODO
 
 ## Memory Map
-
-| Device | Start  | End    | Bytes  | A15 | A14 | A13 | Y   | Z   |
-| ------ | ------ | ------ | ------ | --- | --- | --- | --- | --- |
-| RAM    | 0x0000 | 0x3FFF | 0x4000 | 0   | X   | X   | 0   | 0   |
-| VIA    | 0x4000 | 0x5FFF | 0x2000 | 1   | 0   | 0   | 0   | 1   |
-| Video  | 0x6000 | 0x7FFF | 0x2000 | 1   | 0   | 1   | 1   | 0   |
-| ROM    | 0x8000 | 0xFFFF | 0x8000 | 1   | 1   | X   | 1   | 1   |
+TODO
 
 ## Main Bus Pins
 
-The motherboard and daughterboards are connected with a 36 pin single-row connector. Most of these pins come directly from the 65C02. They are mapped in the following order:
+The motherboard and daughterboards are connected with a 40 pin single-row connector. Most of these pins come directly from the 65C02. They are mapped in the following order:
 
 1. VCC
 2. GND
@@ -87,10 +68,16 @@ The motherboard and daughterboards are connected with a 36 pin single-row connec
 32. NMIB
 33. SYNC
 34. RWB
-35. Y: Decoder output bit 1
-36. Z: Decoder output bit 2
 
-## Notes
+TODO: 35 - 40
 
-1. Add an AND gate to the RAM R/W pin and CLK to only write on the clock pulse (seems to be working without it at low speed, but may cause errors at full speed)
-2. Something is wrong with the high bits on VIA port A, pins are reversed or not connected or something
+## References
+
+### Inspiration
+
+1. HomeComputer 6502: https://www.grappendorf.net/projects/6502-home-computer/
+
+### Guides
+
+1. How to read SD cards with a 6502: https://github.com/gfoot/sdcard6502
+2. ACIA 6551: http://retro.hansotten.nl/6502-sbc/lee-davison-web-site/acia-6551/

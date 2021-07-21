@@ -3,7 +3,7 @@ SYSMON_ASM_SOURCES = zeropage.asm crt0.asm ../spi.asm
 
 COUNTER_SOURCES = counter.c
 PRIMES_SOURCES = primes.c ../acia.c
-SYSMON_SOURCES = sysmon.c ../acia.c ../utils.c
+SYSMON_SOURCES = sysmon.c ../acia.c ../utils.c ../spi_impl.c
 MATRIX_SOURCES = matrix.c ../acia.c ../utils.c
 
 %.o: %.c
