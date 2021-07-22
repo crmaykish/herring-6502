@@ -11,4 +11,7 @@
 #define VIA1_DDRB 0xC402
 #define VIA1_DDRA 0xC403
 
+// Set all pins to output and write 0
+void VIA_InitAll();
+
 #endif

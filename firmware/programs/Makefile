@@ -2,7 +2,7 @@ ASM_SOURCES = zeropage.asm crt0.asm
 SYSMON_ASM_SOURCES = zeropage.asm crt0.asm ../spi.asm
 
 COUNTER_SOURCES = counter.c ../acia.c
-SYSMON_SOURCES = sysmon.c ../acia.c ../utils.c ../spi_impl.c
+SYSMON_SOURCES = sysmon.c ../acia.c ../utils.c ../spi_impl.c ../via.c
 
 %.o: %.c
 	cc65 --standard cc65 --include-dir ../include --cpu 6502 -O -t none -o $(@:.o=.s) $<
