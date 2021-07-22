@@ -7,8 +7,72 @@
 #include "utils.h"
 
 // Compile time feature flags
-#define FULL_LOGO
-#define SPI
+// #define FULL_LOGO
+// #define SPI
+
+void logo();
+void spi();
+void memdump(word addr, byte rows);
+void parse_command(char *buffer);
+
+int main()
+{
+    char buffer[40];
+    byte i = 0;
+
+    byte *block = (byte *)malloc(SD_BLOCK_SIZE);
+
+    ACIA_Init(&SerialConsole);
+
+    logo();
+
+    print("Setting up VIAs...\r\n");
+    VIA_InitAll();
+
+    spi();
+
+    while (true)
+    {
+        print("> ");
+        ACIA_ReadLine(&SerialConsole, buffer, 39, true);
+        print("\r\n");
+        parse_command(buffer);
+        print("\r\n");
+    }
+
+    return 0;
+}
+
+void logo()
+{
+#ifdef FULL_LOGO
+    print("############################################################\r\n");
+    print(" _    _                _                 __ _____  ___ ___  \r\n");
+    print("| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
+    print("| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
+    print("|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
+    print("| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
+    print("|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
+    print("                                __/ |                       \r\n");
+    print("System Monitor v0.1            |___/    github.com/crmaykish\r\n");
+    print("############################################################\r\n");
+#else
+    print("Herring 6502 \r\n");
+#endif
+}
+
+void spi()
+{
+#ifdef SPI
+    print("Setting up SD card...\r\n");
+    SD_Init();
+
+    SD_ReadBlock(block, 0, 0, 0, 0);
+
+    print("Read partition table: \r\n");
+    ReadPartitionTable(block);
+#endif
+}
 
 void memdump(word addr, byte rows)
 {
@@ -66,7 +130,7 @@ void memdump(word addr, byte rows)
     }
 }
 
-void ParseCommand(char *buffer)
+void parse_command(char *buffer)
 {
     word addr;
     byte data;
@@ -105,53 +169,4 @@ void ParseCommand(char *buffer)
         // Reset to the ROM loader program
         asm("jmp %w", ROM_PROGRAM);
     }
-}
-
-int main()
-{
-    char buffer[40];
-    byte i = 0;
-
-    byte *block = (byte *)malloc(SD_BLOCK_SIZE);
-
-    ACIA_Init(&SerialConsole);
-
-#ifdef FULL_LOGO
-    print("############################################################\r\n");
-    print(" _    _                _                 __ _____  ___ ___  \r\n");
-    print("| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
-    print("| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
-    print("|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
-    print("| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
-    print("|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
-    print("                                __/ |                       \r\n");
-    print("System Monitor v0.1            |___/    github.com/crmaykish\r\n");
-    print("############################################################\r\n");
-#else
-    print("Herring 6502 \r\n");
-#endif
-
-    print("Setting up VIAs...\r\n");
-    VIA_InitAll();
-
-#ifdef SPI
-    // print("Setting up SD card...\r\n");
-    // SD_Init();
-
-    // SD_ReadBlock(block, 0, 0, 0, 0);
-
-    // print("Read partition table: \r\n");
-    // ReadPartitionTable(block);
-#endif
-
-    while (true)
-    {
-        print("> ");
-        ACIA_ReadLine(&SerialConsole, buffer, 39, true);
-        print("\r\n");
-        ParseCommand(buffer);
-        print("\r\n");
-    }
-
-    return 0;
 }
