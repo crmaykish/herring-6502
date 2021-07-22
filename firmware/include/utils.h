@@ -11,6 +11,6 @@ byte HexToInt(char hex);
 // convert a hex string to an int, e.g. "2000" => 4096
 word IntegerValue(char *buffer);
 
-void __fastcall__ Delay(word w);
+void Delay(word w);
 
 #endif

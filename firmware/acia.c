@@ -1,25 +1,26 @@
 #include "acia.h"
+#include <stdlib.h>
 
-void ACIA_Init(byte acia)
+void ACIA_Init(const ACIA_t *acia)
 {
     // Reset ACIA
-    poke(ACIA_STATUS(acia), 0x00);
+    poke(acia->Status, 0x00);
     // RTS low, transmit interupt disabled, receiver interupt disabled, DTR low
-    poke(ACIA_COMMAND(acia), 0x0B);
+    poke(acia->Command, 0x0B);
     // Set baudrate to 19200, 8 data bits, 1 stop bits
-    poke(ACIA_CONTROL(acia), 0b00011111);
+    poke(acia->Control, 0b00011111);
 }
 
-byte ACIA_Read(byte acia)
+byte ACIA_Read(const ACIA_t *acia)
 {
-    while ((peek(ACIA_STATUS(acia)) & ACIA_READY_RX) == 0)
+    while ((peek(acia->Status) & ACIA_READY_RX) == 0)
     {
     }
 
-    return peek(ACIA_DATA(acia));
+    return peek(acia->Data);
 }
 
-byte ACIA_ReadLine(byte acia, char *buffer, byte max, bool echo)
+byte ACIA_ReadLine(const ACIA_t *acia, char *buffer, byte max, bool echo)
 {
     byte bytes_read = 0;
     byte in = 0;
@@ -43,24 +44,24 @@ byte ACIA_ReadLine(byte acia, char *buffer, byte max, bool echo)
     return bytes_read;
 }
 
-void ACIA_Write(byte acia, char c)
+void ACIA_Write(const ACIA_t *acia, char c)
 {
-    while ((peek(ACIA_STATUS(acia)) & ACIA_READY_TX) == 0)
+    while ((peek(acia->Status) & ACIA_READY_TX) == 0)
     {
         // Wait for ACIA Tx ready flag
     }
 
     // Write the character to the ACIA
-    poke(ACIA_DATA(acia), c);
+    poke(acia->Data, c);
 }
 
-void ACIA_NewLine(byte acia)
+void ACIA_NewLine(const ACIA_t *acia)
 {
     ACIA_Write(acia, ASCII_NEWLINE);
     ACIA_Write(acia, ASCII_CARRIAGE_RETURN);
 }
 
-void ACIA_WriteBuffer(byte acia, char *buffer)
+void ACIA_WriteBuffer(const ACIA_t *acia, char *buffer)
 {
     unsigned char i = 0;
     while (buffer[i] != 0)
@@ -68,4 +69,25 @@ void ACIA_WriteBuffer(byte acia, char *buffer)
         ACIA_Write(acia, buffer[i]);
         i++;
     }
+}
+
+void put(char c)
+{
+    ACIA_Write(&SerialConsole, c);
+}
+
+void print(char *string)
+{
+    ACIA_WriteBuffer(&SerialConsole, string);
+}
+
+void print_hex(word w)
+{
+    char int_s[5];
+    itoa(w, int_s, 16);
+    if (w < 0x10)
+    {
+        put('0');
+    }
+    print(int_s);
 }
