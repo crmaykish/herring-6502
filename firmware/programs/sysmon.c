@@ -6,6 +6,10 @@
 #include "spi.h"
 #include "utils.h"
 
+// Compile time feature flags
+#define FULL_LOGO
+#define SPI
+
 void memdump(word addr, byte rows)
 {
     byte data;
@@ -103,39 +107,6 @@ void ParseCommand(char *buffer)
     }
 }
 
-void ReadPartitionTable(byte *block)
-{
-    print("first byte: ");
-    print_hex(block[0x1BE]);
-
-    print(", start CHS: ");
-    print_hex(block[0x1BE + 1]);
-    print_hex(block[0x1BE + 2]);
-    print_hex(block[0x1BE + 3]);
-
-    print(", partition type: ");
-    print_hex(block[0x1BE + 4]);
-
-    print(", end CHS: ");
-    print_hex(block[0x1BE + 5]);
-    print_hex(block[0x1BE + 6]);
-    print_hex(block[0x1BE + 7]);
-
-    print(", relative LBA addr: ");
-    print_hex(block[0x1BE + 8]);
-    print_hex(block[0x1BE + 9]);
-    print_hex(block[0x1BE + 10]);
-    print_hex(block[0x1BE + 11]);
-
-    print(", sectors long: ");
-    print_hex(block[0x1BE + 12]);
-    print_hex(block[0x1BE + 13]);
-    print_hex(block[0x1BE + 14]);
-    print_hex(block[0x1BE + 15]);
-
-    print("\r\n");
-}
-
 int main()
 {
     char buffer[40];
@@ -145,31 +116,33 @@ int main()
 
     ACIA_Init(&SerialConsole);
 
-    // print("############################################################\r\n");
-    // print(" _    _                _                 __ _____  ___ ___  \r\n");
-    // print("| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
-    // print("| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
-    // print("|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
-    // print("| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
-    // print("|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
-    // print("                                __/ |                       \r\n");
-    // print("System Monitor v0.1            |___/    github.com/crmaykish\r\n");
-    // print("############################################################\r\n");
-
+#ifdef FULL_LOGO
+    print("############################################################\r\n");
+    print(" _    _                _                 __ _____  ___ ___  \r\n");
+    print("| |  | |              (_)               / /| ____|/ _ \\__ \\ \r\n");
+    print("| |__| | ___ _ __ _ __ _ _ __   __ _   / /_| |__ | | | | ) |\r\n");
+    print("|  __  |/ _ \\ '__| '__| | '_ \\ / _` | | '_ \\___ \\| | | |/ / \r\n");
+    print("| |  | |  __/ |  | |  | | | | | (_| | | (_) |__) | |_| / /_ \r\n");
+    print("|_|  |_|\\___|_|  |_|  |_|_| |_|\\__, |  \\___/____/ \\___/____|\r\n");
+    print("                                __/ |                       \r\n");
+    print("System Monitor v0.1            |___/    github.com/crmaykish\r\n");
+    print("############################################################\r\n");
+#else
     print("Herring 6502 \r\n");
+#endif
 
     print("Setting up VIAs...\r\n");
     VIA_InitAll();
 
-    print("Setting up SD card...\r\n");
-    SD_Init();
+#ifdef SPI
+    // print("Setting up SD card...\r\n");
+    // SD_Init();
 
-    SD_ReadBlock(block, 0, 0, 0, 0);
+    // SD_ReadBlock(block, 0, 0, 0, 0);
 
-    print("Read partition table: \r\n");
-    ReadPartitionTable(block);
-
-    // TODO: reading additional blocks doesn't work correctly, response is C1/FF garbage, probably a clock issue again
+    // print("Read partition table: \r\n");
+    // ReadPartitionTable(block);
+#endif
 
     while (true)
     {

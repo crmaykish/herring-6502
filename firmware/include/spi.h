@@ -31,4 +31,6 @@ void SD_Init();
 
 void SD_ReadBlock(byte *block, byte b3, byte b2, byte b1, byte b0);
 
+void ReadPartitionTable(byte *block);
+
 #endif

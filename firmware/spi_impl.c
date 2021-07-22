@@ -141,3 +141,36 @@ void SD_ReadBlock(byte *block, byte b3, byte b2, byte b1, byte b0)
     // disable SPI chip select
     poke(0xC401, 0b000000101);
 }
+
+void ReadPartitionTable(byte *block)
+{
+    print("first byte: ");
+    print_hex(block[0x1BE]);
+
+    print(", start CHS: ");
+    print_hex(block[0x1BE + 1]);
+    print_hex(block[0x1BE + 2]);
+    print_hex(block[0x1BE + 3]);
+
+    print(", partition type: ");
+    print_hex(block[0x1BE + 4]);
+
+    print(", end CHS: ");
+    print_hex(block[0x1BE + 5]);
+    print_hex(block[0x1BE + 6]);
+    print_hex(block[0x1BE + 7]);
+
+    print(", relative LBA addr: ");
+    print_hex(block[0x1BE + 8]);
+    print_hex(block[0x1BE + 9]);
+    print_hex(block[0x1BE + 10]);
+    print_hex(block[0x1BE + 11]);
+
+    print(", sectors long: ");
+    print_hex(block[0x1BE + 12]);
+    print_hex(block[0x1BE + 13]);
+    print_hex(block[0x1BE + 14]);
+    print_hex(block[0x1BE + 15]);
+
+    print("\r\n");
+}
