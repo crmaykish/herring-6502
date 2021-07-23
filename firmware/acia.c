@@ -31,7 +31,7 @@ byte ACIA_ReadLine(const ACIA_t *acia, char *buffer, byte max, bool echo)
 
         if (echo)
         {
-            ACIA_Write(acia, in);
+            ACIA_Write(&SerialConsole, in);
         }
 
         buffer[bytes_read] = in;

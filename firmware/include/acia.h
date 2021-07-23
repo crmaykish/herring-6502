@@ -30,7 +30,7 @@ typedef struct
 } ACIA_t;
 
 static const ACIA_t SerialConsole = {ACIA0_DATA, ACIA0_STATUS, ACIA0_COMMAND, ACIA0_CONTROL};
-// static const ACIA_t SerialPeripheral = {ACIA1_DATA, ACIA1_STATUS, ACIA1_COMMAND, ACIA1_CONTROL};
+static const ACIA_t SerialPeripheral = {ACIA1_DATA, ACIA1_STATUS, ACIA1_COMMAND, ACIA1_CONTROL};
 
 void ACIA_Init(const ACIA_t *acia);
 byte ACIA_Read(const ACIA_t *acia);

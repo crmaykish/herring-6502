@@ -7,7 +7,7 @@
 #include "utils.h"
 
 // Compile time feature flags
-#define FULL_LOGO
+// #define FULL_LOGO
 // #define SPI
 
 void logo();
@@ -23,6 +23,7 @@ int main()
     byte *block = (byte *)malloc(SD_BLOCK_SIZE);
 
     ACIA_Init(&SerialConsole);
+    ACIA_Init(&SerialPeripheral);
 
     logo();
 
@@ -34,7 +35,7 @@ int main()
     while (true)
     {
         print("> ");
-        ACIA_ReadLine(&SerialConsole, buffer, 39, true);
+        ACIA_ReadLine(&SerialPeripheral, buffer, 39, true);
         print("\r\n");
         parse_command(buffer);
         print("\r\n");
