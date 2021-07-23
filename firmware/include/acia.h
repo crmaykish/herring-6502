@@ -2,6 +2,7 @@
 #define ACIA_H
 
 #include "herring.h"
+#include <stdbool.h>
 
 // Memory mapping
 #define ACIA0_DATA 0xDC00

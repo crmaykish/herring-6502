@@ -1,4 +1,3 @@
-#include <stdbool.h>
 #include "herring.h"
 #include "via.h"
 
@@ -9,20 +8,17 @@ int main()
     word counter = 0;
     word display = 0;
 
-    poke(VIA1_DDRA, 0xFF);
-    poke(VIA1_DDRB, 0xFF);
-    poke(VIA1_PORTA, 0x00);
-    poke(VIA1_PORTB, 0x00);
+    VIA_InitAll();
 
-    while (true)
+    while (1)
     {
         if (counter >= COUNTER_LIMIT)
         {
             // timer expired
             counter = 0;
 
-            poke(VIA1_PORTA, (display & 0xFF));
-            poke(VIA1_PORTB, (display & 0xFF00) >> 8);
+            poke(VIA0_PORTA, (display & 0xFF));
+            poke(VIA0_PORTB, (display & 0xFF00) >> 8);
             display++;
         }
         else

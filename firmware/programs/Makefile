@@ -1,7 +1,7 @@
 ASM_SOURCES = zeropage.asm crt0.asm
 SYSMON_ASM_SOURCES = zeropage.asm crt0.asm ../spi.asm
 
-COUNTER_SOURCES = counter.c ../acia.c
+COUNTER_SOURCES = counter.c ../via.c
 SYSMON_SOURCES = sysmon.c ../acia.c ../utils.c ../spi_impl.c ../via.c
 
 %.o: %.c

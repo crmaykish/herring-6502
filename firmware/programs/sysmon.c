@@ -7,7 +7,7 @@
 #include "utils.h"
 
 // Compile time feature flags
-// #define FULL_LOGO
+#define FULL_LOGO
 // #define SPI
 
 void logo();
