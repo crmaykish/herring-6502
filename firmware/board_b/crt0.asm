@@ -10,20 +10,34 @@
 
 .segment "VECTORS"
 
-    .addr bad_stuff
+    .addr nmi_handler
     .addr _init
-    .addr bad_stuff
+    .addr irq_handler
 
 .segment  "STARTUP"
 
 _init:
+    ; Set up the VIA immediately so we can display error codes
+    lda #$FF
+    sta $C002
+    sta $C003
+
     jmp start
 
-bad_stuff:
-    lda #$55
-    sta $C000
-stuck:
-    jmp stuck
+; NMIs should never happen, stop everything
+nmi_handler:
+    lda #%11110000
+    sta $C001
+    jmp error_catch
+
+; Normal interrupts should be disabled, if we see one, set the LED pattern and return
+irq_handler:
+    lda #%00000111
+    sta $C001
+    rti
+
+error_catch:
+    jmp error_catch
 
 start:
     SEI    
@@ -31,13 +45,8 @@ start:
     TXS
     CLD                          ; Clear decimal mode
 
-    ; set up the via so we can see error codes
-    lda #$FF
-    sta $C002
-    sta $C003
-
     lda #1
-    sta $C000
+    sta $C001
 
     LDA     #<(__RAM_START__ + __RAM_SIZE__)
     STA     sp
@@ -45,26 +54,26 @@ start:
     STA     sp+1
 
     lda #2
-    sta $C000
+    sta $C001
 
     ; JSR     zerobss              ; Clear BSS segment
 
     lda #3
-    sta $C000
+    sta $C001
 
     JSR     copydata             ; Initialize DATA segment
 
     lda #4
-    sta $C000
+    sta $C001
 
     JSR     initlib              ; Run constructors
 
     lda #5
-    sta $C000
+    sta $C001
 
     JSR     _main
 
     lda #6
-    sta $C000
+    sta $C001
 
-    jmp bad_stuff
+    jmp error_catch
