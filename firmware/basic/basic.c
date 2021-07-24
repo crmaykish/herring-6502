@@ -183,6 +183,17 @@ void BASIC_Parse(char * command)
     {
         // TODO: move a command to a new line
     }
+    else if (strncmp(command, "del", 3) == 0)
+    {
+        // TODO: need to move the tokenization up a level.
+        // 1) tokenize
+        // 2) Is the input a command or an instruction?
+        // 3) Handle it accordingly
+
+        // Maybe don't separate commands and instructions? Just treat them all the same.
+        // Get's a little dangerous with meta programming and self-modifying code potentially
+        // Might be fun?
+    }
     else
     {
         // Try to interpret the command as a BASIC instruction
