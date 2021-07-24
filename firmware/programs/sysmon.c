@@ -23,7 +23,7 @@ int main()
     byte *block = (byte *)malloc(SD_BLOCK_SIZE);
 
     ACIA_Init(&SerialConsole);
-    ACIA_Init(&SerialPeripheral);
+    // ACIA_Init(&SerialPeripheral);
 
     logo();
 
@@ -35,7 +35,7 @@ int main()
     while (true)
     {
         print("> ");
-        ACIA_ReadLine(&SerialPeripheral, buffer, 39, true);
+        ACIA_ReadLine(&SerialConsole, buffer, 39, true);
         print("\r\n");
         parse_command(buffer);
         print("\r\n");

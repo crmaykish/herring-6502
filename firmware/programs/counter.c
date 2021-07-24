@@ -6,7 +6,8 @@
 int main()
 {
     word counter = 0;
-    word display = 0;
+    word display = 0b111;
+    byte left = 1;
 
     VIA_InitAll();
 
@@ -19,7 +20,22 @@ int main()
 
             poke(VIA0_PORTA, (display & 0xFF));
             poke(VIA0_PORTB, (display & 0xFF00) >> 8);
-            display++;
+
+            if (display == 0b111000000000000)
+            {
+                left = 0;
+            }
+            else if (display == 0b111)
+            {
+                left = 1;
+            }
+
+            if (left)
+            {
+                display <<= 1;
+            }
+            else
+                display >>= 1;
         }
         else
         {
