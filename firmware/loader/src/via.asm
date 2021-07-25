@@ -1,6 +1,6 @@
 .include "herring.inc"
 
-.export _VIA_OutputAll
+.export _VIA_OutputAll, _VIA_SetPortA, _VIA_SetPortB
 
 .segment "CODE"
 
@@ -11,4 +11,14 @@ _VIA_OutputAll:
     sta VIA0_DDRB
     sta VIA1_DDRA
     sta VIA1_DDRB
+    rts
+
+; Write the A register to Port A of the VIA
+_VIA_SetPortA:
+    sta VIA0_PORTA
+    rts
+
+; Write the A register to port B of the VIA
+_VIA_SetPortB:
+    sta VIA0_PORTB
     rts

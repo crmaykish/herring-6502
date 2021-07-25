@@ -1,13 +1,15 @@
 #ifndef ACIA_H
 #define ACIA_H
 
-#include <stdbool.h>
+#include "herring.h"
+#include <stdlib.h>
 
 extern void ACIA_Init();
-extern char ACIA_ReadByte();
-extern void __fastcall__ ACIA_WriteByte(char c);
+extern void __fastcall__ ACIA_Write(char c);
+extern void ACIA_NewLine();
 
-unsigned char ACIA_ReadLine(char *buffer, unsigned char max, bool echo);
+byte ACIA_Read();
+byte ACIA_ReadLine(char *buffer, byte max, bool echo);
 void ACIA_WriteBuffer(char *buffer);
 
 #endif
