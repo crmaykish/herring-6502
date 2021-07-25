@@ -1,0 +1,43 @@
+; VIA0 Registers
+VIA0_PORTB = $C000
+VIA0_PORTA = $C001
+VIA0_DDRB = $C002
+VIA0_DDRA = $C003
+
+; VIA1 Registers
+VIA1_PORTB = $C400
+VIA1_PORTA = $C401
+VIA1_DDRB = $C402
+VIA1_DDRA = $C403
+
+; VIA Values
+VIA_OUTPUTS = $FF
+VIA_INPUTS = $00
+
+; ACIA0 Registers
+ACIA0_DATA = $DC00
+ACIA0_STATUS = $DC01
+ACIA0_COMMAND = $DC02
+ACIA0_CONTROL = $DC03
+
+; ACIA1 Registers
+ACIA1_DATA = $D800
+ACIA1_STATUS = $D801
+ACIA1_COMMAND = $D802
+ACIA1_CONTROL = $D803
+
+; ACIA Values
+ACIA_READY_RX = $08
+ACIA_READY_TX = $10
+
+; Send a dummy value to the ACIA STATUS register to reset it
+ACIA_RESET = $00
+; RTS low, transmit interrupt disabled, receiver interrupt disabled, DTR low
+ACIA_COMMAND_INIT = $0B 
+; Baudrate 19200, 8 data bits, 1 stop bit
+ACIA_CONTROL_BAUD_19200 = %00011111
+
+; Special ASCII characters
+ASCII_NEWLINE = $0A
+ASCII_RETURN = $0D
+ASCII_ZERO = $00

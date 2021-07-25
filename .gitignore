@@ -5,3 +5,4 @@ a.out
 *.map
 *.lst
 *.bin
+build/
