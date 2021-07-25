@@ -39,9 +39,4 @@ void ACIA_Write(const ACIA_t *acia, char c);
 void ACIA_WriteBuffer(const ACIA_t *acia, char *buffer);
 void ACIA_NewLine(const ACIA_t *acia);
 
-// Output functions, these all write to the serial console
-void put(char c);
-void print(char *string);
-void print_hex(word w);
-
 #endif

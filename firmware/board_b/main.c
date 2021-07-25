@@ -1,27 +1,28 @@
-#include <stdio.h>
 #include <peekpoke.h>
+#include <stdio.h>
 #include "acia.h"
 
-#define PRINT(format, ...)                     \
-    snprintf(buffer, 63, format, __VA_ARGS__); \
+#define SERIAL_PRINT_BUFFER_SIZE 64
+
+// Print a formatted string to the serial console
+#define aprintf(format, ...)                                         \
+    snprintf(buffer, SERIAL_PRINT_BUFFER_SIZE, format, __VA_ARGS__); \
     ACIA_WriteBuffer(&SerialConsole, buffer)
 
 int main()
 {
-    char buffer[64] = {0};
+    char buffer[SERIAL_PRINT_BUFFER_SIZE] = {0};
+    
     unsigned char i = 0;
     char c = '0';
-
-    POKE(0xC002, 0xFF);
-    POKE(0xC003, 0xFF);
 
     ACIA_Init(&SerialConsole);
 
     for (;;)
     {
-        PRINT("hello: %c\r\n", c);
+        aprintf("hello: %c\r\n", c);
 
-        PRINT("more: %c | %s\r\n", c, "test");
+        aprintf("more: %c | %s\r\n", c, "test");
 
         c++;
 
