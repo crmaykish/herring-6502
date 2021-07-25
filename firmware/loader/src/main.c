@@ -1,6 +1,5 @@
 #include "via.h"
 #include "acia.h"
-#include <peekpoke.h>
 
 int main()
 {
