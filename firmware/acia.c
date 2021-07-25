@@ -1,5 +1,4 @@
 #include "acia.h"
-#include <stdlib.h>
 
 void ACIA_Init(const ACIA_t *acia)
 {
@@ -69,25 +68,4 @@ void ACIA_WriteBuffer(const ACIA_t *acia, char *buffer)
         ACIA_Write(acia, buffer[i]);
         i++;
     }
-}
-
-void put(char c)
-{
-    ACIA_Write(&SerialConsole, c);
-}
-
-void print(char *string)
-{
-    ACIA_WriteBuffer(&SerialConsole, string);
-}
-
-void print_hex(word w)
-{
-    char int_s[5];
-    itoa(w, int_s, 16);
-    if (w < 0x10)
-    {
-        put('0');
-    }
-    print(int_s);
 }
