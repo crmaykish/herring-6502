@@ -25,7 +25,8 @@ _ACIA_Read:
     lda ACIA0_STATUS
     and #ACIA_READY_RX
     beq _ACIA_Read
-    sta ACIA0_DATA
+    lda ACIA0_DATA
+    rts
 
 ; Write A to the serial port (blocks until the serial port receives the byte)
 _ACIA_Write:
