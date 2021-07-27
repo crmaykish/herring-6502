@@ -3,18 +3,13 @@
 DEVICE=${1}
 FILE=${2}
 
-SLEEP_TIME=0.005
+SLEEP_TIME=0.05
 
 echo "Sending ${FILE} to ${DEVICE}"
 
 stty 19200 -F ${DEVICE}
 
-echo -en '*' >${DEVICE}
-# sleep $SLEEP_TIME
-echo -en '*' >${DEVICE}
-# sleep $SLEEP_TIME
-echo -en '*' >${DEVICE}
-# sleep $SLEEP_TIME
+# echo -en '\xCF' >${DEVICE}
 
 INDEX=0
 FILE_SIZE=$(wc -c <${FILE})
@@ -41,11 +36,6 @@ done
 
 echo "|"
 
-echo -en '!' >${DEVICE}
-# sleep $SLEEP_TIME
-echo -en '!' >${DEVICE}
-# sleep $SLEEP_TIME
-echo -en '!' >${DEVICE}
-# sleep $SLEEP_TIME
+echo -en '\xDF' > ${DEVICE}
 
 echo "Done!"

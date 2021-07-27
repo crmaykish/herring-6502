@@ -3,8 +3,12 @@
 
 #include "herring.h"
 
-extern void VIA_OutputAll();
-extern void __fastcall__ VIA_SetPortA(byte val);
-extern void __fastcall__ VIA_SetPortB(byte val);
+extern void via_init();
+extern void via_port_a_set(byte val);
+extern void via_port_b_set(byte val);
+extern byte via_port_a_get();
+extern byte via_port_b_get();
+
+void via_set_word(word w);
 
 #endif

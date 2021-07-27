@@ -1,122 +1,86 @@
 #include "via.h"
 #include "acia.h"
-#include "herring.h"
 
-#define PROGRAM_START 0x1000 // TODO: define this from the linker RAM values?
+// TODO: Add the status LED stuff back to the crt0 files, try to figure out what is going on here
 
-typedef enum
-{
-    READY,
-    LOADING,
-    RUNNING
-} State_e;
+// TODO: Update the config to use only the lower RAM since high RAM is now empty
+
+void memdump(word addr, word count);
 
 int main()
 {
-    // Current state of the loader program
-    State_e program_state = READY;
     // Serial input byte
     byte in = 0;
-    // Number of bytes stored into program memory
+    // Number of bytes read
     word in_count = 0;
-
-    byte start_byte_count = 0;
-    byte end_byte_count = 0;
 
     word i = 0;
 
-    VIA_OutputAll();
-    VIA_SetPortA(0);
-    VIA_SetPortB(0);
+    bool loading = true;
 
-    ACIA_Init();
+    via_init();
+    acia_init();
 
-    ACIA_WriteBuffer("\r\nHerring 6502 Serial Loader v2.0\r\n");
-    ACIA_WriteBuffer("Ready to load program.\r\n");
+    print("\r\nReady\r\n");
 
     while (true)
     {
         // Wait for a byte from the serial port
-        in = ACIA_Read();
+        in = getc();
 
-        if (in >= 32 && in < 127)
+        if (in == STOP_BYTE)
         {
-            ACIA_Write(in);
+            loading = false;
+        }
+
+        if (loading)
+        {
+            POKE(PROGRAM_ADDR + in_count, in);
+            in_count++;
+            via_set_word(in_count);
         }
         else
         {
-            ACIA_Write('.');
-        }
+            print_int(in_count);
+            print(" BYTES\r\n");
 
-        if (program_state == READY)
-        {
-            // Watch for start bytes
-            if (in == '*')
-            {
-                start_byte_count++;
+            memdump(PROGRAM_ADDR, in_count);
 
-                if (start_byte_count == 3)
-                {
-                    // Got the start bytes, ready to load program code into RAM
-                    ACIA_WriteBuffer("Loading...\r\n");
-                    program_state = LOADING;
-                }
-            }
-            else
-            {
-                start_byte_count = 0;
-            }
-        }
-        else if (program_state == LOADING)
-        {
-
-            // Store byte into RAM
-            // POKE(PROGRAM_START + in_count, in);
-            in_count++;
-
-            VIA_SetPortA(in_count & 0xFF);
-            VIA_SetPortB((in_count & 0xFF00) >> 8);
-
-            // Watch for end bytes
-            if (in == '!')
-            {
-                ACIA_WriteBuffer("end");
-
-                end_byte_count++;
-
-                if (end_byte_count == 3)
-                {
-                    // Done loading program code
-                    // ACIA_WriteBuffer("\r\n");
-
-                    // for (i; i < in_count; i++)
-                    // {
-                    //     if (PEEK(PROGRAM_START + i) >= 32 && PEEK(PROGRAM_START + i) < 127)
-                    //     {
-                    //         ACIA_Write(PEEK(PROGRAM_START + i));
-                    //     }
-                    //     else
-                    //     {
-                    //         ACIA_Write('.');
-                    //     }
-                    // }
-
-                    ACIA_WriteBuffer("\r\nLoading complete. Press enter to run.\r\n");
-                    program_state = RUNNING;
-                }
-            }
-            else
-            {
-                end_byte_count = 0;
-            }
-        }
-        else if (program_state == RUNNING)
-        {
-            ACIA_WriteBuffer("Starting program...\r\n");
-            asm("jmp %w", PROGRAM_START);
-            break;
+            print("\r\nRUN\r\n");
+            jump_to_ram();
         }
     }
 
     return 0;
+}
+
+void memdump(word addr, word count)
+{
+    word i = 0;
+
+    print_hex(addr);
+    putc(' ');
+
+    for (i; i < count; ++i)
+    {
+        // Print hex value
+        print_hex(PEEK(addr + i));
+        putc(' ');
+
+        if (i > 0)
+        {
+            if (i % 8 == 0)
+            {
+                putc(' ');
+            }
+            if (i % 16 == 0)
+            {
+                // Print newline and address
+                print("\r\n");
+                print_hex(addr + i);
+                putc(' ');
+                putc(' ');
+            }
+        }
+    }
 }
