@@ -16,7 +16,7 @@ cp ${SOURCE_LIB} ${DEST_LIB}
 cp $CRT_ASM config/crt0.asm
 
 echo "Assemble crt0.asm"
-ca65 --cpu 65c02 config/crt0.asm
+ca65 --cpu 65c02 config/crt0.asm --include-dir hardware/include/
 
 echo "Add crt0.o to lib file"
 ar65 a ${DEST_LIB} ${CRT_O}

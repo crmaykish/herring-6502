@@ -1,15 +1,22 @@
-.export   _init
-.import   _main
+.export _init
+.import _main
 
-.export   __STARTUP__ : absolute = 1        ; Mark as startup
-.import   __RAM_START__, __RAM_SIZE__       ; Linker generated
+.export __STARTUP__ : absolute = 1
+.import __RAM_START__, __RAM_SIZE__
 
-.import    copydata, zerobss, initlib
+.import copydata, zerobss, initlib
 
-.include  "zeropage.inc"
+.include "zeropage.inc"
+.include "herring.inc"
+
+; Error codes
+NMI_CODE = %11110000
+IRQ_CODE = %00001111
+END_OF_MAIN_CODE = %00111100
+ERROR_PORT = VIA0_PORTA
+
 
 .segment "VECTORS"
-
     .addr nmi_handler
     .addr _init
     .addr irq_handler
@@ -18,65 +25,66 @@
 
 _init:
     ; Set up the VIA immediately so we can display error codes
-    lda #$FF
-    sta $C002
-    sta $C003
-
+    lda #VIA_OUTPUT
+    sta VIA0_DDRA
+    sta VIA0_DDRB
+    lda #0
+    sta VIA0_PORTB
+    sta ERROR_PORT
     jmp start
 
-; NMIs should never happen, stop everything
 nmi_handler:
-    lda #%11010001
-    sta $C000
+    lda #NMI_CODE
+    sta ERROR_PORT
     jmp error_catch
 
-; Normal interrupts should be disabled, if we see one, set the LED pattern and return
 irq_handler:
-    lda #%01101110
-    sta $C000
-    rti
+    lda #IRQ_CODE
+    sta ERROR_PORT
+    jmp error_catch
 
+; In the event of errors, stop everything and loop forever
 error_catch:
     jmp error_catch
 
 start:
+    ; Disable interrupts
+    sei
+
+    ; Start the stack pointer at 0x01FF
+    ldx #$FF
+    txs
+
+    ; Clear decimal mode
+    cld
+
+    lda #<(__RAM_START__ + __RAM_SIZE__)
+    sta sp
+    lda #>(__RAM_START__ + __RAM_SIZE__)
+    sta sp+1
+
+    ; Clear the BSS section of memory
+    jsr zerobss
+    
     lda #1
-    sta $C001
+    sta ERROR_PORT
 
-    SEI    
-    LDX     #$FF                 ; Initialize stack pointer to $01FF
-    TXS
-    CLD                          ; Clear decimal mode
-
+    ; Copy mutable data from ROM to RAM
+    jsr copydata
+    
     lda #2
-    sta $C001
+    sta ERROR_PORT
 
-    LDA     #<(__RAM_START__ + __RAM_SIZE__)
-    STA     sp
-    LDA     #>(__RAM_START__ + __RAM_SIZE__)
-    STA     sp+1
+    ; Run constructors
+    jsr initlib
 
     lda #3
-    sta $C001
+    sta ERROR_PORT
 
-    JSR     zerobss              ; Clear BSS segment
+    ; Jump to main()
+    jsr _main
 
-    lda #4
-    sta $C001
-
-    JSR     copydata             ; Initialize DATA segment
-
-    lda #5
-    sta $C001
-
-    JSR     initlib              ; Run constructors
-
-    lda #6
-    sta $C001
-
-    JSR     _main
-
-    lda #7
-    sta $C001
-
+    ; If main() ever exits, something terrible happened
+    lda #END_OF_MAIN_CODE
+    sta ERROR_PORT
     jmp error_catch
