@@ -2,6 +2,10 @@
 
 .include "herring.inc"
 
+.segment "ZEROPAGE"
+
+ptr1: .res 2
+
 .segment "CODE"
 
 _acia_init:
@@ -31,5 +35,19 @@ _getc:
     rts
 
 _print:
-    ; TODO
+    pha
+    phy
+    sta ptr1
+    stx ptr1 + 1
+    ldy #0
+next_char:
+    lda (ptr1),y
+    beq end_of_string
+    jsr _putc
+    iny
+    bne next_char
+end_of_string:
+    ply
+    pla
+
     rts

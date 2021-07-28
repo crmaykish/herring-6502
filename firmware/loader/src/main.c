@@ -7,16 +7,20 @@ int main()
 
     acia_init();
 
+    print("Herring 6502\r\n");
+
     while (true)
     {
-        putc(c);
+        print("it's great!\r\n");
 
-        c++;
+        // putc(c);
 
-        if (c >= 126)
-        {
-            c = 32;
-        }
+        // c++;
+
+        // if (c >= 126)
+        // {
+        //     c = 32;
+        // }
     }
 
     return 0;
