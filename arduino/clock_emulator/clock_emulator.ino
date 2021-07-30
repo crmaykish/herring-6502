@@ -35,9 +35,9 @@ int clockState = HIGH;
 void setup()
 {
   pinMode(RESET, OUTPUT);
-  pinMode(CLOCK, OUTPUT);
 
-  digitalWrite(CLOCK, clockState);
+  // Clock needs to start at a high-impedance state, assuming it will be driven externally
+  pinMode(CLOCK, INPUT);
 
   digitalWrite(RESET, LOW);
   delay(resetTime);
@@ -114,6 +114,15 @@ void loop()
       if (runStopState == LOW)
       {
         running = !running;
+
+        if (running)
+        {
+          pinMode(CLOCK, OUTPUT);
+        }
+        else
+        {
+          pinMode(CLOCK, INPUT);
+        }
       }
     }
   }
