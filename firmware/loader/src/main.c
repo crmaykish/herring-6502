@@ -105,13 +105,22 @@ word load_from_serial()
 {
     byte b = 0;
     word count = 0;
+    byte magic_count = 0;
 
-    while (b != MAGIC_END_BYTE)
+    while (magic_count != 3)
     {
         b = getc();
-        // echo(b);
         POKE(PROGRAM_RAM + count, b);
         count++;
+
+        if (b == MAGIC_END_BYTE)
+        {
+            magic_count++;
+        }
+        else
+        {
+            magic_count = 0;
+        }
     }
 
     return count;

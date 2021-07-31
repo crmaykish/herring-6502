@@ -35,5 +35,11 @@ done
 echo "|"
 
 echo -en '\xDE' > ${DEVICE}
+sleep $SLEEP_TIME
+echo -en '\xDE' > ${DEVICE}
+sleep $SLEEP_TIME
+echo -en '\xDE' > ${DEVICE}
+sleep $SLEEP_TIME
+
 
 echo "Done!"
