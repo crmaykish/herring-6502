@@ -4,6 +4,6 @@
 .segment "CODE"
 
 _run_loaded_program:
-    jmp PROGRAM_RAM
+    jsr PROGRAM_RAM
     rts
 

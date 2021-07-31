@@ -3,10 +3,12 @@
 
 int main()
 {
-    while (true)
-    {
-        print("Herring 6502\r\n");
-    }
+    print("Counter\r\n");
+    // while (true)
+    // {
+    // }
+
+    print("Returning...\r\n");
 
     return 0;
 }
