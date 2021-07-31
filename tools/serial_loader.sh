@@ -9,8 +9,6 @@ echo "Sending ${FILE} to ${DEVICE}"
 
 stty 19200 -F ${DEVICE}
 
-# echo -en '\xCF' >${DEVICE}
-
 INDEX=0
 FILE_SIZE=$(wc -c <${FILE})
 
@@ -36,6 +34,6 @@ done
 
 echo "|"
 
-echo -en '\xDF' > ${DEVICE}
+echo -en '\xDE' > ${DEVICE}
 
 echo "Done!"
