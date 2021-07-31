@@ -25,6 +25,7 @@ tx_check:
     beq tx_check
     pla
     sta ACIA0_DATA
+    jsr wdc_bug         ; Comment out for non-WDC 65C51s
     rts
 
 _getc:
@@ -50,4 +51,21 @@ end_of_string:
     ply
     pla
 
+    rts
+
+; From: http://forum.6502.org/viewtopic.php?f=4&t=2543&start=30
+wdc_bug:
+    phy
+    phx
+delay_loop:
+    ldy #2  ; Processor speed in MHz
+minidelay:
+    ldx #$68
+delay_1:
+    dex
+    bne delay_1
+    dey
+    bne minidelay
+    plx
+    ply
     rts
