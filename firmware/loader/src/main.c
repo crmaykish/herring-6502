@@ -40,7 +40,7 @@ int main()
         {
         case 'h':
             // Print the help message
-            print("Commands: (h)elp, (l)oad, (r)un, (m)emdump");
+            print("Commands: (h)elp, (l)oad, (r)un, (m)emdump, (e)rase");
             break;
         case 'l':
             print("Loading program from serial port...\r\n");
@@ -49,12 +49,32 @@ int main()
             print("\r\nLoading complete. Press 'r' to run.");
             break;
         case 'r':
-            print("Running program from RAM...\r\n");
-            run_loaded_program();
+            if (bin_size > 0)
+            {
+                print("Running program from RAM...\r\n");
+                run_loaded_program();
+            }
+            else
+            {
+                print("No program has been loaded.\r\n");
+            }
+            break;
+        case 'e':
+            print("Erasing program...");
+            memset((void *)PROGRAM_RAM, 0, bin_size);
+            bin_size = 0;
+            print("DONE");
             break;
         case 'm':
-            print("Dumping program RAM...\r\n");
-            memdump(PROGRAM_RAM, bin_size);
+            if (bin_size > 0)
+            {
+                print("Dumping program RAM...\r\n");
+                memdump(PROGRAM_RAM, bin_size);
+            }
+            else
+            {
+                print("No program has been loaded.\r\n");
+            }
             break;
         default:
             print("Command not found.");
