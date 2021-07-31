@@ -25,7 +25,7 @@ tx_check:
     beq tx_check
     pla
     sta ACIA0_DATA
-    jsr wdc_bug         ; Comment out for non-WDC 65C51s
+    ; jsr wdc_bug         ; Comment out for non-WDC 65C51s
     rts
 
 _getc:

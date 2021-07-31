@@ -1,17 +1,31 @@
+#include <string.h>
 #include <peekpoke.h>
 #include "herring.h"
 #include "acia.h"
 #include "loader.h"
 
-void memdump(unsigned int address);
+#define PROGRAM_RAM 0x1000
+#define VIA_PORT 0xC000
+#define MAGIC_END_BYTE 0xDE
+
+void memdump(unsigned int address, word count);
+word load_from_serial();
+void echo(byte c);
 
 int main()
 {
-    char in = 0;
+    byte in = 0;
+    word bin_size = 0;
 
     acia_init();
 
-    print("Herring 6502\r\n");
+    print("\r\n\r\n==========================\r\n");
+    print("\r\nHerring 6502\r\n");
+    print("Serial Bootloader v2.0\r\n");
+
+    print("Zeroing out program RAM... ");
+    memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
+    print("DONE\r\n\r\n");
 
     while (true)
     {
@@ -29,18 +43,21 @@ int main()
             print("Commands: (h)elp, (l)oad, (r)un, (m)emdump");
             break;
         case 'l':
-            print("LOAD");
-            load_from_serial();
+            print("Loading program from serial port...\r\n");
+            bin_size = load_from_serial();
+
+            print("\r\nLoading complete. Press 'r' to run.");
             break;
         case 'r':
-            print("RUN");
+            print("Running program from RAM...\r\n");
             run_loaded_program();
             break;
         case 'm':
-            memdump(0x8000);
+            print("Dumping program RAM...\r\n");
+            memdump(PROGRAM_RAM, bin_size);
             break;
         default:
-            print("Bad command");
+            print("Command not found.");
             break;
         }
 
@@ -50,31 +67,44 @@ int main()
     return 0;
 }
 
-void memdump(unsigned int address)
+void memdump(unsigned int address, word count)
 {
-    byte i = 0;
+    word i = 0;
     byte b = 0;
 
-    for (i; i < 0xF0; ++i)
+    while (i < count)
     {
         b = PEEK(address + i);
+        echo(b);
 
-        if (b >= 32 && b < 127)
-        {
-            putc(b);
-        }
-        else
-        {
-            putc('.');
-        }
+        i++;
+    }
+}
 
-        if ((i & 0xF) == 0xF) // If we're at a multiple of 16 (0-indexed)
-        {
-            print("\r\n");
-        }
-        else
-        {
-            putc(' ');
-        }
+word load_from_serial()
+{
+    byte b = 0;
+    word count = 0;
+
+    while (b != MAGIC_END_BYTE)
+    {
+        b = getc();
+        // echo(b);
+        POKE(PROGRAM_RAM + count, b);
+        count++;
+    }
+
+    return count;
+}
+
+void echo(byte c)
+{
+    if (c >= 32 && c < 127)
+    {
+        putc(c);
+    }
+    else
+    {
+        putc('.');
     }
 }
