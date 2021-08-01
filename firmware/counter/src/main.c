@@ -85,6 +85,9 @@ void disassemble(byte *program, word size)
 
     while (i < size)
     {
+        print_hex((word)program + i);
+        print(": ");
+
         switch (program[i])
         {
         case 0xA9: // LDA #
@@ -99,15 +102,45 @@ void disassemble(byte *program, word size)
             bytes = 2;
             break;
 
+        case 0xA2: // LDX #
+            print("ldx #$");
+            print_hex(program[i + 1]);
+            bytes = 2;
+            break;
+
+        case 0xA0: // LDY #
+            print("ldy #$");
+            print_hex(program[i + 1]);
+            bytes = 2;
+            break;
+
         case 0x8D: // STA abs
             print("sta $");
             print_hex(program[i + 2]);
             print_hex(program[i + 1]);
             bytes = 3;
             break;
+
+        case 0x4C:  // JMP abs
+            print("jmp $");
+            print_hex(program[i + 2]);
+            print_hex(program[i + 1]);
+            bytes = 3;
+            break;
+        case 0x20: // JSR
+            print("jsr $");
+            print_hex(program[i + 2]);
+            print_hex(program[i + 1]);
+            bytes = 3;
+            break;
+
+        case 0x60: // RTS
+            print("rts");
+            bytes = 1;
+            break;
         default:
             print("XX");
-            bytes = 2;
+            bytes = 1;
             break;
         }
 
