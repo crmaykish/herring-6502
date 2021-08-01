@@ -10,6 +10,7 @@
 
 void memdump(unsigned int address, word count);
 word load_from_serial();
+void memtest(word start, word size);
 void echo(byte c);
 
 int main()
@@ -76,6 +77,11 @@ int main()
                 print("No program has been loaded.\r\n");
             }
             break;
+        case 't':
+            print("Running memtest...\r\n");
+            memtest(PROGRAM_RAM, 0xC000 - PROGRAM_RAM);
+            print("DONE");
+            break;
         default:
             print("Command not found.");
             break;
@@ -126,5 +132,25 @@ void echo(byte c)
     else
     {
         putc('.');
+    }
+}
+
+void memtest(word start, word size)
+{
+    byte b = 0;
+    word i = 0;
+
+    while (i < size)
+    {
+        POKE(start + i, 0x00);
+
+        b = PEEK(start + i);
+
+        if (b != 0x00)
+        {
+            print("Mem failure\r\n");
+        }
+
+        i++;
     }
 }
