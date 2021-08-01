@@ -1,22 +1,54 @@
 #include <string.h>
 #include <peekpoke.h>
 #include "herring.h"
-#include "acia.h"
 #include "loader.h"
+#include "acia.h"
+#include "print.h"
+#include "assembler.h"
 
 #define PROGRAM_RAM 0x1000
-#define VIA_PORT 0xC000
 #define MAGIC_END_BYTE 0xDE
+#define LOADER_BUFFER_LEN 40
 
-void memdump(unsigned int address, word count);
-word load_from_serial();
-void memtest(word start, word size);
-void echo(byte c);
+typedef struct
+{
+    char buffer[LOADER_BUFFER_LEN];
+    word binary_size;
+} loader_t;
+
+typedef struct
+{
+    char name[6];
+    byte len;
+    void (*handler)(loader_t *);
+    char desc[40];
+} command_t;
+
+void interpret(loader_t *loader);
+
+// Command handlers
+void help(loader_t *loader);
+void load(loader_t *loader);
+void run(loader_t *loader);
+void dump(loader_t *loader);
+void test(loader_t *loader);
+void erase(loader_t *loader);
+void dis(loader_t *loader);
+
+static command_t commands[] = {
+    {"help", 4, help, "Show the help message"},
+    {"load", 4, load, "Load program from the serial port"},
+    {"run", 3, run, "Jump the program RAM"},
+    {"dump", 4, dump, "Dump program RAM"},
+    {"test", 4, test, "Memtest all of program RAM"},
+    {"erase", 5, erase, "Erase program RAM"},
+    {"dis", 3, dis, "Disassemble the loaded program"}};
 
 int main()
 {
-    byte in = 0;
-    word bin_size = 0;
+    loader_t loader;
+    loader.binary_size = 0;
+    memset(loader.buffer, 0, LOADER_BUFFER_LEN);
 
     acia_init();
 
@@ -24,68 +56,13 @@ int main()
     print("\r\nHerring 6502\r\n");
     print("Serial Bootloader v2.0\r\n");
 
-    print("Zeroing out program RAM... ");
-    memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
-    print("DONE\r\n\r\n");
-
     while (true)
     {
         print("> ");
-        in = getc();
-
-        putc(in);
-
+        readline(loader.buffer, true);
         print("\r\n");
 
-        switch (in)
-        {
-        case 'h':
-            // Print the help message
-            print("Commands: (h)elp, (l)oad, (r)un, (m)emdump, (e)rase");
-            break;
-        case 'l':
-            print("Loading program from serial port...\r\n");
-            bin_size = load_from_serial();
-
-            print("\r\nLoading complete. Press 'r' to run.");
-            break;
-        case 'r':
-            if (bin_size > 0)
-            {
-                print("Running program from RAM...\r\n");
-                run_loaded_program();
-            }
-            else
-            {
-                print("No program has been loaded.\r\n");
-            }
-            break;
-        case 'e':
-            print("Erasing program...");
-            memset((void *)PROGRAM_RAM, 0, bin_size);
-            bin_size = 0;
-            print("DONE");
-            break;
-        case 'm':
-            if (bin_size > 0)
-            {
-                print("Dumping program RAM...\r\n");
-                memdump(PROGRAM_RAM, bin_size);
-            }
-            else
-            {
-                print("No program has been loaded.\r\n");
-            }
-            break;
-        case 't':
-            print("Running memtest...\r\n");
-            memtest(PROGRAM_RAM, 0xC000 - PROGRAM_RAM);
-            print("DONE");
-            break;
-        default:
-            print("Command not found.");
-            break;
-        }
+        interpret(&loader);
 
         print("\r\n");
     }
@@ -93,31 +70,47 @@ int main()
     return 0;
 }
 
-void memdump(unsigned int address, word count)
+void interpret(loader_t *loader)
 {
-    word i = 0;
-    byte b = 0;
+    byte i;
 
-    while (i < count)
+    for (i = 0; i < sizeof(commands) / sizeof(command_t); i++)
     {
-        b = PEEK(address + i);
-        echo(b);
+        if (strncmp(loader->buffer, commands[i].name, commands[i].len) == 0)
+        {
+            // Found the command, run the handler
+            commands[i].handler(loader);
+            return;
+        }
+    }
 
-        i++;
+    print("Command not found");
+}
+
+void help(loader_t *loader)
+{
+    byte i;
+
+    for (i = 0; i < sizeof(commands) / sizeof(command_t); i++)
+    {
+        print(commands[i].name);
+        print(": ");
+        print(commands[i].desc);
+        print("\r\n");
     }
 }
 
-word load_from_serial()
+void load(loader_t *loader)
 {
     byte b = 0;
-    word count = 0;
     byte magic_count = 0;
+    loader->binary_size = 0;
 
     while (magic_count != 3)
     {
         b = getc();
-        POKE(PROGRAM_RAM + count, b);
-        count++;
+        POKE(PROGRAM_RAM + loader->binary_size, b);
+        loader->binary_size++;
 
         if (b == MAGIC_END_BYTE)
         {
@@ -128,38 +121,117 @@ word load_from_serial()
             magic_count = 0;
         }
     }
-
-    return count;
 }
 
-void echo(byte c)
+void run(loader_t *loader)
 {
-    if (c >= 32 && c < 127)
+    run_loaded_program();
+}
+
+void dump(loader_t *loader)
+{
+    word i = 0;
+    byte b = 0;
+
+    while (i < 240)
     {
-        putc(c);
-    }
-    else
-    {
-        putc('.');
+        b = PEEK(PROGRAM_RAM + i);
+        if (b >= 32 && b < 127)
+        {
+            putc(b);
+        }
+        else
+        {
+            putc('.');
+        }
+
+        i++;
     }
 }
 
-void memtest(word start, word size)
+void test(loader_t *loader)
 {
     byte b = 0;
     word i = 0;
 
-    while (i < size)
+    while (i < 0xC000 - PROGRAM_RAM)
     {
-        POKE(start + i, 0x00);
+        POKE(PROGRAM_RAM + i, 0x00);
 
-        b = PEEK(start + i);
+        b = PEEK(PROGRAM_RAM + i);
 
         if (b != 0x00)
         {
-            print("Mem failure\r\n");
+            print("Mem failure at: ");
+            print_hex(PROGRAM_RAM + i);
         }
 
         i++;
+    }
+}
+
+void erase(loader_t *loader)
+{
+    memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
+}
+
+void dis(loader_t *loader)
+{
+    word i = 0;
+    op_code_t *curr = NULL;
+    byte *program = (byte *)PROGRAM_RAM;
+
+    while (i < loader->binary_size)
+    {
+        print_hex((word)program + i);
+        print(": ");
+
+        curr = opcode_lookup(program[i]);
+
+        if (curr != NULL)
+        {
+            // Print the mnemonic
+            print(curr->mnemonic);
+            putc(' ');
+
+            // Print any needed prefixes of the operand
+            switch (curr->mode)
+            {
+            case IMM:
+                print("#$");
+                break;
+            case ABS:
+                putc('$');
+                break;
+            case REL:
+                putc('$');
+                break;
+            default:
+                break;
+            }
+
+            // Print the operand
+            switch (curr->bytes)
+            {
+            case 2:
+                print_hex(program[i + 1]);
+                break;
+            case 3:
+                print_hex(program[i + 2]);
+                print_hex(program[i + 1]);
+            default:
+                break;
+            }
+
+            // TODO: print any suffixes, e.g. closing parens, offsets, etc.
+        }
+        else
+        {
+            print("BAD");
+        }
+
+        print("\r\n");
+
+        i += curr->bytes;
     }
 }
