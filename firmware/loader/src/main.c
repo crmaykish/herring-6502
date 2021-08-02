@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <string.h>
 #include <peekpoke.h>
 #include "herring.h"
@@ -7,6 +8,7 @@
 #include "assembler.h"
 
 #define PROGRAM_RAM 0x1000
+#define FILE_RAM 0x8000
 #define MAGIC_END_BYTE 0xDE
 #define LOADER_BUFFER_LEN 40
 
@@ -31,18 +33,20 @@ void help(loader_t *loader);
 void load(loader_t *loader);
 void run(loader_t *loader);
 void dump(loader_t *loader);
-void test(loader_t *loader);
 void erase(loader_t *loader);
 void dis(loader_t *loader);
+void edit(loader_t *loader);
+void cat(loader_t *loader);
 
 static command_t commands[] = {
     {"help", 4, help, "Show the help message"},
     {"load", 4, load, "Load program from the serial port"},
     {"run", 3, run, "Jump the program RAM"},
     {"dump", 4, dump, "Dump program RAM"},
-    {"test", 4, test, "Memtest all of program RAM"},
     {"erase", 5, erase, "Erase program RAM"},
-    {"dis", 3, dis, "Disassemble the loaded program"}};
+    {"dis", 3, dis, "Disassemble the loaded program"},
+    {"edit", 4, edit, "Edit a text file"},
+    {"cat", 3, cat, "Print the file stored in RAM"}};
 
 int main()
 {
@@ -52,9 +56,7 @@ int main()
 
     acia_init();
 
-    print("\r\n\r\n==========================\r\n");
     print("\r\nHerring 6502\r\n");
-    print("Serial Bootloader v2.0\r\n");
 
     while (true)
     {
@@ -149,27 +151,6 @@ void dump(loader_t *loader)
     }
 }
 
-void test(loader_t *loader)
-{
-    byte b = 0;
-    word i = 0;
-
-    while (i < 0xC000 - PROGRAM_RAM)
-    {
-        POKE(PROGRAM_RAM + i, 0x00);
-
-        b = PEEK(PROGRAM_RAM + i);
-
-        if (b != 0x00)
-        {
-            print("Mem failure at: ");
-            print_hex(PROGRAM_RAM + i);
-        }
-
-        i++;
-    }
-}
-
 void erase(loader_t *loader)
 {
     memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
@@ -234,4 +215,64 @@ void dis(loader_t *loader)
 
         i += curr->bytes;
     }
+}
+
+void screen_clear()
+{
+    print("\033[2J\033[H");
+}
+
+void edit(loader_t *loader)
+{
+    bool exit = false;
+
+    byte *file_buffer = (byte *)FILE_RAM;
+    word file_index = 0;
+
+    byte in = 0;
+
+    screen_clear();
+
+    while (!exit)
+    {
+        in = getc();
+
+        switch (in)
+        {
+        case 0x03: // Ctrl-C
+            exit = true;
+            break;
+        // case 0x13: // Ctrl-S
+        //     strncpy((byte *)FILE_RAM, file_buffer, 1024);
+        //     break;
+        case 0x0E: // Ctrl-N
+            screen_clear();
+            memset(file_buffer, 0, 1024);
+            file_index = 0;
+            break;
+        case 0x7F: // Backspace
+            putc(0x08);
+            file_index--;
+            file_buffer[file_index] = 0;
+            break;
+        case 0x0D: // Enter
+            print("\r\n");
+            file_buffer[file_index] = '\r';
+            file_buffer[file_index + 1] = '\n';
+            file_index += 2;
+            break;
+        default:
+            putc(in);
+            file_buffer[file_index] = in;
+            file_index++;
+            break;
+        }
+    }
+
+    screen_clear();
+}
+
+void cat(loader_t *loader)
+{
+    print((byte *)FILE_RAM);
 }

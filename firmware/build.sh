@@ -10,6 +10,7 @@ mkdir -p ${TARGET}/build
 cl65 -O \
     -t none \
     --cpu 65c02 \
+    --static-locals \
     -I hardware/include/ \
     --asm-include-dir hardware/include \
     -I ${TARGET}/include/ \
