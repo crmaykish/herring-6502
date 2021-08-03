@@ -37,6 +37,7 @@ void erase(loader_t *loader);
 void dis(loader_t *loader);
 void edit(loader_t *loader);
 void cat(loader_t *loader);
+void assemble(loader_t *loader);
 
 static command_t commands[] = {
     {"help", 4, help, "Show the help message"},
@@ -44,9 +45,10 @@ static command_t commands[] = {
     {"run", 3, run, "Jump the program RAM"},
     {"dump", 4, dump, "Dump program RAM"},
     {"erase", 5, erase, "Erase program RAM"},
-    {"dis", 3, dis, "Disassemble the loaded program"},
+    {"da", 3, dis, "Disassemble the loaded program"},
     {"edit", 4, edit, "Edit a text file"},
-    {"cat", 3, cat, "Print the file stored in RAM"}};
+    {"cat", 3, cat, "Print the file stored in RAM"},
+    {"as", 2, assemble, "Assemble the text in file RAM"}};
 
 int main()
 {
@@ -276,3 +278,58 @@ void cat(loader_t *loader)
 {
     print((byte *)FILE_RAM);
 }
+
+void assemble(loader_t *loader)
+{
+    // TODO: tokenizing the string in place is a lossy operation
+    // Copy it somewhere temporary first
+
+    word addr = PROGRAM_RAM;
+    op_code_t *opcode = NULL;
+    word operand = 0;
+    char *line = strtok((byte *)FILE_RAM, "\r\n");
+
+    while (line != NULL)
+    {
+        if (line[0] == ';')
+        {
+            print(line);
+        }
+        else
+        {
+            print(line);
+            print(": ");
+
+            opcode = mnemonic_to_opcode(line, &operand);
+
+            print_hex(opcode->code);
+            POKE(addr, opcode->code);
+            addr++;
+
+            if (opcode->bytes > 1)
+            {
+                putc(' ');
+                print_hex(operand & 0xFF);
+                POKE(addr, operand & 0xFF);
+                addr++;
+            }
+
+            if (opcode->bytes > 2)
+            {
+                putc(' ');
+                print_hex((operand & 0xFF00) >> 8);
+                POKE(addr, (operand & 0xFF00) >> 8);
+                addr++;
+            }
+        }
+
+        print("\r\n");
+
+        line = strtok(NULL, "\r\n");
+    }
+}
+
+// TODO: short list
+// The editor should load the existing file if it exists
+// Can probably save a ton of ROM space by just doing a search for all opcodes instead of mapping all 256
+// This is almost useful!

@@ -30,7 +30,7 @@ typedef struct
 } op_code_t;
 
 // Brute-force lookup to go from mnemonic to opcode
-op_code_t *mnemonic_to_opcode(char *mnemonic);
+op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand);
 
 // Look up full opcode details based on the hex value of the opcode
 op_code_t *opcode_lookup(byte op);
