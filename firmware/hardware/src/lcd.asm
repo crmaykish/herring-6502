@@ -1,6 +1,6 @@
 .include "herring.inc"
 
-.export _lcd_init, _lcd_instruction, _lcd_putc
+.export _lcd_init, _lcd_instruction, _lcd_putc, _lcd_clear, _lcd_line2
 
 .segment "CODE"
 
@@ -19,8 +19,7 @@ _lcd_init:
     lda #LCD_CURSOR_SETTINGS
     jsr _lcd_instruction
 
-    lda #LCD_CLEAR
-    jsr _lcd_instruction
+    jsr _lcd_clear
 
     rts
 
@@ -44,6 +43,16 @@ _lcd_putc:
     sta LCD_CTRL_PORT
     lda #LCD_RS
     sta LCD_CTRL_PORT
+    rts
+
+_lcd_clear:
+    lda #LCD_CLEAR
+    jsr _lcd_instruction
+    rts
+
+_lcd_line2:
+    lda #$C0
+    jsr _lcd_instruction
     rts
 
 lcd_wait:

@@ -3,8 +3,11 @@
 
 #include "herring.h"
 
-void __fastcall__ lcd_init();
+void lcd_init();
 void __fastcall__ lcd_putc(byte);
+void lcd_clear();
+
+void lcd_line2();
 
 void lcd_print(char *);
 
