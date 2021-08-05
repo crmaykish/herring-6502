@@ -29,6 +29,8 @@ typedef struct
 
 } op_code_t;
 
+word assemble(char *source, byte *dest);
+
 // Brute-force lookup to go from mnemonic to opcode
 op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand);
 

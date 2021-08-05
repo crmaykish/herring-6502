@@ -48,7 +48,7 @@ static command_t commands[] = {
     {"da", 3, dis, "Disassemble the loaded program"},
     {"edit", 4, edit, "Edit a text file"},
     {"cat", 3, cat, "Print the file stored in RAM"},
-    {"as", 2, assemble, "Assemble the text in file RAM"}};
+    {"as", 2, as, "Assemble the text in file RAM"}};
 
 int main()
 {
@@ -279,7 +279,7 @@ void cat(loader_t *loader)
     print((byte *)FILE_RAM);
 }
 
-void assemble(loader_t *loader)
+void as(loader_t *loader)
 {
     // TODO: tokenizing the string in place is a lossy operation
     // Copy it somewhere temporary first

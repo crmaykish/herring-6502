@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "assembler.h"
 
 static op_code_t opcodes[] = {
@@ -276,6 +277,55 @@ static op_code_t opcodes[] = {
     // {"---", 0xFE, 1, ACC},
     // {"---", 0xFF, 1, ACC}
 };
+
+word assemble(char *source, byte *dest)
+{
+    op_code_t *opcode = NULL;
+    word operand = 0;
+    char *line = strtok(source, "\r\n");
+    word offset = 0;
+
+    while (line != NULL)
+    {
+        if (line[0] == ';')
+        {
+            // print(line);
+        }
+        else
+        {
+            printf(line);
+            printf(": ");
+
+            opcode = mnemonic_to_opcode(line, &operand);
+
+            // print_hex(opcode->code);
+            dest[offset] = opcode->code;
+            offset++;
+
+            if (opcode->bytes > 1)
+            {
+                // putc(' ');
+                // print_hex(operand & 0xFF);
+                dest[offset] = operand & 0xFF;
+                offset++;
+            }
+
+            if (opcode->bytes > 2)
+            {
+                // putc(' ');
+                // print_hex((operand & 0xFF00) >> 8);
+                dest[offset] = (operand & 0xFF00) >> 8;
+                offset++;
+            }
+        }
+
+        printf("\r\n");
+
+        line = strtok(NULL, "\r\n");
+    }
+
+    return offset;
+}
 
 op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand)
 {
