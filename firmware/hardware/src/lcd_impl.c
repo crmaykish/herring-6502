@@ -18,9 +18,17 @@ void lcd_create()
 
 void lcd_write(byte b)
 {
-    lcd_putc(b);
-    lcd.rows[lcd.current_row][lcd.char_count] = b;
-    lcd.char_count++;
+    if (b == '\r')
+    {
+        lcd.char_count = 16; // Kind of a hacky way to handle returns
+    }
+    else if (b != '\n')
+    {
+        lcd_putc(b);
+        lcd.rows[lcd.current_row][lcd.char_count] = b;
+        lcd.char_count++;
+    }
+
     update();
 }
 
