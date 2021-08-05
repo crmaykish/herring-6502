@@ -1,6 +1,7 @@
 #ifndef ACIA_H
 #define ACIA_H
 
+#include <stdbool.h>
 #include "herring.h"
 
 extern void acia_init();

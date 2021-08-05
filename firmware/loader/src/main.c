@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <peekpoke.h>
+#include <stdbool.h>
 #include "herring.h"
 #include "loader.h"
 #include "acia.h"
@@ -37,7 +38,7 @@ void erase(loader_t *loader);
 void dis(loader_t *loader);
 void edit(loader_t *loader);
 void cat(loader_t *loader);
-void assemble(loader_t *loader);
+void as(loader_t *loader);
 
 static command_t commands[] = {
     {"help", 4, help, "Show the help message"},
@@ -156,6 +157,7 @@ void dump(loader_t *loader)
 void erase(loader_t *loader)
 {
     memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
+    loader->binary_size = 0;
 }
 
 void dis(loader_t *loader)
@@ -228,10 +230,10 @@ void edit(loader_t *loader)
 {
     bool exit = false;
 
-    byte *file_buffer = (byte *)FILE_RAM;
+    char *file_buffer = (char *)FILE_RAM;
     word file_index = 0;
 
-    byte in = 0;
+    char in = 0;
 
     screen_clear();
 
@@ -244,9 +246,6 @@ void edit(loader_t *loader)
         case 0x03: // Ctrl-C
             exit = true;
             break;
-        // case 0x13: // Ctrl-S
-        //     strncpy((byte *)FILE_RAM, file_buffer, 1024);
-        //     break;
         case 0x0E: // Ctrl-N
             screen_clear();
             memset(file_buffer, 0, 1024);
@@ -276,60 +275,10 @@ void edit(loader_t *loader)
 
 void cat(loader_t *loader)
 {
-    print((byte *)FILE_RAM);
+    print((char *)FILE_RAM);
 }
 
 void as(loader_t *loader)
 {
-    // TODO: tokenizing the string in place is a lossy operation
-    // Copy it somewhere temporary first
-
-    word addr = PROGRAM_RAM;
-    op_code_t *opcode = NULL;
-    word operand = 0;
-    char *line = strtok((byte *)FILE_RAM, "\r\n");
-
-    while (line != NULL)
-    {
-        if (line[0] == ';')
-        {
-            print(line);
-        }
-        else
-        {
-            print(line);
-            print(": ");
-
-            opcode = mnemonic_to_opcode(line, &operand);
-
-            print_hex(opcode->code);
-            POKE(addr, opcode->code);
-            addr++;
-
-            if (opcode->bytes > 1)
-            {
-                putc(' ');
-                print_hex(operand & 0xFF);
-                POKE(addr, operand & 0xFF);
-                addr++;
-            }
-
-            if (opcode->bytes > 2)
-            {
-                putc(' ');
-                print_hex((operand & 0xFF00) >> 8);
-                POKE(addr, (operand & 0xFF00) >> 8);
-                addr++;
-            }
-        }
-
-        print("\r\n");
-
-        line = strtok(NULL, "\r\n");
-    }
+    assemble((char *)FILE_RAM, (byte *)PROGRAM_RAM);
 }
-
-// TODO: short list
-// The editor should load the existing file if it exists
-// Can probably save a ton of ROM space by just doing a search for all opcodes instead of mapping all 256
-// This is almost useful!
