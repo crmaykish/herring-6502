@@ -349,12 +349,14 @@ op_code_t *opcode_lookup(byte op)
 {
     byte i = 0;
 
-    while (i < 0xFF)
+    while (i < sizeof(opcodes) / sizeof(op_code_t))
     {
         if (opcodes[i].code == op)
         {
             return &opcodes[i];
         }
+
+        i++;
     }
 
     return NULL;

@@ -209,15 +209,17 @@ void dis(loader_t *loader)
             }
 
             // TODO: print any suffixes, e.g. closing parens, offsets, etc.
+
+            i += curr->bytes;
         }
         else
         {
-            print("BAD");
+            print("BAD: ");
+            print_hex(program[i]);
+            i++;
         }
 
         print("\r\n");
-
-        i += curr->bytes;
     }
 }
 
@@ -280,5 +282,5 @@ void cat(loader_t *loader)
 
 void as(loader_t *loader)
 {
-    assemble((char *)FILE_RAM, (byte *)PROGRAM_RAM);
+    loader->binary_size = assemble((char *)FILE_RAM, (byte *)PROGRAM_RAM);
 }
