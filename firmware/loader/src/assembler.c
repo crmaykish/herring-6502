@@ -287,39 +287,25 @@ word assemble(char *source, byte *dest)
 
     while (line != NULL)
     {
-        if (line[0] == ';')
+        if (line[0] != ';')
         {
-            // print(line);
-        }
-        else
-        {
-            printf(line);
-            printf(": ");
-
             opcode = mnemonic_to_opcode(line, &operand);
 
-            // print_hex(opcode->code);
             dest[offset] = opcode->code;
             offset++;
 
             if (opcode->bytes > 1)
             {
-                // putc(' ');
-                // print_hex(operand & 0xFF);
                 dest[offset] = operand & 0xFF;
                 offset++;
             }
 
             if (opcode->bytes > 2)
             {
-                // putc(' ');
-                // print_hex((operand & 0xFF00) >> 8);
                 dest[offset] = (operand & 0xFF00) >> 8;
                 offset++;
             }
         }
-
-        printf("\r\n");
 
         line = strtok(NULL, "\r\n");
     }
