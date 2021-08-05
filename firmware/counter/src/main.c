@@ -4,15 +4,15 @@
 
 int main()
 {
-    print("Setting up LCD... ");
-    lcd_init();
-    print("DONE\r\n");
+    byte in = 0;
 
+    lcd_create();
 
-
-    lcd_print("Herring 6502");
-    lcd_line2();
-    lcd_print("new line");
+    while (in != 0x03)
+    {
+        in = getc();
+        lcd_write(in);
+    }
 
     return 0;
 }
