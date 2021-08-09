@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+// #include <stdio.h>
 #include "assembler.h"
 
 static label_table_t label_table;
@@ -284,12 +284,12 @@ void add_label(char *line, word addr)
 {
     // TODO: if the label does not contain a ':', this will segfault
 
-    printf("LABEL PARSE: %s\r\n", line);
+    // printf("LABEL PARSE: %s\r\n", line);
 
     strncpy(label_table.labels[label_table.label_count], line, (char *)strchr(line, ':') - (char *)line);
     label_table.addresses[label_table.label_count] = addr;
 
-    printf("Adding label %s: 0x%04X\r\n", label_table.labels[label_table.label_count], label_table.addresses[label_table.label_count]);
+    // printf("Adding label %s: 0x%04X\r\n", label_table.labels[label_table.label_count], label_table.addresses[label_table.label_count]);
 
     label_table.label_count++;
 }
@@ -327,7 +327,7 @@ word assemble(char *source, byte *dest)
     // ==== PASS 1 ==== //
     // Find all the labels and meta-instructions
 
-    printf("\r\nStarting first pass...\r\n");
+    // printf("\r\nStarting first pass...\r\n");
 
     // TODO: cache the opcodes so we don't have to look them up in both passes. more ram, less cpu
 
@@ -339,7 +339,7 @@ word assemble(char *source, byte *dest)
 
             if (opcode == NULL)
             {
-                printf("op code is NULL: %s\r\n", line);
+                // printf("op code is NULL: %s\r\n", line);
 
                 if (line[0] == '.')
                 {
@@ -366,7 +366,7 @@ word assemble(char *source, byte *dest)
     // ==== PASS 2 ==== //
     // Translate instructions to opcodes
 
-    printf("\r\nStarting second pass...\r\n");
+    // printf("\r\nStarting second pass...\r\n");
 
     // Reset all of the working variables before the second pass
     free(source_copy);
@@ -384,7 +384,7 @@ word assemble(char *source, byte *dest)
 
             if (opcode != NULL)
             {
-                printf("%s => %02X, %04X\r\n", line, opcode->code, operand);
+                // printf("%s => %02X, %04X\r\n", line, opcode->code, operand);
 
                 dest[offset] = opcode->code;
                 offset++;
@@ -465,7 +465,7 @@ op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand, bool replace_labels
             // operand is a label
             // Note: labels must be all lower-case letters
             *operand = get_label_val(&mnemonic[4]);
-            printf("Replace %s with $%04X\r\n", &mnemonic[4], *operand);
+            // printf("Replace %s with $%04X\r\n", &mnemonic[4], *operand);
         }
     }
 

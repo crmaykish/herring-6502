@@ -24,7 +24,6 @@ typedef struct
     char name[6];
     byte len;
     void (*handler)(loader_t *);
-    char desc[40];
 } command_t;
 
 void interpret(loader_t *loader);
@@ -41,15 +40,15 @@ void cat(loader_t *loader);
 void as(loader_t *loader);
 
 static command_t commands[] = {
-    {"help", 4, help, "Show the help message"},
-    {"load", 4, load, "Load program from the serial port"},
-    {"run", 3, run, "Jump the program RAM"},
-    {"dump", 4, dump, "Dump program RAM"},
-    {"erase", 5, erase, "Erase program RAM"},
-    {"da", 3, dis, "Disassemble the loaded program"},
-    {"edit", 4, edit, "Edit a text file"},
-    {"cat", 3, cat, "Print the file stored in RAM"},
-    {"as", 2, as, "Assemble the text in file RAM"}};
+    {"help", 4, help},
+    {"load", 4, load},
+    {"run", 3, run},
+    {"dump", 4, dump},
+    {"erase", 5, erase},
+    {"da", 3, dis},
+    {"edit", 4, edit},
+    {"cat", 3, cat},
+    {"as", 2, as}};
 
 int main()
 {
@@ -99,8 +98,8 @@ void help(loader_t *loader)
     for (i = 0; i < sizeof(commands) / sizeof(command_t); i++)
     {
         print(commands[i].name);
-        print(": ");
-        print(commands[i].desc);
+        // print(": ");
+        // print(commands[i].desc);
         print("\r\n");
     }
 }
