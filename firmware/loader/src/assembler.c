@@ -282,8 +282,8 @@ word assemble(char *source, byte *dest)
 {
     op_code_t *opcode = NULL;
     word operand = 0;
-    char *line = strtok(source, "\r\n");
     word offset = 0;
+    char *line = strtok(source, "\r\n");
 
     while (line != NULL)
     {
@@ -291,18 +291,26 @@ word assemble(char *source, byte *dest)
         {
             opcode = mnemonic_to_opcode(line, &operand);
 
-            dest[offset] = opcode->code;
-            offset++;
-
-            if (opcode->bytes > 1)
+            if (opcode != NULL)
             {
-                dest[offset] = operand & 0xFF;
+
+                dest[offset] = opcode->code;
                 offset++;
-            }
 
-            if (opcode->bytes > 2)
+                if (opcode->bytes > 1)
+                {
+                    dest[offset] = operand & 0xFF;
+                    offset++;
+                }
+
+                if (opcode->bytes > 2)
+                {
+                    dest[offset] = (operand & 0xFF00) >> 8;
+                    offset++;
+                }
+            }
+            else
             {
-                dest[offset] = (operand & 0xFF00) >> 8;
                 offset++;
             }
         }
