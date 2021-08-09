@@ -3,6 +3,8 @@
 #include "herring.h"
 #include "assembler.h"
 
+void logger(char *c);
+
 int main(int argc, char *argv[])
 {
     char source[4096] = {0};
@@ -14,13 +16,13 @@ int main(int argc, char *argv[])
 
     int index = 0;
 
-    char c = 0;
+    char c = fgetc(source_file);
 
     while (c != EOF)
     {
-        c = fgetc(source_file);
         source[index] = c;
         index++;
+        c = fgetc(source_file);
     }
 
     fclose(source_file);
