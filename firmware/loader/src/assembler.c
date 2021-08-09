@@ -155,9 +155,9 @@ static op_code_t opcodes[] = {
     // {"---", 0x89, 1, ACC},
     {"txa", 0x8A, 1, IMPL},
     // {"---", 0x8B, 1, ACC},
-    // {"---", 0x8C, 1, ACC},
+    {"sty", 0x8C, 3, ABS},
     {"sta", 0x8D, 3, ABS},
-    // {"---", 0x8E, 1, ACC},
+    {"stx", 0x8E, 3, ABS},
     // {"---", 0x8F, 1, ACC},
     // 0x90
     {"bcc", 0x90, 2, REL},
@@ -343,10 +343,10 @@ word assemble(char *source, byte *dest)
 
                 if (line[0] == '.')
                 {
-                    // TODO: handle meta instructions
                     if (strncmp(line, ".org", 4) == 0)
                     {
-                        // TODO: set offset to org operand
+                        // Set offset to org operand
+                        offset = strtol(line + 6, NULL, 16);
                     }
                 }
                 else
