@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include "assembler.h"
 
+static label_table_t label_table;
+
 static op_code_t opcodes[] = {
     // 0x00
     {"brk", 0x00, 1, IMPL},
@@ -278,21 +280,111 @@ static op_code_t opcodes[] = {
     // {"---", 0xFF, 1, ACC}
 };
 
+void add_label(char *line, word addr)
+{
+    // TODO: if the label does not contain a ':', this will segfault
+
+    printf("LABEL PARSE: %s\r\n", line);
+
+    strncpy(label_table.labels[label_table.label_count], line, (char *)strchr(line, ':') - (char *)line);
+    label_table.addresses[label_table.label_count] = addr;
+
+    printf("Adding label %s: 0x%04X\r\n", label_table.labels[label_table.label_count], label_table.addresses[label_table.label_count]);
+
+    label_table.label_count++;
+}
+
+word get_label_val(char *line)
+{
+    byte i = 0;
+
+    for (i; i < label_table.label_count; i++)
+    {
+        if (strcmp(label_table.labels[i], line) == 0)
+        {
+            return label_table.addresses[i];
+        }
+    }
+
+    return 0;
+}
+
 word assemble(char *source, byte *dest)
 {
     op_code_t *opcode = NULL;
     word operand = 0;
     word offset = 0;
-    char *line = strtok(source, "\r\n");
+
+    char *source_copy = strdup(source);
+
+    char *line = strtok(source_copy, "\r\n");
+
+    // Reset label table
+    memset(label_table.labels, 0, MAX_LABELS * MAX_LABEL_LENGTH);
+    memset(label_table.addresses, 0, MAX_LABELS * sizeof(word));
+    label_table.label_count = 0;
+
+    // ==== PASS 1 ==== //
+    // Find all the labels and meta-instructions
+
+    printf("\r\nStarting first pass...\r\n");
+
+    // TODO: cache the opcodes so we don't have to look them up in both passes. more ram, less cpu
 
     while (line != NULL)
     {
         if (line[0] != ';')
         {
-            opcode = mnemonic_to_opcode(line, &operand);
+            opcode = mnemonic_to_opcode(line, &operand, false);
+
+            if (opcode == NULL)
+            {
+                printf("op code is NULL: %s\r\n", line);
+
+                if (line[0] == '.')
+                {
+                    // TODO: handle meta instructions
+                    if (strncmp(line, ".org", 4) == 0)
+                    {
+                        // TODO: set offset to org operand
+                    }
+                }
+                else
+                {
+                    add_label(line, offset);
+                }
+            }
+            else
+            {
+                offset += opcode->bytes;
+            }
+        }
+
+        line = strtok(NULL, "\r\n");
+    }
+
+    // ==== PASS 2 ==== //
+    // Translate instructions to opcodes
+
+    printf("\r\nStarting second pass...\r\n");
+
+    // Reset all of the working variables before the second pass
+    free(source_copy);
+    source_copy = strdup(source);
+    line = strtok(source_copy, "\r\n");
+    opcode = NULL;
+    offset = 0;
+    operand = 0;
+
+    while (line != NULL)
+    {
+        if (line[0] != ';')
+        {
+            opcode = mnemonic_to_opcode(line, &operand, true);
 
             if (opcode != NULL)
             {
+                printf("%s => %02X, %04X\r\n", line, opcode->code, operand);
 
                 dest[offset] = opcode->code;
                 offset++;
@@ -309,22 +401,26 @@ word assemble(char *source, byte *dest)
                     offset++;
                 }
             }
-            else
-            {
-                offset++;
-            }
         }
+
+        operand = 0;
+        opcode = NULL;
 
         line = strtok(NULL, "\r\n");
     }
 
+    free(source_copy);
+
     return offset;
 }
 
-op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand)
+op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand, bool replace_labels)
 {
     byte i = 0;
     address_mode_e mode = IMPL;
+    op_code_t *opcode = NULL;
+
+    // 1) Find the addressing mode
 
     // TODO: This is not a complete addressing mode lookup scheme
     if (mnemonic[4] == '#')
@@ -339,18 +435,41 @@ op_code_t *mnemonic_to_opcode(char *mnemonic, word *operand)
 
         *operand = strtol(mnemonic + 5, NULL, 16);
     }
+    // This is really fragile. Requires an instruction with no operands to have no space after it
+    else if (mnemonic[3] == ' ' && mnemonic[4] >= 'a' && mnemonic[4] <= 'z')
+    {
+        mode = ABS;
+    }
+
+    // 2) Lookup the full opcode
 
     while (i < 0xFF)
     {
         if (strncmp(mnemonic, opcodes[i].mnemonic, 3) == 0 && mode == opcodes[i].mode)
         {
-            return &opcodes[i];
+            opcode = &opcodes[i];
         }
 
         i++;
     }
 
-    return NULL;
+    // 3) Check for labels in the operand and replace with their real value
+
+    if (opcode != NULL)
+    {
+        if (replace_labels &&
+            opcode->bytes == 3 &&
+            mnemonic[4] >= 'a' &&
+            mnemonic[4] <= 'z')
+        {
+            // operand is a label
+            // Note: labels must be all lower-case letters
+            *operand = get_label_val(&mnemonic[4]);
+            printf("Replace %s with $%04X\r\n", &mnemonic[4], *operand);
+        }
+    }
+
+    return opcode;
 }
 
 op_code_t *opcode_lookup(byte op)

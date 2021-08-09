@@ -3,8 +3,6 @@
 #include "herring.h"
 #include "assembler.h"
 
-void logger(char *c);
-
 int main(int argc, char *argv[])
 {
     char source[4096] = {0};
@@ -29,6 +27,7 @@ int main(int argc, char *argv[])
 
     printf("Assembling source: \r\n");
     printf(source);
+    printf("\r\n");
 
     word size = assemble(source, machine_code);
 
