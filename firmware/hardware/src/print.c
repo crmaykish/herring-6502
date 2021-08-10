@@ -21,3 +21,22 @@ void print_dec(word w)
     utoa(w, s, 10);
     print(s);
 }
+
+void print_string_bin(char *str, byte max)
+{
+    byte i = 0;
+
+    while (i < max)
+    {
+        if (str[i] >= 32 && str[i] < 127)
+        {
+            putc(str[i]);
+        }
+        else
+        {
+            putc('.');
+        }
+
+        i++;
+    }
+}
