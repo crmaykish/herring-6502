@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "herring.h"
 #include "acia.h"
+#include "print.h"
 
 typedef enum
 {
@@ -34,16 +35,51 @@ void move_cursor(cursor_dir_e dir, byte steps)
     putc((char)dir);
 }
 
+void set_column(byte col)
+{
+    print("\033[");
+    print_dec(col);
+    putc('G');
+}
+
+void set_position(byte row, byte col)
+{
+    print("\033[");
+    print_dec(row);
+    putc(';');
+    print_dec(col);
+    putc('H');
+}
+
+void screen_clear()
+{
+    print("\033[2J\033[H");
+}
+
 int main()
 {
+    byte i = 0;
+    byte j = 0;
+
+    screen_clear();
+
     font_green();
+    set_position(5, 5);
     print("Conway's Game of Life");
     font_reset();
 
-    move_cursor(LEFT, 4);
+    set_column(40);
 
     font_red();
     putc('X');
+
+    font_reset();
+
+    for (i=0; i < 24; i++)
+    {
+        set_position(i, i);
+        putc('#');
+    }
 
     return 0;
 }
