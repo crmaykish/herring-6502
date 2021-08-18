@@ -49,25 +49,31 @@ int main()
 
     lcd_print("Primes:\r\n");
 
-    while (prime < 10000)
+    while (true)
     {
-        if (is_prime(prime))
+        count = 1;
+        prime = 2;
+
+        while (count <= 5000)
         {
-            utoa(count, output_string, 10);
-            lcd_print(output_string);
-            lcd_print(": ");
+            if (is_prime(prime))
+            {
+                utoa(count, output_string, 10);
+                lcd_print(output_string);
+                lcd_print(": ");
 
-            utoa(prime, output_string, 10);
-            lcd_print(output_string);
-            lcd_print("\r");
+                utoa(prime, output_string, 10);
+                lcd_print(output_string);
+                lcd_print("\r");
 
-            POKE(0xC000, reverse_bits(prime & 0xFF));
-            POKE(0xC001, reverse_bits((prime & 0xFF00) >> 8));
+                POKE(0xC000, reverse_bits(prime & 0xFF));
+                POKE(0xC001, reverse_bits((prime & 0xFF00) >> 8));
 
-            count++;
+                count++;
+            }
+
+            prime++;
         }
-
-        prime++;
     }
 
     return 0;
