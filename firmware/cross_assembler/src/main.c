@@ -12,16 +12,7 @@ int main(int argc, char *argv[])
     FILE *bin_file = fopen(argv[2], "w+");
     printf("Reading source file...\r\n");
 
-    int index = 0;
-
-    char c = fgetc(source_file);
-
-    while (c != EOF)
-    {
-        source[index] = c;
-        index++;
-        c = fgetc(source_file);
-    }
+    int index = fread(source, sizeof(char), 4096, source_file);
 
     fclose(source_file);
 

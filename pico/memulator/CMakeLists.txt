@@ -16,5 +16,8 @@ add_executable(memulator
 # Add pico_stdlib library which aggregates commonly used features
 target_link_libraries(memulator pico_stdlib)
 
+pico_enable_stdio_usb(memulator 1)
+pico_enable_stdio_uart(memulator 0)
+
 # create map/bin/hex/uf2 file in addition to ELF.
 pico_add_extra_outputs(memulator)
