@@ -46,7 +46,7 @@ int main()
     memset(memory, 0xEA, 0xFFFF);
 
     // Store the program code to "ROM"
-    uint8_t code[] = {0xA9, 0x00, 0x8D, 0x80, 0x00, 0x69, 0x01, 0x4C, 0x02, 0x80};
+    uint8_t code[] = {0xA9, 0x00, 0x8D, 0x02, 0xC0, 0x8D, 0x03, 0xC0, 0x8D, 0x00, 0xC0, 0x69, 0x01, 0x4C, 0x08, 0x80};
     memcpy(&memory[0x8000], code, sizeof(code) / sizeof(uint8_t));
 
     // Set interrupt vectors
@@ -108,8 +108,8 @@ int main()
             {
                 // Address is in the I/O space
                 gpio_set_dir_in_masked(DATA_BUS_MASK);
-                
             }
+            
             sleep_ms(10);
         }
         sleep_ms(25);
