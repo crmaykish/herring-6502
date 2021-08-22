@@ -14,7 +14,7 @@ add_executable(memulator
 )
 
 # Add pico_stdlib library which aggregates commonly used features
-target_link_libraries(memulator pico_stdlib)
+target_link_libraries(memulator pico_stdlib pico_multicore)
 
 pico_enable_stdio_usb(memulator 1)
 pico_enable_stdio_uart(memulator 0)
