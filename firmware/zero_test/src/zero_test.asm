@@ -13,11 +13,20 @@ acia_init:
     lda #$1F
     sta $F803
 
+via_init:
+    lda #$00
+    sta $F402
+    sta $F403
+    sta $F400
+    sta $F401
+
 restart:
     ldx #32
 
 loop:
     stx $F800
+    stx $F400
+    stx $F401
     cpx #126
     beq restart
     inx
