@@ -16,14 +16,14 @@
 #define DATA_BUS_MASK 0xFF
 #define ALL_PINS (DATA_BUS_MASK | ADDR_BUS_MASK | RW_MASK)
 
-#define IO_START 0xF400
-#define IO_END 0xFC00
+#define ROM_START 0xE000
+#define ROM_END 0xFFFF
 
 // 64K memory block
 static uint8_t memory[0xFFFF] = {0};
 
 // Program code
-static uint8_t code[] = {0xa9, 0x00, 0x8d, 0x01, 0xf8, 0xa9, 0x0b, 0x8d, 0x02, 0xf8, 0xa9, 0x1f, 0x8d, 0x03, 0xf8, 0xa9, 0x00, 0x8d, 0x02, 0xf4, 0x8d, 0x03, 0xf4, 0x8d, 0x00, 0xf4, 0x8d, 0x01, 0xf4, 0xa2, 0x20, 0x8e, 0x00, 0xf8, 0x8e, 0x00, 0xf4, 0x8e, 0x01, 0xf4, 0xe0, 0x7e, 0xf0, 0xf1, 0xe8, 0x4c, 0x1f, 0x02};
+static uint8_t code[] = {0xa9, 0x00, 0x8d, 0x01, 0x80, 0xa9, 0x0b, 0x8d, 0x02, 0x80, 0xa9, 0x1f, 0x8d, 0x03, 0x80, 0xa9, 0xff, 0x8d, 0x02, 0x84, 0xa9, 0x00, 0x8d, 0x00, 0x84, 0xa2, 0x20, 0x8e, 0x00, 0x80, 0x8e, 0x00, 0x84, 0xe0, 0x7e, 0xf0, 0xf4, 0xe8, 0x4c, 0x1b, 0xe0};
 
 void serial_handler()
 {
@@ -39,34 +39,22 @@ void serial_handler()
 void memory_handler()
 {
     uint address = 0;
-    bool rw = true; // read = true, write = false
 
     // Turn the LED on when emulation starts
     gpio_put(PICO_DEFAULT_LED_PIN, true);
 
     while (true)
     {
-        // Read the address bus and the read/write pin
+        // Read the address bus
         address = (gpio_get_all() & LOWER_ADDR_BUS_MASK) >> 8;
         address |= (gpio_get(A15_PIN) << 15);
 
-        rw = gpio_get(RW_PIN);
-
-        // If address is not in the I/O space
-        if (address < IO_START || address >= IO_END)
+        // If address is in "ROM"
+        if (address >= ROM_START && address <= ROM_END)
         {
-            if (rw)
-            {
-                // Output memory value to the data bus
-                gpio_set_dir_out_masked(DATA_BUS_MASK);
-                gpio_put_masked(DATA_BUS_MASK, memory[address]);
-            }
-            else
-            {
-                // Store data bus into memory
-                gpio_set_dir_in_masked(DATA_BUS_MASK);
-                memory[address] = (gpio_get_all() & DATA_BUS_MASK);
-            }
+            // Output memory value to the data bus
+            gpio_set_dir_out_masked(DATA_BUS_MASK);
+            gpio_put_masked(DATA_BUS_MASK, memory[address]);
         }
         else
         {
@@ -88,16 +76,16 @@ int main()
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
     // Write NOPs to all memory locations
-    memset(memory, 0xEA, 0xFFFF);
+    // memset(memory, 0xEA, 0xFFFF);
 
     // Store the program code to "ROM"
-    memcpy(&memory[0x200], code, sizeof(code) / sizeof(uint8_t));
+    memcpy(&memory[ROM_START], code, sizeof(code) / sizeof(uint8_t));
 
     // Set interrupt vectors
     memory[0xFFFA] = (uint8_t)0x00;
     memory[0xFFFB] = (uint8_t)0xA0;
     memory[0xFFFC] = (uint8_t)0x00;
-    memory[0xFFFD] = (uint8_t)0x02;
+    memory[0xFFFD] = (uint8_t)0xE0;
     memory[0xFFFE] = (uint8_t)0x00;
     memory[0xFFFF] = (uint8_t)0xB0;
 
