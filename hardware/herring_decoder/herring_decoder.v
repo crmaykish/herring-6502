@@ -45,7 +45,7 @@ module herring_decoder (
 	// 24 = 3 Hz
 	// 25 = 1.5 Hz
 	// 26 = 0.75 Hz
-	parameter INDEX = 5;
+	parameter INDEX = 19;
 
 	reg [26:0] counter;
 	
@@ -53,32 +53,28 @@ module herring_decoder (
 	always @(posedge clk_src) begin
 		counter <= counter + 1;
 	end	
-		
+
 	assign cpu_clk_in = counter[INDEX-1];
 	
 	// RAM Write
-	assign decoder[0] = 1;
+	assign decoder[0] = ~(cpu_clk_out & ~rw);	// Clock high and RW low (write)
 	
-	
+	// RAM High (disabled)
 	assign decoder[1] = 1;
-	
 	
 	assign decoder[2] = 1;
 	
-	
 	assign decoder[3] = 1;
-	
 	
 	assign decoder[4] = 1;
 	
+	// VIA 1 (0x8400)
+	assign decoder[5] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & address[10]);;
 	
-	assign decoder[5] = 1;
+	// ACIA 1 (0x8000)
+	assign decoder[6] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & ~address[10]);
 	
-	// Serial Card 1 - $F800
-	assign decoder[6] = ~(address[15] & address[14] & address[13] & address[12] & address[11] & ~address[10]);
-	//assign decoder[6] = 1;
-	
-	// Bus enable
+	// Bus enable (enabled)
 	assign decoder[7] = 1;
 
 endmodule
