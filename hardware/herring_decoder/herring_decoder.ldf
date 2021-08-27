@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BaliProject version="3.2" title="herring_decoder" device="LCMXO2-1200HC-4SG32C" default_implementation="impl">
+    <Options/>
+    <Implementation title="impl" dir="impl" description="impl" synthesis="lse" default_strategy="Strategy1">
+        <Options def_top="herring_decoder"/>
+        <Source name="herring_decoder.v" type="Verilog" type_short="Verilog">
+            <Options top_module="herring_decoder"/>
+        </Source>
+        <Source name="herring_decoder.lpf" type="Logic Preference" type_short="LPF">
+            <Options/>
+        </Source>
+    </Implementation>
+    <Strategy name="Strategy1" file="herring_decoder.sty"/>
+</BaliProject>
