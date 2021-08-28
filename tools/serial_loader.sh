@@ -20,6 +20,9 @@ echo -n "Transferring program: "
 
 echo -n "|"
 
+echo -en '\xDE' > ${DEVICE}
+sleep $SLEEP_TIME
+
 while [ $INDEX -lt $FILE_SIZE ]; do
     dd if=${FILE} of=${DEVICE} status=none bs=1 count=1 skip=$INDEX
 

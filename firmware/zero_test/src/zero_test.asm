@@ -10,6 +10,25 @@ VIA1_DDRA = $8403
 
 .segment "CODE"
 
+init:
+    jsr via_init
+    jsr acia_init
+
+    ldy #0
+
+restart:
+    ldx #32
+loop:
+    sty VIA1_PORTA
+    iny
+    stx ACIA1_DATA
+    stx VIA1_PORTB
+    cpx #126
+    beq restart
+    inx
+    
+    jmp loop
+
 acia_init:
     ; reset
     lda #$00
@@ -23,20 +42,15 @@ acia_init:
     lda #$1F
     sta ACIA1_CONTROL
 
+    rts
+
 via_init:
     lda #$FF
     sta VIA1_DDRB
+    sta VIA1_DDRA
 
     lda #0
     sta VIA1_PORTB
+    sta VIA1_PORTA
 
-restart:
-    ldx #32
-
-loop:
-    stx ACIA1_DATA
-    stx VIA1_PORTB
-    cpx #126
-    beq restart
-    inx
-    jmp loop
+    rts
