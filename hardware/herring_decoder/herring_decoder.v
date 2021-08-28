@@ -45,7 +45,7 @@ module herring_decoder (
 	// 24 = 3 Hz
 	// 25 = 1.5 Hz
 	// 26 = 0.75 Hz
-	parameter INDEX = 19;
+	parameter INDEX = 10;
 
 	reg [26:0] counter;
 	
@@ -69,7 +69,7 @@ module herring_decoder (
 	assign decoder[4] = 1;
 	
 	// VIA 1 (0x8400)
-	assign decoder[5] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & address[10]);;
+	assign decoder[5] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & address[10]);
 	
 	// ACIA 1 (0x8000)
 	assign decoder[6] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & ~address[10]);
