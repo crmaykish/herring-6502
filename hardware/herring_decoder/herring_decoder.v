@@ -45,7 +45,7 @@ module herring_decoder (
 	// 24 = 3 Hz
 	// 25 = 1.5 Hz
 	// 26 = 0.75 Hz
-	parameter INDEX = 10;
+	parameter INDEX = 5;
 
 	reg [26:0] counter;
 	

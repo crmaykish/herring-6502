@@ -27,7 +27,7 @@ bool volatile ready = false;
 
 void serial_handler()
 {
-    uint index = 0; // TODO: this index is overflowing and messing up the memory storage!
+    uint index = 0;
     uint8_t in = 0;
 
     uint8_t end_count = 0;
