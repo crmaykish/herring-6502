@@ -6,15 +6,17 @@
 
 void memdump(word address, byte bytes);
 
+void screen_clear();
+
 int main()
 {
     char buffer[80];
 
     acia_init();
 
-    // TODO: clear screen
+    screen_clear();
 
-    print("\r\nHerring 6502 Monitor v1.2\r\n");
+    print("Herring 6502 Monitor v1.2\r\n");
     print("Colin Maykish - 2021\r\n");
     print("github.com/crmaykish/herring-6502\r\n\r\n");
 
@@ -69,4 +71,9 @@ void memdump(word address, byte bytes)
     acia_putc('|');
     print_string_bin((char *)(address + i - 16), 16);
     acia_putc('|');
+}
+
+void screen_clear()
+{
+    print("\033[2J\033[H");
 }
