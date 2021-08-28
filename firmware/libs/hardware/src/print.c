@@ -9,7 +9,7 @@ void print_hex(word w)
 
     if (w < 0x10)
     {
-        putc('0');
+        acia_putc('0');
     }
 
     print(s);
@@ -30,11 +30,11 @@ void print_string_bin(char *str, byte max)
     {
         if (str[i] >= 32 && str[i] < 127)
         {
-            putc(str[i]);
+            acia_putc(str[i]);
         }
         else
         {
-            putc('.');
+            acia_putc('.');
         }
 
         i++;

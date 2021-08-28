@@ -6,8 +6,8 @@
 
 extern void acia_init();
 
-extern char getc();
-extern void __fastcall__ putc(byte);
+extern char acia_getc();
+extern void __fastcall__ acia_putc(byte);
 extern void __fastcall__ print(byte *);
 
 byte readline(char *buffer, bool echo);

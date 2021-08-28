@@ -1,4 +1,4 @@
-.export _acia_init, _putc, _getc, _print
+.export _acia_init, _acia_putc, _acia_getc, _print
 
 .include "herring.inc"
 
@@ -17,7 +17,7 @@ _acia_init:
     sta ACIA0_CONTROL
     rts
 
-_putc:
+_acia_putc:
     pha
 tx_check:
     lda ACIA0_STATUS
@@ -28,10 +28,10 @@ tx_check:
     ; jsr wdc_bug         ; Comment out for non-WDC 65C51s
     rts
 
-_getc:
+_acia_getc:
     lda ACIA0_STATUS
     and #ACIA_READY_RX
-    beq _getc
+    beq _acia_getc
     lda ACIA0_DATA
     rts
 
@@ -44,7 +44,7 @@ _print:
 next_char:
     lda (ptr1),y
     beq end_of_string
-    jsr _putc
+    jsr _acia_putc
     iny
     bne next_char
 end_of_string:

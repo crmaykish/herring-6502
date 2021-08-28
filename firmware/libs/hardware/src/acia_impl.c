@@ -3,17 +3,17 @@
 byte readline(char *buffer, bool echo)
 {
     byte count = 0;
-    byte in = getc();
+    byte in = acia_getc();
 
     while (in != '\n' && in != '\r')
     {
         if (echo)
         {
-            putc(in);
+            acia_putc(in);
         }
 
         buffer[count] = in;
-        in = getc();
+        in = acia_getc();
         count++;
     }
 
