@@ -27,7 +27,7 @@ bool volatile ready = false;
 
 void serial_handler()
 {
-    uint8_t index = 0;  // TODO: this index is overflowing and messing up the memory storage!
+    uint index = 0; // TODO: this index is overflowing and messing up the memory storage!
     uint8_t in = 0;
 
     uint8_t end_count = 0;
@@ -63,7 +63,7 @@ void serial_handler()
                 if (end_count == 3)
                 {
                     ready = true;
-                    printf("\r\nDONE!\r\n");
+                    printf("\r\nDONE! Bytes loaded: %d\r\n", index - 3);
                     gpio_put(PICO_DEFAULT_LED_PIN, true);
                 }
             }
