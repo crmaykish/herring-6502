@@ -40,3 +40,14 @@ void print_string_bin(char *str, byte max)
         i++;
     }
 }
+
+void print_line(char *str)
+{
+    print(str);
+    print_newline();
+}
+
+void print_newline()
+{
+    print("\r\n");
+}
