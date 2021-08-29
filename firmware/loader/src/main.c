@@ -60,10 +60,6 @@ int main()
         else if (strncmp(buffer, "jump", 4) == 0)
         {
             addr = strtol(&buffer[4], 0, 16);
-
-            print("Jump to: ");
-            print_hex(addr);
-
             jump_to(addr);
         }
         else if (strncmp(buffer, "zero", 4) == 0)
