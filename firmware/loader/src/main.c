@@ -8,6 +8,7 @@
 #include "terminal.h"
 #include "print.h"
 #include "memdump.h"
+#include "jump.h"
 
 #define INPUT_BUFFER_SIZE 80
 
@@ -28,7 +29,17 @@ int main()
         readline(buffer, true);
         print_newline();
 
-        if (strncmp(buffer, "peek", 4) == 0)
+        if (strncmp(buffer, "help", 4) == 0)
+        {
+            print_line("Commands:");
+            print_line("help");
+            print_line("peek <addr>");
+            print_line("poke <addr> <val>");
+            print_line("dump <addr>");
+            print_line("jump <addr>");
+            print("zero <addr>");
+        }
+        else if (strncmp(buffer, "peek", 4) == 0)
         {
             addr = strtol(&buffer[4], 0, 16);
             print_hex(PEEK(addr));
@@ -44,6 +55,24 @@ int main()
         {
             addr = strtol(&buffer[4], 0, 16);
             memdump(addr, 128);
+        }
+        else if (strncmp(buffer, "jump", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+
+            print("Jump to: ");
+            print_hex(addr);
+
+            jump_to(addr);
+        }
+        else if (strncmp(buffer, "zero", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            // val = strtol(&buffer[9], 0, 16);
+
+            memset((word *)addr, 0, 128);
+
+            print("OK");
         }
         else
         {
