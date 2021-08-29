@@ -20,8 +20,8 @@ module herring_decoder (
 	
 	reg[27:0] counter=28'd0;
 	
-	// Divide the 50 MHz source clock by 25 for a 2MHz CPU clock
-	parameter DIVISOR = 28'd25;
+	// Divide the 50 MHz source clock by 50 for a 1MHz CPU clock
+	parameter DIVISOR = 28'd50;
 	
 	always @(posedge clk_src)
 	begin
