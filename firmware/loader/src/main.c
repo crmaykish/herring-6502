@@ -33,6 +33,7 @@ int main()
         {
             print_line("Commands:");
             print_line("help");
+            print_line("clear");
             print_line("peek <addr>");
             print_line("poke <addr> <val>");
             print_line("dump <addr>");
@@ -73,6 +74,11 @@ int main()
             memset((word *)addr, 0, 128);
 
             print("OK");
+        }
+        else if (strncmp(buffer, "clear", 5) == 0)
+        {
+            screen_clear();
+            continue;
         }
         else
         {
