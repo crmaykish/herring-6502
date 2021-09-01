@@ -11,17 +11,17 @@ cl65 -O \
     -t none \
     --cpu 65c02 \
     --static-locals \
-    -I hardware/include/ \
-    --asm-include-dir hardware/include \
+    -I libs/hardware/include/ \
+    --asm-include-dir libs/hardware/include \
     -I ${TARGET}/include/ \
     --asm-include-dir ${TARGET}/include \
     -C config/${TYPE}.cfg \
     -o ${TARGET}/build/firmware.bin \
-    -m ${TARGET}/build/loader.map \
-    ${TARGET}/src/* hardware/src/* \
+    -m ${TARGET}/build/${TARGET}.map \
+    ${TARGET}/src/* libs/hardware/src/* \
     config/${TYPE}.lib
 
 mv ${TARGET}/src/*.o ${TARGET}/build/
-mv hardware/src/*.o ${TARGET}/build/
+mv libs/hardware/src/*.o ${TARGET}/build/
 
 echo "Done!"

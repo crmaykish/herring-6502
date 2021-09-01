@@ -1,285 +1,130 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include <peekpoke.h>
-#include <stdbool.h>
 #include "herring.h"
-#include "loader.h"
 #include "acia.h"
+#include "terminal.h"
 #include "print.h"
-#include "assembler.h"
+#include "memdump.h"
+#include "jump.h"
 
-#define PROGRAM_RAM 0x1000
-#define FILE_RAM 0x8000
-#define MAGIC_END_BYTE 0xDE
-#define LOADER_BUFFER_LEN 40
+#define INPUT_BUFFER_SIZE 80
 
-typedef struct
-{
-    char buffer[LOADER_BUFFER_LEN];
-    word binary_size;
-} loader_t;
-
-typedef struct
-{
-    char name[6];
-    byte len;
-    void (*handler)(loader_t *);
-} command_t;
-
-void interpret(loader_t *loader);
-
-// Command handlers
-void help(loader_t *loader);
-void load(loader_t *loader);
-void run(loader_t *loader);
-void dump(loader_t *loader);
-void erase(loader_t *loader);
-void dis(loader_t *loader);
-void edit(loader_t *loader);
-void cat(loader_t *loader);
-void as(loader_t *loader);
-
-static command_t commands[] = {
-    {"help", 4, help},
-    {"load", 4, load},
-    {"run", 3, run},
-    {"dump", 4, dump},
-    {"erase", 5, erase},
-    {"da", 3, dis},
-    {"edit", 4, edit},
-    {"cat", 3, cat},
-    {"as", 2, as}};
+void header();
+void free_ram();
 
 int main()
 {
-    loader_t loader;
-    loader.binary_size = 0;
-    memset(loader.buffer, 0, LOADER_BUFFER_LEN);
+    char buffer[INPUT_BUFFER_SIZE];
+    word addr = 0;
+    byte val = 0;
 
     acia_init();
-
-    print("\r\nHerring 6502\r\n");
+    header();
 
     while (true)
     {
         print("> ");
-        readline(loader.buffer, true);
-        print("\r\n");
+        readline(buffer, true);
+        print_newline();
 
-        interpret(&loader);
+        if (strncmp(buffer, "help", 4) == 0)
+        {
+            print_line("Commands:");
+            print_line("help");
+            print_line("clear");
+            print_line("free");
+            print_line("peek <addr>");
+            print_line("poke <addr> <val>");
+            print_line("dump <addr>");
+            print_line("jump <addr>");
+            print("zero <addr>");
+        }
+        else if (strncmp(buffer, "peek", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            print_hex(PEEK(addr));
+        }
+        else if (strncmp(buffer, "poke", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            val = strtol(&buffer[9], 0, 16);
+            POKE(addr, val);
+            print("OK");
+        }
+        else if (strncmp(buffer, "dump", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            memdump(addr, 128);
+        }
+        else if (strncmp(buffer, "jump", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            jump_to(addr);
+        }
+        else if (strncmp(buffer, "zero", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            memset((word *)addr, 0, 128);
 
-        print("\r\n");
+            print("OK");
+        }
+        else if (strncmp(buffer, "free", 4) == 0)
+        {
+            free_ram();
+        }
+        else if (strncmp(buffer, "clear", 5) == 0)
+        {
+            screen_clear();
+            continue;
+        }
+        else
+        {
+            font_red();
+            print("Command not found: ");
+            print(buffer);
+            font_reset();
+        }
+
+        print_newline();
     }
 
     return 0;
 }
 
-void interpret(loader_t *loader)
+void header()
 {
-    byte i;
-
-    for (i = 0; i < sizeof(commands) / sizeof(command_t); i++)
-    {
-        if (strncmp(loader->buffer, commands[i].name, commands[i].len) == 0)
-        {
-            // Found the command, run the handler
-            commands[i].handler(loader);
-            return;
-        }
-    }
-
-    print("Command not found");
-}
-
-void help(loader_t *loader)
-{
-    byte i;
-
-    for (i = 0; i < sizeof(commands) / sizeof(command_t); i++)
-    {
-        print(commands[i].name);
-        // print(": ");
-        // print(commands[i].desc);
-        print("\r\n");
-    }
-}
-
-void load(loader_t *loader)
-{
-    byte b = 0;
-    byte magic_count = 0;
-    loader->binary_size = 0;
-
-    while (magic_count != 3)
-    {
-        b = getc();
-        POKE(PROGRAM_RAM + loader->binary_size, b);
-        loader->binary_size++;
-
-        if (b == MAGIC_END_BYTE)
-        {
-            magic_count++;
-        }
-        else
-        {
-            magic_count = 0;
-        }
-    }
-}
-
-void run(loader_t *loader)
-{
-    run_loaded_program();
-}
-
-void dump(loader_t *loader)
-{
-    word i = 0;
-    byte b = 0;
-
-    while (i < 240)
-    {
-        b = PEEK(PROGRAM_RAM + i);
-        if (b >= 32 && b < 127)
-        {
-            putc(b);
-        }
-        else
-        {
-            putc('.');
-        }
-
-        i++;
-    }
-}
-
-void erase(loader_t *loader)
-{
-    memset((void *)PROGRAM_RAM, 0, 0xC000 - PROGRAM_RAM);
-    loader->binary_size = 0;
-}
-
-void dis(loader_t *loader)
-{
-    word i = 0;
-    op_code_t *curr = NULL;
-    byte *program = (byte *)PROGRAM_RAM;
-
-    while (i < loader->binary_size)
-    {
-        print_hex((word)program + i);
-        print(": ");
-
-        curr = opcode_lookup(program[i]);
-
-        if (curr != NULL)
-        {
-            // Print the mnemonic
-            print(curr->mnemonic);
-            putc(' ');
-
-            // Print any needed prefixes of the operand
-            switch (curr->mode)
-            {
-            case IMM:
-                print("#$");
-                break;
-            case ABS:
-                putc('$');
-                break;
-            case REL:
-                putc('$');
-                break;
-            default:
-                break;
-            }
-
-            // Print the operand
-            switch (curr->bytes)
-            {
-            case 2:
-                print_hex(program[i + 1]);
-                break;
-            case 3:
-                print_hex(program[i + 2]);
-                print_hex(program[i + 1]);
-            default:
-                break;
-            }
-
-            // TODO: print any suffixes, e.g. closing parens, offsets, etc.
-
-            i += curr->bytes;
-        }
-        else
-        {
-            print("BAD: ");
-            print_hex(program[i]);
-            i++;
-        }
-
-        print("\r\n");
-    }
-}
-
-void screen_clear()
-{
-    print("\033[2J\033[H");
-}
-
-void edit(loader_t *loader)
-{
-    bool exit = false;
-
-    char *file_buffer = (char *)FILE_RAM;
-    word file_index = 0;
-
-    char in = 0;
-
     screen_clear();
 
-    while (!exit)
-    {
-        in = getc();
+    font_green();
+    print("Herring 6502 Monitor v1.2\r\n");
 
-        switch (in)
-        {
-        case 0x03: // Ctrl-C
-            exit = true;
-            break;
-        case 0x0E: // Ctrl-N
-            screen_clear();
-            memset(file_buffer, 0, 1024);
-            file_index = 0;
-            break;
-        case 0x7F: // Backspace
-            putc(0x08);
-            file_index--;
-            file_buffer[file_index] = 0;
-            break;
-        case 0x0D: // Enter
-            print("\r\n");
-            file_buffer[file_index] = '\r';
-            file_buffer[file_index + 1] = '\n';
-            file_index += 2;
-            break;
-        default:
-            putc(in);
-            file_buffer[file_index] = in;
-            file_index++;
-            break;
-        }
-    }
+    font_red();
+    print("Colin Maykish - 2021\r\n");
 
-    screen_clear();
+    font_cyan();
+    print("github.com/crmaykish/herring-6502\r\n");
+
+    font_reset();
+
+    print("-----\r\n");
+
+    font_blue();
+    print("Available RAM: ");
+    free_ram();
+    print_newline();
+
+    font_reset();
+
+    print("-----\r\n");
 }
 
-void cat(loader_t *loader)
+void free_ram()
 {
-    print((char *)FILE_RAM);
-}
+    size_t free_ram = _heapmemavail();
 
-void as(loader_t *loader)
-{
-    loader->binary_size = assemble((char *)FILE_RAM, (byte *)PROGRAM_RAM);
+    print_dec(free_ram);
+    print(" bytes free");
 }
