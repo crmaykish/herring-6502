@@ -15,11 +15,10 @@ IRQ_CODE = %00001111
 END_OF_MAIN_CODE = %00111100
 ERROR_PORT = VIA0_PORTA
 
-
-; .segment "VECTORS"
-;     .addr nmi_handler
-;     .addr _init
-;     .addr irq_handler
+ .segment "VECTORS"
+     .addr nmi_handler
+     .addr _init
+     .addr irq_handler
 
 .segment  "STARTUP"
 

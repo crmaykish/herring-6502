@@ -13,6 +13,7 @@
 #define INPUT_BUFFER_SIZE 80
 
 void header();
+void free_ram();
 
 int main()
 {
@@ -34,6 +35,7 @@ int main()
             print_line("Commands:");
             print_line("help");
             print_line("clear");
+            print_line("free");
             print_line("peek <addr>");
             print_line("poke <addr> <val>");
             print_line("dump <addr>");
@@ -71,6 +73,10 @@ int main()
 
             print("OK");
         }
+        // else if (strncmp(buffer, "free", 4) == 0)
+        // {
+        //     print_line("free");
+        // }
         else if (strncmp(buffer, "clear", 5) == 0)
         {
             screen_clear();
@@ -92,8 +98,6 @@ int main()
 
 void header()
 {
-    size_t free_ram = _heapmemavail();
-
     screen_clear();
 
     font_green();
@@ -111,10 +115,17 @@ void header()
 
     font_blue();
     print("Available RAM: ");
-    print_dec(free_ram);
-    print(" bytes\r\n");
+    free_ram();
 
     font_reset();
 
     print("-----\r\n");
+}
+
+void free_ram()
+{
+    size_t free_ram = _heapmemavail();
+
+    print_dec(free_ram);
+    print(" bytes\r\n");
 }

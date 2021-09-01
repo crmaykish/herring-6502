@@ -1,5 +1,5 @@
 #define SERIAL_BAUDRATE 115200
-#define CLOCK_DELAY 250
+#define CLOCK_SPEED_HZ 1000
 
 // Clock
 #define CLK_IN PIN_PC2
@@ -26,6 +26,7 @@ uint8_t reverse_bits(uint8_t b);
 
 uint8_t volatile data_bus = 0;
 uint16_t volatile addr_bus = 0;
+bool volatile rw = 0;
 
 void write_ram(uint16_t addr, uint8_t val)
 {
@@ -45,39 +46,10 @@ void write_ram(uint16_t addr, uint8_t val)
 void setup() {
   Serial1.begin(SERIAL_BAUDRATE);
 
-  pinMode(CLK_IN, INPUT);
+  pinMode(CLK_IN, OUTPUT);
   pinMode(CLK_OUT, INPUT);
   pinMode(BUS_EN, OUTPUT);
   pinMode(RESB, OUTPUT);
-
-  // Load program code to RAM
-
-  Serial1.println("Load program into RAM...");
-
-  digitalWrite(BUS_EN, LOW);
-
-  pinMode(A15, OUTPUT);
-  PORT_ADDR_HIGH.DIR = 0xFF;
-  PORT_ADDR_LOW.DIR = 0xFF;  
-
-  PORT_DATA.DIR = 0xFF;
-
-  pinMode(RWB, OUTPUT);
-  digitalWrite(RWB, HIGH);
-
-  uint8_t program[] = {0xa9, 0x00, 0x8d, 0x01, 0xf8, 0xa9, 0x0b, 0x8d, 0x02, 0xf8, 0xa9, 0x1f, 0x8d, 0x03, 0xf8, 0xa9, 0x00, 0x8d, 0x02, 0xf4, 0x8d, 0x03, 0xf4, 0x8d, 0x00, 0xf4, 0x8d, 0x01, 0xf4, 0xa2, 0x20, 0x8e, 0x00, 0xf8, 0x8e, 0x00, 0xf4, 0x8e, 0x01, 0xf4, 0xe0, 0x7e, 0xf0, 0xf1, 0xe8, 0x4c, 0x1f, 0x02};
-
-  for (int i = 0; i < sizeof(program); i++)
-  {
-    uint16_t addr = 0x200 + i;
-    
-    write_ram(addr, program[i]);
-  }
-
-  // Write the reset vector (0x200)
-  write_ram(0xFFFC, 0x00);
-  write_ram(0xFFFD, 0x02);
-
   pinMode(RWB, INPUT);
 
   // Set data bus to input
@@ -104,6 +76,10 @@ void setup() {
   delay(10);
 
   attachInterrupt(digitalPinToInterrupt(CLK_OUT), clock_interrupt, RISING);
+
+  delay(20);
+
+  tone(CLK_IN, CLOCK_SPEED_HZ);
 }
 
 void loop() {
@@ -114,7 +90,9 @@ void clock_interrupt()
 {
   addr_bus = (digitalRead(A15) << 15) + (reverse_bits(PORT_ADDR_HIGH.IN) << 7) + reverse_bits(PORT_ADDR_LOW.IN);
   data_bus = PORT_DATA.IN;
+  rw = digitalRead(RWB);
 
+  Serial1.print(rw ? "R | " : "W | ");
   Serial1.print(addr_bus, HEX);
   Serial1.print(": ");
   Serial1.print(data_bus, HEX);

@@ -6,3 +6,8 @@ a.out
 *.lst
 *.bin
 build/
+hardware/herring_decoder/.run_manager.ini
+hardware/herring_decoder/herring_decoder_tcl.html
+hardware/herring_decoder/reportview.xml
+hardware/herring_decoder/promote.xml
+hardware/herring_decoder/herring_decoder_tcr.dir/*
