@@ -67,16 +67,14 @@ int main()
         else if (strncmp(buffer, "zero", 4) == 0)
         {
             addr = strtol(&buffer[4], 0, 16);
-            // val = strtol(&buffer[9], 0, 16);
-
             memset((word *)addr, 0, 128);
 
             print("OK");
         }
-        // else if (strncmp(buffer, "free", 4) == 0)
-        // {
-        //     print_line("free");
-        // }
+        else if (strncmp(buffer, "free", 4) == 0)
+        {
+            free_ram();
+        }
         else if (strncmp(buffer, "clear", 5) == 0)
         {
             screen_clear();
@@ -116,6 +114,7 @@ void header()
     font_blue();
     print("Available RAM: ");
     free_ram();
+    print_newline();
 
     font_reset();
 
@@ -127,5 +126,5 @@ void free_ram()
     size_t free_ram = _heapmemavail();
 
     print_dec(free_ram);
-    print(" bytes\r\n");
+    print(" bytes free");
 }
