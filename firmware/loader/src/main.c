@@ -14,6 +14,7 @@
 
 void header();
 void free_ram();
+void load_code(word addr);
 
 int main()
 {
@@ -40,6 +41,7 @@ int main()
             print_line("poke <addr> <val>");
             print_line("dump <addr>");
             print_line("jump <addr>");
+            print_line("load <addr>");
             print("zero <addr>");
         }
         else if (strncmp(buffer, "peek", 4) == 0)
@@ -79,6 +81,15 @@ int main()
         {
             screen_clear();
             continue;
+        }
+        else if (strncmp(buffer, "load", 4) == 0)
+        {
+            addr = strtol(&buffer[4], 0, 16);
+            print("Loading into: 0x");
+            print_hex(addr);
+            print_line("...");
+
+            load_code(addr);
         }
         else
         {
@@ -127,4 +138,37 @@ void free_ram()
 
     print_dec(free_ram);
     print(" bytes free");
+}
+
+void load_code(word addr)
+{
+    word in_count = 0;
+    byte magic_count = 0;
+    byte in = 0;
+
+    while (magic_count != 3)
+    {
+        in = acia_getc();
+
+        // Don't store the first DE magic byte that comes in
+        if (in == 0xDE && in_count == 0)
+        {
+            continue;
+        }
+
+        POKE(addr + in_count, in);
+
+        if (in == 0xDE)
+        {
+            magic_count++;
+        }
+        else
+        {
+            magic_count = 0;
+        }
+
+        in_count++;
+    }
+
+    print_line("Done loading!");
 }
