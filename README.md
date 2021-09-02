@@ -93,6 +93,40 @@ The motherboard and daughterboards are connected with a 40 pin single-row connec
 
 # Software
 
+Herring currently runs a simple monitor program from ROM that provides the basic peek, poke, jump commands as well as memory clearing and memory dumping.
+
+```
+Herring 6502 Monitor v1.2
+Colin Maykish - 2021
+github.com/crmaykish/herring-6502
+-----
+Available RAM: 31581 bytes free
+-----
+> help
+Commands:
+help
+clear
+free
+peek <addr>
+poke <addr> <val>
+dump <addr>
+jump <addr>
+zero <addr>
+```
+
+```
+> dump E000
+E000  A9 FF 8D 03 84 8D 02 84  A9 00 8D 00 84 8D 01 84  |................|
+E010  4C 26 E0 A9 F0 8D 01 84  4C 23 E0 A9 0F 8D 01 84  |L&......L#......|
+E020  4C 23 E0 4C 23 E0 78 A2  FF 9A D8 A9 00 85 02 A9  |L#.L#.x.........|
+E030  80 85 03 20 B4 EC A9 01  8D 01 84 20 97 E6 A9 02  |... ....... ....|
+E040  8D 01 84 20 68 E0 A9 03  8D 01 84 20 D5 E0 A9 3C  |... h...... ...<|
+E050  8D 01 84 4C 23 E0 58 E0  38 A5 02 E9 00 8D 06 02  |...L#.X.8.......|
+E060  A5 03 E9 02 8D 07 02 60  A0 02 F0 07 A9 56 A2 E0  |.......`.....V..|
+E070  4C 0C 02 60 8D 00 02 8E  01 02 6C 00 02 20 01 E6  |L..`......l.. ..|
+```
+
+This monitor program is written in C and was built with the cc65 compiler. A customized set of config files are provided in the `firmware/config` directory.
 
 # References
 
