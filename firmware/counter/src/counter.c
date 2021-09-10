@@ -19,7 +19,10 @@ int main()
 
     while (true)
     {
-        // Write the FPGA GPIO latch
+        // Write byte to VIA port B
+        POKE(0x8400, a);
+
+        // Write byte to the FPGA GPIO Latch
         POKE(0x8C00, a);
         delay(1000);
         a++;

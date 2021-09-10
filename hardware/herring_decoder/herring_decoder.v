@@ -18,17 +18,17 @@ module herring_decoder (
 	input rw
 );
 	
-	reg[27:0] counter=28'd0;
+	reg[31:0] counter=32'd0;
 	
-	// Divide the 50 MHz source clock by 50 for a 1MHz CPU clock
-	parameter DIVISOR = 28'd50;
+	// Divide the 50 MHz source clock by 8 for a 6.25MHz CPU clock
+	parameter DIVISOR = 32'd8;
 	
 	always @(posedge clk_src)
 	begin
-		counter <= counter + 28'd1;
+		counter <= counter + 32'd1;
 		
 		if(counter>=(DIVISOR-1))
-			counter <= 28'd0;
+			counter <= 32'd0;
 
 		cpu_clk_in <= (counter<DIVISOR/2)?1'b1:1'b0;
 	end
@@ -36,8 +36,8 @@ module herring_decoder (
 	// RAM Write
 	assign decoder[0] = ~(cpu_clk_out & ~rw);	// Clock high and RW low (write)
 	
-	// RAM High (disabled)
-	assign decoder[1] = 1;
+	// ROM (0xE000 - 0xFFFF)
+	assign decoder[1] = ~(address[15] & address[14] & address[13]);
 	
 	assign decoder[2] = 1;
 	
