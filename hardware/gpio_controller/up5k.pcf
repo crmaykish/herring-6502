@@ -1,0 +1,20 @@
+set_io --warn-no-port IO[0] 2
+set_io --warn-no-port IO[1] 46
+set_io --warn-no-port IO[2] 47
+set_io --warn-no-port IO[3] 45
+set_io --warn-no-port IO[4] 48
+set_io --warn-no-port IO[5] 3
+set_io --warn-no-port IO[6] 4
+set_io --warn-no-port IO[7] 44
+
+set_io --warn-no-port DATA[0] 38
+set_io --warn-no-port DATA[1] 42
+set_io --warn-no-port DATA[2] 36
+set_io --warn-no-port DATA[3] 43
+set_io --warn-no-port DATA[4] 34
+set_io --warn-no-port DATA[5] 37
+set_io --warn-no-port DATA[6] 31
+set_io --warn-no-port DATA[7] 35
+
+set_io --warn-no-port EN 25
+set_io --warn-no-port CLK 23
