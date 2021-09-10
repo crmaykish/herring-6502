@@ -41,9 +41,11 @@ module herring_decoder (
 	
 	assign decoder[2] = 1;
 	
-	assign decoder[3] = 1;
+	// FPGA (0x8C00)
+	assign decoder[3] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & address[11] & address[10]);
 	
-	assign decoder[4] = 1;
+	// (0x8800)
+	assign decoder[4] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & address[11] & ~address[10]);
 	
 	// VIA 1 (0x8400)
 	assign decoder[5] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & address[10]);
