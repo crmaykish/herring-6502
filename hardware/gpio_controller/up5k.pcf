@@ -18,3 +18,4 @@ set_io --warn-no-port DATA[7] 35
 
 set_io --warn-no-port EN 25
 set_io --warn-no-port CLK 23
+set_io --warn-no-port RST 19

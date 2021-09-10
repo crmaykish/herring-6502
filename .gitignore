@@ -11,3 +11,7 @@ hardware/herring_decoder/herring_decoder_tcl.html
 hardware/herring_decoder/reportview.xml
 hardware/herring_decoder/promote.xml
 hardware/herring_decoder/herring_decoder_tcr.dir/*
+hardware/gpio_controller/.sconsign.dblite
+hardware/gpio_controller/hardware.asc
+hardware/gpio_controller/hardware.json
+hardware/gpio_controller/hardware.out
