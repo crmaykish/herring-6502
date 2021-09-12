@@ -1,12 +1,24 @@
-module vga_controller(R, G, B, Hs, Vs, CLK);
+module vga_controller(R, G, B, Hs, Vs, CLK, DATA, CE, RW);
     input CLK;
-    output R, G, B;
+    output reg R, G, B;
     output Hs, Vs;
     
+    input [7:0] DATA;
+    input CE, RW;
+
     reg [9:0] sx;
     reg [9:0] sy;
 
     wire de;
+
+    // Framebuffer, 160x120, 3-bit color
+    reg [2:0] v_ram [0:159][0:119];
+
+    initial begin
+        v_ram[50][50] = 3'b001;
+        v_ram[12][25] = 3'b101;
+        v_ram[89][100] = 3'b010;
+    end
 
     // 25 MHz clock generation (from 50 MHz source clock)
     reg pixel_clock = 1'b1;
@@ -25,7 +37,6 @@ module vga_controller(R, G, B, Hs, Vs, CLK);
     parameter VS_END = VS_STA + 2;
     parameter SCREEN = 524;
 
-
     always @(posedge pixel_clock) begin
         if (sx == LINE)
             begin
@@ -38,14 +49,16 @@ module vga_controller(R, G, B, Hs, Vs, CLK);
             end
     end
 
+    always @(posedge pixel_clock) begin
+        if (de) begin
+            R <= v_ram[sx[9:2]][sy[9:2]][0];
+            G <= v_ram[sx[9:2]][sy[9:2]][1];
+            B <= v_ram[sx[9:2]][sy[9:2]][2];
+        end
+    end
+
     assign Hs = ~(sx >= HS_STA && sx < HS_END);
     assign Vs = ~(sy >= VS_STA && sy < VS_END);
     assign de = (sx <= HA_END && sy <= VA_END);
-
-    assign R = (de && (sx < 32 && sy < 32)) ? 1 : 0;
-
-    assign G = (de && (sx > 600 && sy > 440)) ? 1 : 0;
-
-    assign B = (de && (sx > 400 && sx < 500) && sy > 300 && sy < 360) ? 1 : 0;
 
 endmodule
