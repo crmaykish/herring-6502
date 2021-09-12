@@ -6,7 +6,7 @@ module herring_decoder (
 	input cpu_clk_out,
 	
 	// CPU clock in (output from FPGA perspective)
-	output cpu_clk_in,
+	output reg cpu_clk_in,
 	
 	// Address bus
 	input [15:10] address,
@@ -17,11 +17,11 @@ module herring_decoder (
 	// RWB pin
 	input rw
 );
-	/*
+	
 	reg[31:0] counter=32'd0;
 	
-	// Divide the 50 MHz source clock by 8 for a 6.25MHz CPU clock
-	parameter DIVISOR = 32'd8;
+	// Divide the 50 MHz source clock by 15 for a 3.33MHz CPU clock
+	parameter DIVISOR = 32'd15;
 	
 	always @(posedge clk_src)
 	begin
@@ -32,13 +32,6 @@ module herring_decoder (
 
 		cpu_clk_in <= (counter<DIVISOR/2)?1'b1:1'b0;
 	end
-	*/
-	
-	// Use the FPGA's internal oscillator to generate a 7 MHz CPU clock
-	OSCH #(.NOM_FREQ("7.00")) oscillator (
-		.STDBY(1'b0), 
-		.OSC(cpu_clk_in)
-	);
 	
 	// RAM Write
 	assign decoder[0] = ~(cpu_clk_out & ~rw);	// Clock high and RW low (write)
