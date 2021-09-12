@@ -15,9 +15,13 @@ module vga_controller(R, G, B, Hs, Vs, CLK, DATA, CE, RW);
     reg [2:0] v_ram [0:159][0:119];
 
     initial begin
-        v_ram[50][50] = 3'b001;
-        v_ram[12][25] = 3'b101;
-        v_ram[89][100] = 3'b010;
+        v_ram[10][10] = 3'b001;
+        v_ram[20][20] = 3'b010;
+        v_ram[20][20] = 3'b011;
+        v_ram[30][30] = 3'b100;
+        v_ram[40][40] = 3'b101;
+        v_ram[50][50] = 3'b110;
+        v_ram[60][60] = 3'b111;
     end
 
     // 25 MHz clock generation (from 50 MHz source clock)
