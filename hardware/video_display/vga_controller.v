@@ -17,42 +17,35 @@ module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, RESB, CPU_CLK, RWB, CE);
     reg [7:0] y_coord;
     reg [2:0] color;
 
-    reg [9:0] sx;
+    reg [10:0] sx;
     reg [9:0] sy;
 
     reg de;
 
-    // Framebuffer, 160x120, 3-bit color
-    reg [2:0] v_ram [0:159][0:119];
+    // Framebuffer, 200x150, 3-bit color
+    reg [2:0] v_ram [0:199][0:149];
 
     initial begin
         v_ram[10][10] <= 3'b001;
         v_ram[20][20] <= 3'b010;
-        v_ram[20][20] <= 3'b011;
-        v_ram[30][30] <= 3'b100;
-        v_ram[40][40] <= 3'b101;
-        v_ram[50][50] <= 3'b110;
-        v_ram[60][60] <= 3'b111;
+        v_ram[30][30] <= 3'b011;
+        v_ram[40][40] <= 3'b100;
+        v_ram[50][50] <= 3'b101;
+        v_ram[60][60] <= 3'b110;
+        v_ram[70][70] <= 3'b111;
     end
 
-    // 25 MHz clock generation (from 50 MHz source clock)
-    reg pixel_clock = 1'b1;
+    parameter HA_END = 799;
+    parameter HS_STA = HA_END + 40;
+    parameter HS_END = HS_STA + 128;
+    parameter LINE = 1055;
+
+    parameter VA_END = 599;
+    parameter VS_STA = VA_END + 1;
+    parameter VS_END = VS_STA + 4;
+    parameter SCREEN = 627;
 
     always @(posedge CLK) begin
-        pixel_clock <= ~pixel_clock;
-    end
-
-    parameter HA_END = 639;
-    parameter HS_STA = HA_END + 16;
-    parameter HS_END = HS_STA + 96;
-    parameter LINE = 799;
-
-    parameter VA_END = 479;
-    parameter VS_STA = VA_END + 10;
-    parameter VS_END = VS_STA + 2;
-    parameter SCREEN = 524;
-
-    always @(posedge pixel_clock) begin
         if (sx == LINE)
             begin
                 sx <= 0;
@@ -64,9 +57,9 @@ module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, RESB, CPU_CLK, RWB, CE);
             end
     end
 
-    always @(posedge pixel_clock) begin
-        Hs <= ~(sx >= HS_STA && sx < HS_END);
-        Vs <= ~(sy >= VS_STA && sy < VS_END);
+    always @(posedge CLK) begin
+        Hs <= (sx >= HS_STA && sx < HS_END);
+        Vs <= (sy >= VS_STA && sy < VS_END);
         de <= (sx <= HA_END && sy <= VA_END);
 
         if (de)
@@ -86,7 +79,7 @@ module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, RESB, CPU_CLK, RWB, CE);
                 2'b10: color <= IO[2:0];
                 // Draw (write to framebuffer)
                 2'b11: v_ram[x_coord][y_coord] <= color;
-
+                
                 default:
                     begin
                         x_coord <= 0;
