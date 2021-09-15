@@ -22,15 +22,3 @@ set_io --warn-no-port RESB 18
 set_io --warn-no-port CPU_CLK 19
 set_io --warn-no-port RWB 13
 set_io --warn-no-port CE 21
-
-set_io --warn-no-port IO[0] 2
-set_io --warn-no-port IO[1] 46
-set_io --warn-no-port IO[2] 47
-set_io --warn-no-port IO[3] 45
-set_io --warn-no-port IO[4] 48
-set_io --warn-no-port IO[5] 3
-set_io --warn-no-port IO[6] 4
-set_io --warn-no-port IO[7] 44
-
-set_io --warn-no-port TARGET[0] 11
-set_io --warn-no-port TARGET[1] 12

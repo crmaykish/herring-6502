@@ -1,4 +1,4 @@
-module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, IO, RESB, CPU_CLK, RWB, CE, TARGET);
+module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, RESB, CPU_CLK, RWB, CE);
     // VGA connections
     input CLK;
     output reg R, G, B;
@@ -10,8 +10,8 @@ module vga_controller(R, G, B, Hs, Vs, CLK, ADDR, DATA, IO, RESB, CPU_CLK, RWB, 
     input [1:0] ADDR;
     input [7:0] DATA;
 
-    output reg [1:0] TARGET;
-    output reg [7:0] IO;
+    reg [1:0] TARGET;
+    reg [7:0] IO;
 
     reg [7:0] x_coord;
     reg [7:0] y_coord;

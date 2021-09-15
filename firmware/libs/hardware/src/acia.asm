@@ -1,4 +1,4 @@
-.export _acia_init, _acia_putc, _acia_getc, _print
+.export _acia_init, _acia_putc, _acia_getc, _print, _acia_rx_ready
 
 .include "herring.inc"
 
@@ -51,6 +51,11 @@ end_of_string:
     ply
     pla
 
+    rts
+
+_acia_rx_ready:
+    lda ACIA0_STATUS
+    and #ACIA_READY_RX
     rts
 
 ; From: http://forum.6502.org/viewtopic.php?f=4&t=2543&start=30

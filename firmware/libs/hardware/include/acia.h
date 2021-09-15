@@ -6,6 +6,7 @@
 
 extern void acia_init();
 
+extern char acia_rx_ready();
 extern char acia_getc();
 extern void __fastcall__ acia_putc(byte);
 extern void __fastcall__ print(byte *);
