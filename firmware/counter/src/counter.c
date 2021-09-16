@@ -20,6 +20,21 @@
 #define VGA_CYAN 0b110
 #define VGA_WHITE 0b111
 
+// {0b, 0b, 0b, 0b, 0b},
+
+byte digits[10][5] = {
+    {0b01111110, 0b10000001, 0b10000001, 0b10000001, 0b01111110}, // 0
+    {0b10000000, 0b10000010, 0b11111111, 0b10000000, 0b10000000}, // 1
+    {0b11000010, 0b10100001, 0b10010001, 0b10001001, 0b10000110}, // 2
+    {0b01000010, 0b10000001, 0b10001001, 0b10001001, 0b01110110}, // 3
+    {0b00010000, 0b00011000, 0b00010100, 0b00010010, 0b11111111}, // 4
+    {0b01001111, 0b10001001, 0b10001001, 0b10001001, 0b01110001}, // 5
+    {0b01111100, 0b10010010, 0b10010001, 0b10010001, 0b01100000}, // 6
+    {0b00000001, 0b00000001, 0b11111001, 0b00000101, 0b00000011}, // 7
+    {0b01110110, 0b10001001, 0b10001001, 0b10001001, 0b01110110}, // 8
+    {0b00000110, 0b10001001, 0b10001001, 0b01001001, 0b00111110}, // 9
+};
+
 void delay(word t)
 {
     word delay = 0;
@@ -38,23 +53,19 @@ void vga_draw_pixel(byte x, byte y)
     POKE(VGA_DRAW_PIXEL, 0);
 }
 
-void vga_set_color(byte color)
-{
-    POKE(VGA_SET_COLOR, color);
-}
-
 void vga_clear()
 {
     byte x = 0;
     byte y = 0;
 
-    vga_set_color(VGA_BLACK);
+    POKE(VGA_SET_COLOR, VGA_BLACK);
 
-    for (x = 0; x < VGA_WIDTH; x++)
+    for (x = VGA_WIDTH - 1; x != 0; x--)
     {
-        for (y = 0; y < VGA_HEIGHT; y++)
+        POKE(VGA_SET_X, x);
+
+        for (y = VGA_HEIGHT - 1; y != 0; y--)
         {
-            POKE(VGA_SET_X, x);
             POKE(VGA_SET_Y, y);
             POKE(VGA_DRAW_PIXEL, 0);
         }
@@ -75,12 +86,56 @@ void draw_block(byte x, byte y, byte w, byte h)
     }
 }
 
+void draw_char(byte c[], byte x, byte y)
+{
+    byte i = 0;
+    byte j = 0;
+    for (i = 0; i < 5; i++)
+    {
+        for (j = 0; j < 8; j++)
+        {
+            if (c[i] & (1 << j))
+            {
+                vga_draw_pixel(x + i, y + j);
+            }
+        }
+    }
+}
+
+void vga_print(word num, byte x, byte y)
+{
+    byte i = 0;
+    byte j = 0;
+    byte d[5];
+    bool ready = false;
+
+    while (num)
+    {
+        d[i] = (byte)(num % 10);
+        num /= 10;
+        i++;
+    }
+
+    for (i = 0; i < 5; i++)
+    {
+        if (d[4 - i] != 0 || ready)
+        {
+            ready = true;
+            draw_char(digits[d[4 - i]], x + j, y);
+            j += 6;
+        }
+    }
+}
+
 int main()
 {
     byte x = 0;
     byte y = 0;
     byte i = 0;
     byte color = VGA_RED;
+
+    word counter = 0;
+    byte counter_rollover = 0;
 
     byte in = 0;
 
@@ -92,8 +147,15 @@ int main()
 
     vga_clear();
 
+    POKE(VGA_SET_COLOR, VGA_PURPLE);
+
+    for (i = 0; i < 10; i++)
+    {
+        draw_char(digits[i], 100 + 6 * i, 100);
+    }
+
     // draw a border
-    vga_set_color(VGA_BLUE);
+    POKE(VGA_SET_COLOR, VGA_BLUE);
     for (x = 0; x < VGA_WIDTH; x++)
     {
         vga_draw_pixel(x, 0);
@@ -112,12 +174,11 @@ int main()
     // Game loop
     while (true)
     {
-
         if (acia_rx_ready() != 0)
         {
             in = acia_getc();
 
-            vga_set_color(VGA_BLACK);
+            POKE(VGA_SET_COLOR, VGA_BLACK);
             vga_draw_pixel(x, y);
             vga_draw_pixel(x, y + 1);
             vga_draw_pixel(x + 1, y);
@@ -153,7 +214,19 @@ int main()
             }
         }
 
-        vga_set_color(VGA_GREEN);
+        if (counter_rollover == 100)
+        {
+            POKE(VGA_SET_COLOR, VGA_BLACK);
+            draw_block(10, VGA_HEIGHT - 10 - 8, 6 * 5, 8);
+            POKE(VGA_SET_COLOR, VGA_WHITE);
+            vga_print(counter, 10, VGA_HEIGHT - 10 - 8);
+            counter++;
+            counter_rollover = 0;
+        }
+
+        counter_rollover++;
+
+        POKE(VGA_SET_COLOR, VGA_GREEN);
         vga_draw_pixel(x, y);
         vga_draw_pixel(x, y + 1);
         vga_draw_pixel(x + 1, y);
@@ -163,15 +236,13 @@ int main()
 
         for (i = 0; i < 4; i++)
         {
-            vga_set_color(VGA_BLACK);
-            // vga_draw_pixel(enemies[i][0], enemies[i][1]);
+            POKE(VGA_SET_COLOR, VGA_BLACK);
             draw_block(enemies[i][0], enemies[i][1], 5, 2);
 
             // Update positions
             enemies[i][0] += (byte)enemy_dir;
 
-            vga_set_color(VGA_RED);
-            // vga_draw_pixel(enemies[i][0], enemies[i][1]);
+            POKE(VGA_SET_COLOR, VGA_RED);
             draw_block(enemies[i][0], enemies[i][1], 5, 2);
         }
 
