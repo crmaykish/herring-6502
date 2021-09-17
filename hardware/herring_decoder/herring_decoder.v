@@ -17,30 +17,8 @@ module herring_decoder (
 	// RWB pin
 	input rw
 );
-	
-	assign cpu_clk_in = 1'bz;
-	
-	// RAM Write
-	assign decoder[0] = ~(cpu_clk_out & ~rw);	// Clock high and RW low (write)
-	
-	// ROM (0xE000 - 0xFFFF)
-	assign decoder[1] = ~(address[15] & address[14] & address[13]);
-	
-	assign decoder[2] = 1;
-	
-	// FPGA (0x8C00)
-	assign decoder[3] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & address[11] & address[10]);
-	
-	// (0x8800)
-	assign decoder[4] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & address[11] & ~address[10]);
-	
-	// VIA 1 (0x8400)
-	assign decoder[5] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & address[10]);
-	
-	// ACIA 1 (0x8000)
-	assign decoder[6] = ~(address[15] & ~address[14] & ~address[13] & ~address[12] & ~address[11] & ~address[10]);
-	
-	// Bus enable (enabled)
-	assign decoder[7] = 1;
+	cpu_clk ClockGen(clk_src, cpu_clk_in);
+
+	address_decoder AddressDecoder(address, rw, cpu_clk_out, decoder);
 
 endmodule
