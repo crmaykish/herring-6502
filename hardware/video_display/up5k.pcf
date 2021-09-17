@@ -15,8 +15,16 @@ set_io --warn-no-port DATA[5] 34
 set_io --warn-no-port DATA[6] 37
 set_io --warn-no-port DATA[7] 31
 
-set_io --warn-no-port ADDR[0] 6
-set_io --warn-no-port ADDR[1] 9
+set_io --warn-no-port ADDR[0] 2
+set_io --warn-no-port ADDR[1] 46
+set_io --warn-no-port ADDR[2] 47
+set_io --warn-no-port ADDR[3] 45
+set_io --warn-no-port ADDR[4] 48
+set_io --warn-no-port ADDR[5] 3
+set_io --warn-no-port ADDR[6] 4
+set_io --warn-no-port ADDR[7] 44
+set_io --warn-no-port ADDR[8] 6
+set_io --warn-no-port ADDR[9] 9
 
 set_io --warn-no-port RESB 18
 set_io --warn-no-port CPU_CLK 19

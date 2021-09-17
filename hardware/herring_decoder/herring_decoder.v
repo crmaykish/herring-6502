@@ -6,7 +6,7 @@ module herring_decoder (
 	input cpu_clk_out,
 	
 	// CPU clock in (output from FPGA perspective)
-	output reg cpu_clk_in,
+	output cpu_clk_in,
 	
 	// Address bus
 	input [15:10] address,
@@ -18,20 +18,7 @@ module herring_decoder (
 	input rw
 );
 	
-	reg[31:0] counter=32'd0;
-	
-	// Divide the 50 MHz source clock by 15 for a 3.33MHz CPU clock
-	parameter DIVISOR = 32'd15;
-	
-	always @(posedge clk_src)
-	begin
-		counter <= counter + 32'd1;
-		
-		if(counter>=(DIVISOR-1))
-			counter <= 32'd0;
-
-		cpu_clk_in <= (counter<DIVISOR/2)?1'b1:1'b0;
-	end
+	assign cpu_clk_in = 1'bz;
 	
 	// RAM Write
 	assign decoder[0] = ~(cpu_clk_out & ~rw);	// Clock high and RW low (write)
