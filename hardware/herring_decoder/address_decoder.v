@@ -8,19 +8,25 @@ module address_decoder (
     // RAM-Write Flag
     assign DECODE[0] = ~(PHI2 & ~RWB);
 
-    // ROM Enable (0xE000 - 0xFFFF)
+	// Note: Low RAM at 0x0000 to 0x7FFF (32KB)
+
+    // ROM at 0xE000 (8KB)
     assign DECODE[1] = ~(full_address >= 16'hE000);
 
-    // ACIA Console (0x8000)
+    // ACIA Console at 0x8000 (1KB)
     assign DECODE[2] = ~(full_address >= 16'h8000 && full_address < 16'h8400);
 
-    assign DECODE[3] = 1'b1;
+	// VIA at 0x8400 (1KB)
+    assign DECODE[3] = ~(full_address >= 16'h8400 && full_address < 16'h8800);
     
-    assign DECODE[4] = 1'b1;
+    // 0x8800 (1KB)
+    assign DECODE[4] = ~(full_address >= 16'h8800 && full_address < 16'h8C00);
 
-    assign DECODE[5] = 1'b1;
+    // 0x8C00 (1k)
+    assign DECODE[5] = ~(full_address >= 16'h8C00 && full_address < 16'h9000);
 
-    assign DECODE[6] = 1'b1;
+    // 0x9000 to 0xDFFF (20k)
+    assign DECODE[6] = ~(full_address >= 16'h9000 && full_address < 16'hE000);
 
     // Bus-enable pin (always high)
     assign DECODE[7] = 1'b1;
