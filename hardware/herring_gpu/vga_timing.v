@@ -1,6 +1,5 @@
-module vga_timing(PIXEL_CLOCK, R, G, B, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
+module vga_timing(PIXEL_CLOCK, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
     input PIXEL_CLOCK;
-    output reg R, G, B;
     output reg Hs, Vs;
 
     output reg [10:0] SCREEN_X;
@@ -36,7 +35,7 @@ module vga_timing(PIXEL_CLOCK, R, G, B, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
         Vs <= (SCREEN_Y >= VS_STA && SCREEN_Y < VS_END);
 
         // Is the pixel within the visible portion of the display?
-        ON_SCREEN <= (SCREEN_X <= HA_END && SCREEN_Y <= VA_END);
+        ON_SCREEN <= (SCREEN_X <= HA_END) && (SCREEN_Y <= VA_END);
     end
 
 endmodule
