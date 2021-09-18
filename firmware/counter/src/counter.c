@@ -2,11 +2,12 @@
 #include <peekpoke.h>
 #include "herring.h"
 #include "acia.h"
+#include "print.h"
 
-#define VGA_SET_X 0x8C00
-#define VGA_SET_Y 0x8C01
-#define VGA_SET_COLOR 0x8C02
-#define VGA_DRAW_PIXEL 0x8C03
+#define VGA_SET_COLOR 0x9000
+#define VGA_SET_X 0x9001
+#define VGA_SET_Y 0x9002
+#define VGA_DRAW_PIXEL 0x9003
 
 #define VGA_WIDTH 200
 #define VGA_HEIGHT 150
@@ -214,12 +215,17 @@ int main()
             }
         }
 
-        if (counter_rollover == 100)
+        if (counter_rollover == 10)
         {
             POKE(VGA_SET_COLOR, VGA_BLACK);
             draw_block(10, VGA_HEIGHT - 10 - 8, 6 * 5, 8);
             POKE(VGA_SET_COLOR, VGA_WHITE);
+            
             vga_print(counter, 10, VGA_HEIGHT - 10 - 8);
+            POKEW(0x8400, counter);
+            print_dec(counter);
+            print_newline();
+            
             counter++;
             counter_rollover = 0;
         }
@@ -251,7 +257,6 @@ int main()
             enemy_dir = ~enemy_dir;
         }
 
-        delay(1000);
         // TODO: needs a real timer to control framerate
     }
 

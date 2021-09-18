@@ -3,7 +3,11 @@ module framebuffer(
     input [10:0] PX,
     input [9:0] PY,
     input ON_SCREEN,
-    output reg RED, GREEN, BLUE
+    output reg RED, GREEN, BLUE,
+
+    input [7:0] X_POS, Y_POS,
+    input [2:0] COLOR,
+    input WRITE
 );
 
     // 200x150 resolution, 3-bit color
@@ -30,6 +34,12 @@ module framebuffer(
                 RED <= current_pixel[0];
                 GREEN <= current_pixel[1];
                 BLUE <= current_pixel[2];
+        end
+    end
+
+    always @(posedge PIXEL_CLOCK) begin
+        if (WRITE) begin
+            v_ram[X_POS][Y_POS] <= COLOR;
         end
     end
 

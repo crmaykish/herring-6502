@@ -5,3 +5,18 @@ set_io --warn-no-port VGA_GREEN 27
 set_io --warn-no-port VGA_BLUE 26
 set_io --warn-no-port VGA_HSYNC 25
 set_io --warn-no-port VGA_VSYNC 23
+
+set_io --warn-no-port DATA[0] 28
+set_io --warn-no-port DATA[1] 38
+set_io --warn-no-port DATA[2] 42
+set_io --warn-no-port DATA[3] 36
+set_io --warn-no-port DATA[4] 43
+set_io --warn-no-port DATA[5] 34
+set_io --warn-no-port DATA[6] 37
+set_io --warn-no-port DATA[7] 31
+
+set_io --warn-no-port RS[0] 2
+set_io --warn-no-port RS[1] 46
+
+set_io --warn-no-port CE 47
+set_io --warn-no-port CPU_CLOCK 45
