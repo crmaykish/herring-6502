@@ -4,8 +4,8 @@ module cpu_clk(CLK_SRC, PHI0);
 	output reg PHI0;
 
 	// Divde the source clock (50 MHz by DIVISOR to get the CPU speed)
-	// i.e 50 MHz / 14 = 3.57 MHz
-    parameter DIVISOR = 14;
+	// i.e 50 MHz / 8 = 6.25 MHz
+    parameter DIVISOR = 8;
 
     reg [32:0] counter = 0;
 
