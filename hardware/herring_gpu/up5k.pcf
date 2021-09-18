@@ -20,3 +20,4 @@ set_io --warn-no-port RS[1] 46
 
 set_io --warn-no-port CE 47
 set_io --warn-no-port CPU_CLOCK 45
+set_io --warn-no-port RWB 48
