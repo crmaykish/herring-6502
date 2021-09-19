@@ -15,3 +15,4 @@ hardware/herring_decoder/herring_decoder_tcr.dir/*
 hardware.asc
 hardware.json
 hardware.out
+hardware/herring_gpu/hardware.rpt

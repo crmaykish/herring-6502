@@ -6,6 +6,12 @@
         <Source name="herring_decoder.v" type="Verilog" type_short="Verilog">
             <Options top_module="herring_decoder"/>
         </Source>
+        <Source name="cpu_clk.v" type="Verilog" type_short="Verilog">
+            <Options/>
+        </Source>
+        <Source name="address_decoder.v" type="Verilog" type_short="Verilog">
+            <Options/>
+        </Source>
         <Source name="herring_decoder.lpf" type="Logic Preference" type_short="LPF">
             <Options/>
         </Source>
