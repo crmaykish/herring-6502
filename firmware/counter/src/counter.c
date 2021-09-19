@@ -10,8 +10,8 @@
 #define VGA_SET_Y 0x9002
 #define VGA_SET_PIXEL 0x00
 
-#define VGA_WIDTH 200
-#define VGA_HEIGHT 150
+#define VGA_WIDTH 160
+#define VGA_HEIGHT 120
 
 #define VGA_BLACK 0b000
 #define VGA_RED 0b001

@@ -1,5 +1,5 @@
 module herring_gpu(
-    input PIXEL_CLOCK,
+    input SYS_CLOCK,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
     output VGA_HSYNC, VGA_VSYNC,
 
@@ -11,8 +11,11 @@ module herring_gpu(
     input RWB               // Read/write flag
 );
 
+    // Clock
+    wire pixel_clock;
+
     // Screen position and status
-    wire [10:0] pixel_x;
+    wire [9:0] pixel_x;
     wire [9:0] pixel_y;
     wire on_screen;
 
@@ -23,14 +26,16 @@ module herring_gpu(
     reg write_fb = 1'b0;
     reg [7:0] status = 8'b0;
 
-    vga_timing VGATiming800x600(PIXEL_CLOCK,
+    pixel_clock ClockGen(SYS_CLOCK, pixel_clock);
+
+    vga_timing VGATiming640x480(pixel_clock,
                                 VGA_HSYNC,
                                 VGA_VSYNC,
                                 pixel_x,
                                 pixel_y,
                                 on_screen);
 
-    framebuffer FrameBuffer(PIXEL_CLOCK,
+    framebuffer FrameBuffer(pixel_clock,
                             pixel_x,
                             pixel_y,
                             on_screen,
@@ -64,7 +69,7 @@ module herring_gpu(
         end
     end
 
-    always @(posedge PIXEL_CLOCK) begin
+    always @(posedge pixel_clock) begin
         // Update status register
         case (RS)
             // Return current color

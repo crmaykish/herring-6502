@@ -1,4 +1,4 @@
-set_io --warn-no-port PIXEL_CLOCK 35
+set_io --warn-no-port SYS_CLOCK 35
 
 set_io --warn-no-port VGA_RED 32
 set_io --warn-no-port VGA_GREEN 27
