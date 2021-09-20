@@ -62,11 +62,11 @@ void vga_clear()
 
     POKE(VGA_SET_COLOR, VGA_BLACK);
 
-    for (x = VGA_WIDTH - 1; x != 0; x--)
+    for (x = 0; x < VGA_WIDTH; x++)
     {
         POKE(VGA_SET_X, x);
 
-        for (y = VGA_HEIGHT - 1; y != 0; y--)
+        for (y = 0; y < VGA_HEIGHT; y++)
         {
             POKE(VGA_SET_Y, y);
             POKE(VGA_STATUS, VGA_SET_PIXEL);
@@ -162,85 +162,25 @@ int main()
     word counter = 0;
     byte counter_rollover = 0;
 
-    byte in = 0;
-
-    byte enemies[4][2] = {{10, 10}, {20, 10}, {30, 10}, {40, 10}};
-
-    bool enemy_dir = true;
-
-    acia_init();
+    draw_border();
 
     // Game loop
     while (true)
     {
         vga_clear();
 
-        draw_border();
-
-        if (acia_rx_ready() != 0)
-        {
-            in = acia_getc();
-
-            if (in == 'w')
-            {
-                if (y > 2)
-                {
-                    y -= 2;
-                }
-            }
-            else if (in == 'a')
-            {
-                if (x > 2)
-                {
-                    x -= 2;
-                }
-            }
-            else if (in == 's')
-            {
-                if (y < VGA_HEIGHT - 4)
-                {
-                    y += 2;
-                }
-            }
-            else if (in == 'd')
-            {
-                if (x < VGA_WIDTH - 4)
-                {
-                    x += 2;
-                }
-            }
-        }
+        
 
         if (counter_rollover == 10)
         {
             POKE(VGA_SET_COLOR, VGA_WHITE);
             vga_print(counter, 10, VGA_HEIGHT - 10 - 8);
 
-            POKEW(0x8400, counter);
-
-            print_dec(counter);
-            print_newline();
-
             counter++;
             counter_rollover = 0;
         }
 
         counter_rollover++;
-
-        // Update and draw enemies
-        for (i = 0; i < 4; i++)
-        {
-            // Update positions
-            enemies[i][0] += (byte)enemy_dir;
-
-            POKE(VGA_SET_COLOR, VGA_RED);
-            draw_block(enemies[i][0], enemies[i][1], 3, 3);
-        }
-
-        if (enemies[3][0] == VGA_WIDTH - 8 || enemies[0][0] == 4)
-        {
-            enemy_dir = ~enemy_dir;
-        }
     }
 
     return 0;
