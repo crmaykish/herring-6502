@@ -16,3 +16,5 @@ hardware.asc
 hardware.json
 hardware.out
 hardware/herring_gpu/hardware.rpt
+*.vvp
+*.vcd

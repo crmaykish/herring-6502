@@ -26,6 +26,12 @@ module herring_gpu(
     reg write_fb = 1'b0;
     reg [7:0] status = 8'b0;
 
+    // Video Ram
+    reg vram_we = 1'b0;
+    reg [13:0] vram_addr;
+    reg [15:0] vram_in;
+    wire [15:0] vram_out;
+
     pixel_clock ClockGen(SYS_CLOCK, pixel_clock);
 
     vga_timing VGATiming640x480(pixel_clock,
@@ -35,17 +41,22 @@ module herring_gpu(
                                 pixel_y,
                                 on_screen);
 
-    framebuffer FrameBuffer(pixel_clock,
-                            pixel_x,
-                            pixel_y,
-                            on_screen,
-                            VGA_RED,
-                            VGA_GREEN,
-                            VGA_BLUE,
-                            x_pos,
-                            y_pos,
-                            color,
-                            write_fb);
+    video_ram VRAM(SYS_CLOCK,
+                   vram_we,
+                   vram_in,
+                   vram_out);
+
+    // framebuffer FrameBuffer(pixel_clock,
+    //                         pixel_x,
+    //                         pixel_y,
+    //                         on_screen,
+    //                         VGA_RED,
+    //                         VGA_GREEN,
+    //                         VGA_BLUE,
+    //                         x_pos,
+    //                         y_pos,
+    //                         color,
+    //                         write_fb);
 
     assign DATA = (~CE && RWB) ? status : 8'bZ;
 
@@ -69,7 +80,7 @@ module herring_gpu(
         end
     end
 
-    always @(posedge pixel_clock) begin
+    always @(posedge SYS_CLOCK) begin
         // Update status register
         case (RS)
             // Return current color
