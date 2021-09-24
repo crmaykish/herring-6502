@@ -41,22 +41,21 @@ module herring_gpu(
                                 pixel_y,
                                 on_screen);
 
-    video_ram VRAM(SYS_CLOCK,
-                   vram_we,
-                   vram_in,
-                   vram_out);
+    framebuffer FrameBuffer(pixel_clock,
+                            pixel_x,
+                            pixel_y,
+                            on_screen,
+                            VGA_RED,
+                            VGA_GREEN,
+                            VGA_BLUE,
+                            x_pos,
+                            y_pos,
+                            color,
+                            write_fb);
 
-    // framebuffer FrameBuffer(pixel_clock,
-    //                         pixel_x,
-    //                         pixel_y,
-    //                         on_screen,
-    //                         VGA_RED,
-    //                         VGA_GREEN,
-    //                         VGA_BLUE,
-    //                         x_pos,
-    //                         y_pos,
-    //                         color,
-    //                         write_fb);
+    // TODO: use VRAM module
+
+    // Wrap up the CPU interface into a module
 
     assign DATA = (~CE && RWB) ? status : 8'bZ;
 

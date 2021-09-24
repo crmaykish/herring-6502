@@ -1,11 +1,11 @@
-module vga_timing(PIXEL_CLOCK, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
-    input PIXEL_CLOCK;
-    output reg Hs, Vs;
-
-    output reg [9:0] SCREEN_X;
-    output reg [9:0] SCREEN_Y;
-
-    output reg ON_SCREEN;
+module vga_timing(
+    input PIXEL_CLOCK,
+    output reg Hs = 1'b0,
+    output reg Vs = 1'b0,
+    output reg [9:0] SCREEN_X,
+    output reg [9:0]SCREEN_Y,
+    output reg ON_SCREEN
+);
 
     parameter HA_END = 639;
     parameter HS_STA = HA_END + 16;
