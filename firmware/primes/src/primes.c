@@ -27,53 +27,22 @@ bool is_prime(word p)
     return true;
 }
 
-byte reverse_bits(byte b)
-{
-    return ((b & 0b1) << 7) |
-           ((b & 0b10) << 5) |
-           ((b & 0b100) << 3) |
-           ((b & 0b1000) << 1) |
-           ((b & 0b10000) >> 1) |
-           ((b & 0b100000) >> 3) |
-           ((b & 0b1000000) >> 5) |
-           ((b & 0b10000000) >> 7);
-}
-
 int main()
 {
-    word count = 1;
-    word prime = 2;
-    char output_string[10] = {0};
+    acia_init();
 
-    lcd_create();
+    lcd_init();
 
-    lcd_print("Primes:\r\n");
+    lcd_putc('H');
+    lcd_putc('e');
+    lcd_putc('r');
+    lcd_putc('r');
+    lcd_putc('i');
+    lcd_putc('n');
+    lcd_putc('g');
 
     while (true)
     {
-        count = 1;
-        prime = 2;
-
-        while (count <= 5000)
-        {
-            if (is_prime(prime))
-            {
-                utoa(count, output_string, 10);
-                lcd_print(output_string);
-                lcd_print(": ");
-
-                utoa(prime, output_string, 10);
-                lcd_print(output_string);
-                lcd_print("\r");
-
-                POKE(0xC000, reverse_bits(prime & 0xFF));
-                POKE(0xC001, reverse_bits((prime & 0xFF00) >> 8));
-
-                count++;
-            }
-
-            prime++;
-        }
     }
 
     return 0;
