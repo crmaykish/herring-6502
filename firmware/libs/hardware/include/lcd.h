@@ -7,5 +7,6 @@ extern void lcd_init();
 extern void lcd_clear();
 extern void lcd_home();
 extern void __fastcall__ lcd_putc(char);
+extern void __fastcall__ lcd_print(char *);
 
 #endif

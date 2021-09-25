@@ -3,6 +3,7 @@
 #include <peekpoke.h>
 #include "herring.h"
 #include "lcd.h"
+#include "acia.h"
 
 // very slow!
 bool is_prime(word p)
@@ -29,20 +30,19 @@ bool is_prime(word p)
 
 int main()
 {
-    acia_init();
+    byte in = 0;
+    char buffer[17] = {0};
 
+    acia_init();
     lcd_init();
 
-    lcd_putc('H');
-    lcd_putc('e');
-    lcd_putc('r');
-    lcd_putc('r');
-    lcd_putc('i');
-    lcd_putc('n');
-    lcd_putc('g');
+    lcd_clear();
+    lcd_home();
 
     while (true)
     {
+        readline(buffer, true);
+        lcd_print(buffer);
     }
 
     return 0;
