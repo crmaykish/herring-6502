@@ -28,6 +28,12 @@ bool is_prime(word p)
     return true;
 }
 
+void lcd_set_cursor(byte x, byte y)
+{
+    // TODO: implement this in ASM
+    POKE(0x8800, 0b10000000 | (y == 0 ? 0 : 0x40) | x);
+}
+
 int main()
 {
     byte in = 0;
@@ -36,12 +42,24 @@ int main()
     acia_init();
     lcd_init();
 
+    // LCD is not getting reset properly every time
+    // Sometimes a power cycle is required to clear it
+
     lcd_clear();
     lcd_home();
+
+    lcd_print("Herring 6502 >");
+
+    lcd_set_cursor(3, 1);
+    lcd_print("line 2");
 
     while (true)
     {
         readline(buffer, true);
+
+        lcd_clear();
+        lcd_home();
+
         lcd_print(buffer);
     }
 
