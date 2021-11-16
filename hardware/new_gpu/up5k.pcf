@@ -1,4 +1,4 @@
-set_io --warn-no-port CLK_50MHz 2
+set_io --warn-no-port CLK_PIXEL 2
 
 set_io --warn-no-port VGA_RED 28
 set_io --warn-no-port VGA_GREEN 38
