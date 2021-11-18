@@ -10,6 +10,10 @@ set_io --warn-no-port DATA[0] 46
 set_io --warn-no-port DATA[1] 47
 set_io --warn-no-port DATA[2] 45
 set_io --warn-no-port DATA[3] 48
+set_io --warn-no-port DATA[4] 3
+set_io --warn-no-port DATA[5] 4
+set_io --warn-no-port DATA[6] 44
+set_io --warn-no-port DATA[7] 6
 
 set_io --warn-no-port RST 43
 set_io --warn-no-port RW 34

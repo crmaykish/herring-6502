@@ -1,6 +1,6 @@
 module new_gpu(
     input RST, RW, CE, CLK_CPU,
-    input [3:0] DATA,
+    input [7:0] DATA,
     input CLK_PIXEL,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
     output VGA_HSYNC, VGA_VSYNC
@@ -21,7 +21,7 @@ module new_gpu(
     reg [7:0] font [0:127][0:7];
 
     // Character buffer
-    reg [7:0] framebuffer[0:8191];
+    reg [6:0] framebuffer[0:2047];
 
     initial begin
         // Initialize the font "ROM" and character buffer
@@ -31,33 +31,33 @@ module new_gpu(
 
     // which framebuffer cell is the pixel in? is there a sprite there? if yes, find the pixel in the sprite
 
-    wire [7:0] fb_x = pixel_x[10:3];
-    wire [7:0] fb_y = pixel_y[10:3];
+    wire [5:0] fb_x = pixel_x[10:4];
+    wire [5:0] fb_y = pixel_y[10:4];
 
-    reg [2:0] sprite_index;
+    reg [6:0] sprite_index;
 
     // indices into the sprite table
-    wire [2:0] sp_x = pixel_x - (fb_x << 3);
-    wire [2:0] sp_y = pixel_y - (fb_y << 3);
+    wire [2:0] sp_x = pixel_x[7:1] - (fb_x << 4);
+    wire [2:0] sp_y = pixel_y[7:1] - (fb_y << 4);
 
     // Is the exact pixel in the sprite on or off?
-    wire sprite_pixel = font[sprite_index][sp_x][sp_y];
+    wire sprite_pixel = font[sprite_index][sp_y][sp_x ^ 3'b111];
 
     // assign VGA_RED = on_screen && sprite_pixel;
     assign VGA_GREEN = on_screen && sprite_pixel;
     // assign VGA_BLUE = on_screen && sprite_pixel;
 
     always @(posedge CLK_PIXEL) begin
-        sprite_index <= framebuffer[(fb_y * 100) + fb_x];
+        sprite_index <= framebuffer[(fb_y * 50) + fb_x];
     end
 
     reg [20:0] cursor_pos = 0;
 
-    reg [3:0] data_in = 0;
+    reg [6:0] data_in = 0;
 
     always @(negedge CLK_CPU) begin
         if (~CE && ~RW) begin
-            data_in <= DATA;
+            data_in <= DATA[6:0];
             cursor_pos <= cursor_pos + 1;
         end
 
