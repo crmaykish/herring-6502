@@ -21,12 +21,11 @@ module new_gpu(
     reg [7:0] font [0:127][0:7];
 
     // Character buffer
-    reg [6:0] framebuffer[0:2047];
+    reg [6:0] framebuffer[0:37][0:49];
 
     initial begin
-        // Initialize the font "ROM" and character buffer
+        // Load the font character set
         $readmemb("font.txt", font);
-        $readmemh("framebuffer.txt", framebuffer);
     end
 
     // which framebuffer cell is the pixel in? is there a sprite there? if yes, find the pixel in the sprite
@@ -48,20 +47,28 @@ module new_gpu(
     // assign VGA_BLUE = on_screen && sprite_pixel;
 
     always @(posedge CLK_PIXEL) begin
-        sprite_index <= framebuffer[(fb_y * 50) + fb_x];
+        sprite_index <= framebuffer[fb_y][fb_x];
     end
 
-    reg [20:0] cursor_pos = 0;
+    reg [20:0] cursor_x = 0;
+    reg [20:0] cursor_y = 0;
 
     reg [6:0] data_in = 0;
 
     always @(negedge CLK_CPU) begin
         if (~CE && ~RW) begin
             data_in <= DATA[6:0];
-            cursor_pos <= cursor_pos + 1;
+
+            cursor_x <= cursor_x + 2;
+
+            if (cursor_x == 48) begin
+                cursor_x <= 0;
+                cursor_y <= cursor_y + 2;
+            end
+            
         end
 
-        framebuffer[cursor_pos] <= data_in;
+        framebuffer[cursor_y][cursor_x] <= data_in;
     end
 
 
