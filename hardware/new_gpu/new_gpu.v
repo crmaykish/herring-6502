@@ -17,11 +17,11 @@ module new_gpu(
                          pixel_y,
                          on_screen);
 
-    // Font ROM (4 x 8 x 8)
-    reg [7:0] font [0:255][0:7];
+    // Font ROM (127 x 8 x 8)
+    reg [7:0] font [0:127][0:7];
 
     // Character buffer
-    reg [2:0] framebuffer[0:8191];
+    reg [7:0] framebuffer[0:8191];
 
     initial begin
         // Initialize the font "ROM" and character buffer
@@ -45,7 +45,7 @@ module new_gpu(
 
     // assign VGA_RED = on_screen && sprite_pixel;
     assign VGA_GREEN = on_screen && sprite_pixel;
-    // assign VGA_BLUE = on_screen && (sprite_index == 2'b11) && sprite_pixel;
+    // assign VGA_BLUE = on_screen && sprite_pixel;
 
     always @(posedge CLK_PIXEL) begin
         sprite_index <= framebuffer[(fb_y * 100) + fb_x];
