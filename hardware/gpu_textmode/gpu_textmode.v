@@ -60,30 +60,74 @@ module gpu_textmode(
 
     reg [7:0] data_in = 0;
 
-    reg write_flag = 0;
+    parameter IDLE = 3'b000;
+    parameter WRITING = 3'b001;
+    parameter CLEARING = 3'b010;
+    parameter CLEARED = 3'b011;
 
-    // TODO build a state machine to handle I/O and more complex tasks
+    reg [2:0] state = IDLE;
 
     always @(negedge CLK_CPU) begin
-        if (~CE && ~RW) begin
-            data_in <= DATA;
-            write_flag <= 1;
-        end
 
-        if (write_flag) begin
-            framebuffer[cursor_y][cursor_x] <= data_in;
+        case (state)
+            IDLE:
+                begin
+                    if (~CE && ~RW) begin
+                        data_in <= DATA;
+                        state <= WRITING;
+                    end
+                end
+            WRITING:
+                begin
+                    state <= IDLE;
 
-            cursor_x <= cursor_x + 1;
+                    case (data_in)
+                        // New Line
+                        8'h0A: cursor_y <= cursor_y + 2;
+                        // Return
+                        8'h0D: cursor_x <= 0;
+                        8'h7F:
+                            begin
+                                cursor_x <= 0;
+                                cursor_y <= 0;
+                                state <= CLEARING;
+                            end
+                        // Printable character
+                        default:
+                            begin
+                                framebuffer[cursor_y][cursor_x] <= data_in;
+                                cursor_x <= cursor_x + 1;
 
-            if (cursor_x == 78) begin
-                cursor_x <= 0;
-                cursor_y <= cursor_y + 2;
-            end
+                                if (cursor_x == 78) begin
+                                    cursor_x <= 0;
+                                    cursor_y <= cursor_y + 2;
+                                end
+                            end
+                    endcase
+                end
+            CLEARING:
+                begin
+                    framebuffer[cursor_y][cursor_x] <= 0;
+                    cursor_x <= cursor_x + 1;
 
-            write_flag <= 0;
-        end
+                    if (cursor_x == 79) begin
+                        cursor_x <= 0;
+                        cursor_y <= cursor_y + 1;
+
+                        if (cursor_y == 59) begin
+                            state <= CLEARED;
+                        end
+                    end
+                end
+            CLEARED:
+                begin
+                    cursor_x <= 0;
+                    cursor_y <= 0;
+                    state <= IDLE;
+                end
+            default: state <= IDLE;
+        endcase
+
     end
-
-
 
 endmodule
