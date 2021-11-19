@@ -1,4 +1,4 @@
-module new_gpu(
+module gpu_textmode(
     input RST, RW, CE, CLK_CPU,
     input [7:0] DATA,
     input CLK_SYS,

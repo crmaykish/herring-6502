@@ -1,11 +1,11 @@
-module vga_timing(
-    input PIXEL_CLOCK,
-    output reg Hs = 1'b0,
-    output reg Vs = 1'b0,
-    output reg [9:0] SCREEN_X,
-    output reg [9:0]SCREEN_Y,
-    output reg ON_SCREEN
-);
+module vga_timing(CLK_PIXEL, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
+    input CLK_PIXEL;
+    output reg Hs, Vs;
+
+    output reg [10:0] SCREEN_X;
+    output reg [10:0] SCREEN_Y;
+
+    output reg ON_SCREEN;
 
     parameter HA_END = 639;
     parameter HS_STA = HA_END + 16;
@@ -17,7 +17,7 @@ module vga_timing(
     parameter VS_END = VS_STA + 2;
     parameter SCREEN = 524;
 
-    always @(posedge PIXEL_CLOCK) begin
+    always @(posedge CLK_PIXEL) begin
         if (SCREEN_X == LINE)
             begin
                 SCREEN_X <= 0;
@@ -29,12 +29,9 @@ module vga_timing(
             end
     end
 
-    always @(posedge PIXEL_CLOCK) begin
-        // Set SCREEN_Ync pulses
+    always @(posedge CLK_PIXEL) begin
         Hs <= ~(SCREEN_X >= HS_STA && SCREEN_X < HS_END);
         Vs <= ~(SCREEN_Y >= VS_STA && SCREEN_Y < VS_END);
-
-        // Is the pixel within the visible portion of the display?
         ON_SCREEN <= (SCREEN_X <= HA_END) && (SCREEN_Y <= VA_END);
     end
 
