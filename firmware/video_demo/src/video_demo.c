@@ -10,46 +10,49 @@
 #define FB_HEIGHT (60)
 #define FB_SIZE (FB_WIDTH * FB_HEIGHT)
 
+#define FB_SWAP_COMMAND (0b01000000)
+#define FB_SWAP_BUFFERS() POKE(FB_START, FB_SWAP_COMMAND)
+
 #define BLACK 0x0
+#define RED 0x1
+#define GREEN 0x2
+#define YELLOW 0x3
+#define BLUE 0x4
 #define PURPLE 0x5
+#define CYAN 0x6
 #define WHITE 0x7
 
-void delay(word t)
+#define BALL_COUNT 6
+
+typedef struct
 {
-    word delay = 0;
+    int pos_x;
+    int pos_y;
+    int width;
+    int height;
+    int x_dir;
+    int y_dir;
+    byte color;
+} ball_t;
 
-    while (delay < t)
-    {
-        asm("nop");
-        delay++;
-    }
-}
-
-void draw_block(byte x, byte y, byte w, byte h, byte color)
-{
-    byte i = 0;
-
-    for (i; i < h; i++)
-    {
-        memset(FB_START + ((y + i) * FB_WIDTH) + x, color, w);
-    }
-}
+void draw_ball(byte x, byte y, byte w, byte h, byte color);
 
 int main()
 {
-    byte bg_color = 0x01;
-    byte player_color = 0x4;
-
-    byte pos_x = 0;
-    byte pos_y = 0;
-
-    byte sprite[] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x02, 0x02};
+    ball_t balls[BALL_COUNT] = {
+        {0, 0, 3, 4, 1, 1, RED},
+        {10, 20, 2, 2, -1, 1, GREEN},
+        {40, 5, 5, 5, 1, -1, YELLOW},
+        {20, 40, 2, 3, -1, -1, BLUE},
+        {0, 30, 4, 2, 1, -1, PURPLE},
+        {10, 50, 4, 4, -1, 1, CYAN}};
 
     acia_init();
 
     print_line("Starting framebuffer demo");
 
     print_line("Clearing front and back framebuffers");
+
     memset(FB_START, 0, FB_SIZE);
     POKE(FB_START, 0b01000000);
     memset(FB_START, 0, FB_SIZE);
@@ -61,35 +64,56 @@ int main()
 
     while (true)
     {
-        // clear framebuffer
+        byte i = 0;
+
+        // === Erase the framebuffer === //
+
         memset(FB_START, 0, FB_SIZE);
 
-        // redraw the useful stuff
-        draw_block(pos_x, pos_y, 4, 4, PURPLE);
+        // === Update the game state === //
 
-        // draw border
-        draw_block(0, 0, FB_WIDTH, 1, WHITE);
-        draw_block(0, FB_HEIGHT - 1, FB_WIDTH, 1, WHITE);
-        draw_block(0, 0, 1, FB_HEIGHT, WHITE);
-        draw_block(FB_WIDTH - 1, 0, 1, FB_HEIGHT, WHITE);
-
-        // swap buffers now that drawing is done
-        POKE(FB_START, 0b01000000);
-
-        // Update program state
-
-        pos_x++;
-        pos_y++;
-
-        if (pos_x >= FB_WIDTH || pos_y >= FB_HEIGHT)
+        for (i = 0; i < BALL_COUNT; i++)
         {
-            pos_x = 0;
-            pos_y = 0;
+            balls[i].pos_x += balls[i].x_dir;
+            balls[i].pos_y += balls[i].y_dir;
+
+            if (balls[i].pos_x == 0 || balls[i].pos_x == (FB_WIDTH - balls[i].width))
+            {
+                balls[i].x_dir *= -1;
+            }
+
+            if (balls[i].pos_y == 0 || balls[i].pos_y == (FB_HEIGHT - balls[i].height))
+            {
+                balls[i].y_dir *= -1;
+            }
         }
 
-        // Frame timing delay
-        delay(2000);
+        // === Draw the updated framebuffer === //
+
+        for (i = 0; i < BALL_COUNT; i++)
+        {
+            draw_ball(balls[i].pos_x, balls[i].pos_y, balls[i].width, balls[i].height, balls[i].color);
+        }
+
+        // === Swap display buffers === ///
+
+        while ((PEEK(FB_START) & 0b1) != 0b0)
+        {
+            // Wait for the vertical blanking time
+        }
+
+        FB_SWAP_BUFFERS();
     }
 
     return 0;
+}
+
+void draw_ball(byte x, byte y, byte w, byte h, byte color)
+{
+    byte i = 0;
+
+    for (i; i < h; i++)
+    {
+        memset(FB_START + ((y + i) * FB_WIDTH) + x, color, w);
+    }
 }

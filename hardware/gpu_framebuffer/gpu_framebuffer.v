@@ -1,6 +1,6 @@
 module gpu_framebuffer(
     input RW, CE, CLK_CPU,
-    input [6:0] DATA,
+    inout [6:0] DATA,
     input [14:0] ADDR,
     input CLK_SYS,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
@@ -48,20 +48,19 @@ module gpu_framebuffer(
 
     // === CPU interface and state machine === //
 
+    assign DATA = (~CE && RW) ? data_out : 7'bZ;
+
     reg [20:0] cursor_x = 0;
     reg [20:0] cursor_y = 0;
 
     reg [14:0] addr_in = 0;
-    reg [7:0] data_in = 0;
+    reg [6:0] data_in = 0;
+    reg [6:0] data_out = 0;
 
     reg buffer_flag = 0;
-    reg buffer_swap_flag = 0;
-
     reg write_flag = 0;
 
     always @(negedge CLK_CPU) begin
-        // Don't accept anything new while there's a buffer swap request waiting
-
         if (~CE && ~RW) begin
             addr_in <= ADDR - 4096;
             data_in <= DATA;
@@ -71,25 +70,22 @@ module gpu_framebuffer(
         if (write_flag) begin
             write_flag <= 0;
 
-            if (buffer_flag) begin
-                front_buffer[addr_in] <= data_in[2:0];
-            end else begin
-                back_buffer[addr_in] <= data_in[2:0];
-            end
-
             if (data_in[6] == 1'b1) begin
-                buffer_swap_flag <= 1;
+                // Buffer swap command
+                buffer_flag <= ~buffer_flag;
+            end else begin
+                // Write to inactive framebuffer
+                if (buffer_flag) begin
+                    front_buffer[addr_in] <= data_in[2:0];
+                end else begin
+                    back_buffer[addr_in] <= data_in[2:0];
+                end
             end
+            
         end
 
-        // NOTE: With Vsync, there's no tearing, but the other buffer seems to flash through
-        // Why?
-
-        if (buffer_swap_flag) begin
-            buffer_flag <= ~buffer_flag;
-            buffer_swap_flag <= 0;
-        end
-
+        // Expose VSYNC signal to CPU
+        data_out <= VGA_VSYNC;
     end
 
 endmodule
