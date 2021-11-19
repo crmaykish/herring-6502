@@ -18,3 +18,4 @@ hardware.out
 hardware/herring_gpu/hardware.rpt
 *.vvp
 *.vcd
+hardware/new_gpu/hardware.rpt
