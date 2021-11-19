@@ -35,12 +35,27 @@ typedef struct
     byte color;
 } ball_t;
 
+static void buffer_swap()
+{
+    while ((PEEK(FB_START) & 0b1) != 0b0)
+    {
+        // Wait for the vertical blanking time
+    }
+
+    FB_SWAP_BUFFERS();
+}
+
+static void buffer_clear()
+{
+    memset(FB_START, 0, FB_SIZE);
+}
+
 void draw_ball(byte x, byte y, byte w, byte h, byte color);
 
 int main()
 {
     ball_t balls[BALL_COUNT] = {
-        {0, 0, 3, 4, 1, 1, RED},
+        {0, 0, 3, 4, 2, 1, RED},
         {10, 20, 2, 2, -1, 1, GREEN},
         {40, 5, 5, 5, 1, -1, YELLOW},
         {20, 40, 2, 3, -1, -1, BLUE},
@@ -53,10 +68,10 @@ int main()
 
     print_line("Clearing front and back framebuffers");
 
-    memset(FB_START, 0, FB_SIZE);
-    POKE(FB_START, 0b01000000);
-    memset(FB_START, 0, FB_SIZE);
-    POKE(FB_START, 0b01000000);
+    buffer_clear();
+    buffer_swap();
+    buffer_clear();
+    buffer_swap();
 
     print_line("Done!");
 
@@ -68,7 +83,7 @@ int main()
 
         // === Erase the framebuffer === //
 
-        memset(FB_START, 0, FB_SIZE);
+        buffer_clear();
 
         // === Update the game state === //
 
@@ -77,12 +92,12 @@ int main()
             balls[i].pos_x += balls[i].x_dir;
             balls[i].pos_y += balls[i].y_dir;
 
-            if (balls[i].pos_x == 0 || balls[i].pos_x == (FB_WIDTH - balls[i].width))
+            if (balls[i].pos_x <= 0 || balls[i].pos_x >= (FB_WIDTH - balls[i].width))
             {
                 balls[i].x_dir *= -1;
             }
 
-            if (balls[i].pos_y == 0 || balls[i].pos_y == (FB_HEIGHT - balls[i].height))
+            if (balls[i].pos_y <= 0 || balls[i].pos_y >= (FB_HEIGHT - balls[i].height))
             {
                 balls[i].y_dir *= -1;
             }
@@ -97,12 +112,7 @@ int main()
 
         // === Swap display buffers === ///
 
-        while ((PEEK(FB_START) & 0b1) != 0b0)
-        {
-            // Wait for the vertical blanking time
-        }
-
-        FB_SWAP_BUFFERS();
+        buffer_swap();
     }
 
     return 0;
