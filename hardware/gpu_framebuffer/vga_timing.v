@@ -7,15 +7,15 @@ module vga_timing(CLK_PIXEL, Hs, Vs, SCREEN_X, SCREEN_Y, ON_SCREEN);
 
     output reg ON_SCREEN;
 
-    parameter HA_END = 639;
-    parameter HS_STA = HA_END + 16;
-    parameter HS_END = HS_STA + 96;
-    parameter LINE = 799;
+    parameter HA_END = 1023;
+    parameter HS_STA = HA_END + 24;
+    parameter HS_END = HS_STA + 136;
+    parameter LINE = 1343;
 
-    parameter VA_END = 479;
-    parameter VS_STA = VA_END + 10;
-    parameter VS_END = VS_STA + 2;
-    parameter SCREEN = 524;
+    parameter VA_END = 767;
+    parameter VS_STA = VA_END + 3;
+    parameter VS_END = VS_STA + 6;
+    parameter SCREEN = 805;
 
     always @(posedge CLK_PIXEL) begin
         if (SCREEN_X == LINE)

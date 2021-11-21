@@ -1,16 +1,29 @@
 module gpu_framebuffer(
+    input CLK,
     input RW, CE, CLK_CPU,
     inout [6:0] DATA,
     input [14:0] ADDR,
-    input CLK_SYS,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
     output VGA_HSYNC, VGA_VSYNC
 );
-    reg CLK_PIXEL;
-    
-    always @(posedge CLK_SYS) begin
-        CLK_PIXEL <= ~CLK_PIXEL;
-    end
+
+    // Generate pixel clock with PLL
+    wire CLK_PIXEL;
+
+    // 12 MHz, 65 MHz out
+    SB_PLL40_CORE #(
+        .FEEDBACK_PATH("SIMPLE"),
+        .DIVR(4'b0000),
+        .DIVF(7'b1010110),
+        .DIVQ(3'b100),
+        .FILTER_RANGE(3'b001)
+    ) pll (
+        .LOCK(locked),
+        .RESETB(1'b1),
+        .BYPASS(1'b0),
+        .REFERENCECLK(CLK),
+        .PLLOUTGLOBAL(CLK_PIXEL)
+    );
 
     wire [10:0] pixel_x;
     wire [10:0] pixel_y;
@@ -23,11 +36,11 @@ module gpu_framebuffer(
                          pixel_y,
                          on_screen);
 
-    parameter FB_WIDTH = 80;
-    parameter FB_HEIGHT = 60;
+    parameter FB_WIDTH = 128;
+    parameter FB_HEIGHT = 96;
     // NOTE: when the screen size changes, the framebuffer indices also need to change in order to scale to full screen
 
-    // Character buffer
+    // Framebuffers
     reg [2:0] front_buffer[0:((FB_WIDTH * FB_HEIGHT) - 1)];
     reg [2:0] back_buffer[0:((FB_WIDTH * FB_HEIGHT) - 1)];
 

@@ -7,8 +7,8 @@
 
 #define FB_ADDR (0x9000)
 #define FB_START ((unsigned char *)(FB_ADDR))
-#define FB_WIDTH (80)
-#define FB_HEIGHT (60)
+#define FB_WIDTH (128)
+#define FB_HEIGHT (96)
 #define FB_SIZE (FB_WIDTH * FB_HEIGHT)
 
 #define FB_SWAP_COMMAND (0b01000000)
@@ -23,7 +23,7 @@
 #define CYAN 0x6
 #define WHITE 0x7
 
-#define BALL_COUNT 10
+#define BALL_COUNT 7
 
 typedef struct
 {
@@ -93,8 +93,8 @@ int main()
         balls[i].height = (rand() % 8) + 3; // 3-10
         balls[i].pos_x = rand() % (FB_WIDTH - balls[i].width - 1);
         balls[i].pos_y = rand() % (FB_HEIGHT - balls[i].height - 1);
-        balls[i].x_dir = ((rand() % 1) ? -1 : 1) * ((rand() % 2) + 1);
-        balls[i].y_dir = ((rand() % 1) ? -1 : 1) * ((rand() % 2) + 1);
+        balls[i].x_dir = ((rand() % 1) ? -1 : 1);
+        balls[i].y_dir = ((rand() % 1) ? -1 : 1);
         balls[i].color = (i % 7) + 1;
     }
 
