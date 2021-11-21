@@ -30,6 +30,8 @@ word *pixel_address(byte x, byte y);
 
 void draw_pixel(byte x, byte y, byte color);
 
+void draw_line(byte x1, byte y1, byte x2, byte y2, byte color);
+
 void fill_rect(byte x, byte y, byte width, byte height, byte color);
 
 #endif
