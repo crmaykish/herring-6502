@@ -4,24 +4,7 @@
 #include "herring.h"
 #include "acia.h"
 #include "print.h"
-
-#define FB_ADDR (0x9000)
-#define FB_START ((unsigned char *)(FB_ADDR))
-#define FB_WIDTH (128)
-#define FB_HEIGHT (96)
-#define FB_SIZE (FB_WIDTH * FB_HEIGHT)
-
-#define FB_SWAP_COMMAND (0b01000000)
-#define FB_SWAP_BUFFERS() POKE(FB_START, FB_SWAP_COMMAND)
-
-#define BLACK 0x0
-#define RED 0x1
-#define GREEN 0x2
-#define YELLOW 0x3
-#define BLUE 0x4
-#define PURPLE 0x5
-#define CYAN 0x6
-#define WHITE 0x7
+#include "framebuffer.h"
 
 #define BALL_COUNT 7
 
@@ -35,23 +18,6 @@ typedef struct
     int y_dir;
     byte color;
 } ball_t;
-
-static void buffer_swap()
-{
-    while ((PEEK(FB_START) & 0b1) != 0b0)
-    {
-        // Wait for the vertical blanking time
-    }
-
-    FB_SWAP_BUFFERS();
-}
-
-static void buffer_clear()
-{
-    memset(FB_START, 0, FB_SIZE);
-}
-
-void draw_ball(byte x, byte y, byte w, byte h, byte color);
 
 int main()
 {
@@ -68,10 +34,7 @@ int main()
 
     print_line("Clearing front and back framebuffers");
 
-    buffer_clear();
-    buffer_swap();
-    buffer_clear();
-    buffer_swap();
+    framebuffer_init();
 
     print_line("Enter some random characters: ");
 
@@ -104,7 +67,7 @@ int main()
     {
         // === Erase the framebuffer === //
 
-        buffer_clear();
+        framebuffer_clear();
 
         // === Update the game state === //
 
@@ -113,12 +76,12 @@ int main()
             balls[i].pos_x += balls[i].x_dir;
             balls[i].pos_y += balls[i].y_dir;
 
-            if (balls[i].pos_x <= 0 || balls[i].pos_x >= (FB_WIDTH - balls[i].width))
+            if (balls[i].pos_x == 1 || balls[i].pos_x >= (FB_WIDTH - balls[i].width) - 1)
             {
                 balls[i].x_dir *= -1;
             }
 
-            if (balls[i].pos_y <= 0 || balls[i].pos_y >= (FB_HEIGHT - balls[i].height))
+            if (balls[i].pos_y == 1 || balls[i].pos_y >= (FB_HEIGHT - balls[i].height) - 1)
             {
                 balls[i].y_dir *= -1;
             }
@@ -128,23 +91,13 @@ int main()
 
         for (i = 0; i < BALL_COUNT; i++)
         {
-            draw_ball(balls[i].pos_x, balls[i].pos_y, balls[i].width, balls[i].height, balls[i].color);
+            fill_rect(balls[i].pos_x, balls[i].pos_y, balls[i].width, balls[i].height, balls[i].color);
         }
 
         // === Swap display buffers === ///
 
-        buffer_swap();
+        framebuffer_swap();
     }
 
     return 0;
-}
-
-void draw_ball(byte x, byte y, byte w, byte h, byte color)
-{
-    byte i = 0;
-
-    for (i; i < h; i++)
-    {
-        memset(FB_START + ((y + i) * FB_WIDTH) + x, color, w);
-    }
 }
