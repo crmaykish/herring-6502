@@ -1,5 +1,3 @@
-set_io --warn-no-port CLK_SYS 2
-
 set_io --warn-no-port VGA_RED 28
 set_io --warn-no-port VGA_GREEN 38
 set_io --warn-no-port VGA_BLUE 42
@@ -13,9 +11,9 @@ set_io --warn-no-port DATA[3] 48
 set_io --warn-no-port DATA[4] 3
 set_io --warn-no-port DATA[5] 4
 set_io --warn-no-port DATA[6] 44
-set_io --warn-no-port DATA[7] 6
 
-set_io --warn-no-port RST 43
 set_io --warn-no-port RW 34
 set_io --warn-no-port CE 37
 set_io --warn-no-port CLK_CPU 31
+
+set_io --warn-no-port CLK 20

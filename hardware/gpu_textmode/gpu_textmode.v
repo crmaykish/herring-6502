@@ -1,15 +1,27 @@
 module gpu_textmode(
-    input RST, RW, CE, CLK_CPU,
-    input [7:0] DATA,
-    input CLK_SYS,
+    input RW, CE, CLK_CPU,
+    input [6:0] DATA,
+    input CLK,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
     output VGA_HSYNC, VGA_VSYNC
 );
-    reg CLK_PIXEL;
-    
-    always @(posedge CLK_SYS) begin
-        CLK_PIXEL <= ~CLK_PIXEL;
-    end
+    // Generate pixel clock with PLL
+    wire CLK_PIXEL;
+
+    // 12 MHz, 65 MHz out
+    SB_PLL40_CORE #(
+        .FEEDBACK_PATH("SIMPLE"),
+        .DIVR(4'b0000),
+        .DIVF(7'b1000010),
+        .DIVQ(3'b101),
+        .FILTER_RANGE(3'b001)
+    ) pll (
+        .LOCK(locked),
+        .RESETB(1'b1),
+        .BYPASS(1'b0),
+        .REFERENCECLK(CLK),
+        .PLLOUTGLOBAL(CLK_PIXEL)
+    );
 
     wire [10:0] pixel_x;
     wire [10:0] pixel_y;
