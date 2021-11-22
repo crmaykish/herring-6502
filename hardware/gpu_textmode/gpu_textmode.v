@@ -8,7 +8,7 @@ module gpu_textmode(
     // Generate pixel clock with PLL
     wire CLK_PIXEL;
 
-    // 12 MHz, 65 MHz out
+    // 12 MHz, 25.125 MHz out
     SB_PLL40_CORE #(
         .FEEDBACK_PATH("SIMPLE"),
         .DIVR(4'b0000),
@@ -33,6 +33,8 @@ module gpu_textmode(
                          pixel_x,
                          pixel_y,
                          on_screen);
+
+    // TODO: explore storing the font in SPRAM instead of BRAM
 
     // Font ROM (64 x 8 x 8)
     reg [7:0] font [0:63][0:7];
