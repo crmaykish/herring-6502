@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <peekpoke.h>
+#include <6502.h>
 #include "herring.h"
 #include "acia.h"
 #include "terminal.h"
@@ -11,6 +12,8 @@
 #include "jump.h"
 
 #define INPUT_BUFFER_SIZE 80
+
+static char *cpu_names[] = {"6502", "65C02", "65816", "4510", "65SC02", "65CE02"};
 
 void header();
 void free_ram();
@@ -109,18 +112,18 @@ void header()
 {
     screen_clear();
 
-    font_green();
-    print("Herring 6502 Monitor v1.2\r\n");
+    print("=======================================================\r\n");
 
-    font_red();
-    print("Colin Maykish - 2021\r\n");
+    font_green();
+    print("Herring Monitor v1.3 | Colin Maykish | Built 2021-12-01\r\n");
 
     font_cyan();
     print("github.com/crmaykish/herring-6502\r\n");
 
-    font_reset();
-
-    print("-----\r\n");
+    font_red();
+    print("CPU Type: ");
+    print(cpu_names[getcpu()]);
+    print_newline();
 
     font_blue();
     print("Available RAM: ");
@@ -129,7 +132,7 @@ void header()
 
     font_reset();
 
-    print("-----\r\n");
+    print("=======================================================\r\n\r\n");
 }
 
 void free_ram()
