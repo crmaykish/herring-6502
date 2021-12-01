@@ -76,12 +76,12 @@ int main()
             balls[i].pos_x += balls[i].x_dir;
             balls[i].pos_y += balls[i].y_dir;
 
-            if (balls[i].pos_x == 1 || balls[i].pos_x >= (FB_WIDTH - balls[i].width) - 1)
+            if (balls[i].pos_x == 0 || balls[i].pos_x >= (FB_WIDTH - balls[i].width) - 1)
             {
                 balls[i].x_dir *= -1;
             }
 
-            if (balls[i].pos_y == 1 || balls[i].pos_y >= (FB_HEIGHT - balls[i].height) - 1)
+            if (balls[i].pos_y == 0 || balls[i].pos_y >= (FB_HEIGHT - balls[i].height) - 1)
             {
                 balls[i].y_dir *= -1;
             }

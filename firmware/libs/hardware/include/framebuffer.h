@@ -6,8 +6,8 @@
 
 #define FB_ADDR (0x9000)
 #define FB_START ((unsigned char *)(FB_ADDR))
-#define FB_WIDTH (128)
-#define FB_HEIGHT (96)
+#define FB_WIDTH (64)
+#define FB_HEIGHT (48)
 #define FB_SIZE (FB_WIDTH * FB_HEIGHT)
 
 #define FB_SWAP_COMMAND (0b01000000)

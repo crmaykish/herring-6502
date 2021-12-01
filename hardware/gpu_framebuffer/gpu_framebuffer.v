@@ -36,8 +36,8 @@ module gpu_framebuffer(
                          pixel_y,
                          on_screen);
 
-    parameter FB_WIDTH = 128;
-    parameter FB_HEIGHT = 96;
+    parameter FB_WIDTH = 64;
+    parameter FB_HEIGHT = 48;
     // NOTE: when the screen size changes, the framebuffer indices also need to change in order to scale to full screen
 
     // Framebuffers
@@ -45,8 +45,8 @@ module gpu_framebuffer(
     reg [2:0] back_buffer[0:((FB_WIDTH * FB_HEIGHT) - 1)];
 
     // Indices into the framebuffer
-    wire [7:0] fb_x = pixel_x[10:3];
-    wire [7:0] fb_y = pixel_y[10:3];
+    wire [7:0] fb_x = pixel_x[10:4];
+    wire [7:0] fb_y = pixel_y[10:4];
 
     reg [2:0] current_pixel;
     reg [2:0] current_pixel2;
