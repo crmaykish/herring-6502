@@ -20,3 +20,7 @@ hardware/herring_gpu/hardware.rpt
 *.vcd
 hardware/new_gpu/hardware.rpt
 *.rpt
+*.chp
+*.fus
+*.jed
+*.pin
