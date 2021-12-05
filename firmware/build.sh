@@ -1,27 +1,24 @@
 #!/bin/sh
 
-TARGET=${1} # folder name
-TYPE=${2} # loader or program
+TARGET=${1} # program name
+TYPE=${2} # 'ram' or 'rom'
 
 echo "Building ${1}"
 
-mkdir -p ${TARGET}/build
+mkdir -p build
 
 cl65 -O \
     -t none \
     --cpu 65c02 \
     --static-locals \
-    -I libs/hardware/include/ \
-    --asm-include-dir libs/hardware/include \
-    -I ${TARGET}/include/ \
-    --asm-include-dir ${TARGET}/include \
+    -I include/ \
+    --asm-include-dir include \
     -C config/${TYPE}.cfg \
-    -o ${TARGET}/build/firmware.bin \
-    -m ${TARGET}/build/${TARGET}.map \
-    ${TARGET}/src/* libs/hardware/src/* \
+    -o build/${TARGET}.bin \
+    src/libs/* src/${TARGET}.c \
     config/${TYPE}.lib
 
-mv ${TARGET}/src/*.o ${TARGET}/build/
-mv libs/hardware/src/*.o ${TARGET}/build/
+mv src/*.o build
+mv src/libs/*.o build
 
 echo "Done!"
