@@ -32,7 +32,6 @@ while [ $INDEX -lt $FILE_SIZE ]; do
         echo -n "-"
     fi
 
-    # sleep $SLEEP_TIME
 done
 
 echo "|"
