@@ -13,6 +13,8 @@
 #define COMMAND_MAX_LENGTH 6
 #define MEMDUMP_BYTES 128
 
+#define PROMPT "><(((°>"
+
 typedef struct
 {
     char name[6];
@@ -22,8 +24,8 @@ typedef struct
 } command_t;
 
 void header();
+void prompt();
 void free_ram();
-void load_code(word addr);
 
 // Handler functions for each monitor command
 void handler_help();
@@ -67,7 +69,7 @@ int main()
         command_handled = false;
 
         // Present the command prompt and wait for input
-        print("> ");
+        prompt();
         readline(buffer, true);
         print_newline();
 
@@ -100,17 +102,27 @@ void header()
 {
     screen_clear();
 
-    print("=======================================================\r\n");
+    font_blue();
+    print(".·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·.\r\n");
 
     font_green();
     print("Herring Monitor v1.4 | Colin Maykish | Built 2021-12-06\r\n");
 
-    font_cyan();
+    font_red();
     print("github.com/crmaykish/herring-6502\r\n");
 
-    font_reset();
+    font_blue();
+    print(".·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·.\r\n\r\n");
 
-    print("=======================================================\r\n\r\n");
+    font_reset();
+}
+
+void prompt()
+{
+    font_cyan();
+    print(PROMPT);
+    font_reset();
+    print(" ");
 }
 
 void free_ram()
