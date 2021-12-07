@@ -20,6 +20,7 @@ typedef struct
     char name[6];
     char param1[6];
     char param2[6];
+    char desc[48];
     void (*handler)();
 } command_t;
 
@@ -36,6 +37,7 @@ void handler_dump();
 void handler_jump();
 void handler_zero();
 void handler_load();
+void handler_clear();
 void command_not_found(char *command_name);
 
 // CPU type names
@@ -43,14 +45,15 @@ static const char *cpu_names[] = {"6502", "65C02", "65816", "4510", "65SC02", "6
 
 // Input command definitions
 static const command_t commands[] = {
-    {"help", "", "", handler_help},
-    {"info", "", "", handler_info},
-    {"peek", "addr", "", handler_peek},
-    {"poke", "addr", "val", handler_poke},
-    {"dump", "addr", "", handler_dump},
-    {"jump", "addr", "", handler_jump},
-    {"zero", "addr", "", handler_zero},
-    {"load", "addr", "", handler_load}};
+    {"help", "", "", "Show this message", handler_help},
+    {"info", "", "", "Get system info", handler_info},
+    {"peek", "addr", "", "Peek at a memory address", handler_peek},
+    {"poke", "addr", "val", "Poke a value into memory", handler_poke},
+    {"dump", "addr", "", "Dump memory in hex and ASCII", handler_dump},
+    {"jump", "addr", "", "Jump to address", handler_jump},
+    {"zero", "", "", "Clear program memory (0x1000-0x7FFF)", handler_zero},
+    {"load", "addr", "", "Load a program over serial", handler_load},
+    {"clear", "", "", "Clear the screen", handler_clear}};
 
 static const byte COMMAND_COUNT = sizeof(commands) / sizeof(command_t);
 
@@ -141,7 +144,10 @@ void handler_help()
 
     for (i = 0; i < COMMAND_COUNT; i++)
     {
+        font_green();
         print(commands[i].name);
+        font_reset();
+
         if (commands[i].param1[0] != '\0')
         {
             print(" <");
@@ -154,6 +160,12 @@ void handler_help()
             print(commands[i].param2);
             print(">");
         }
+
+        print(" : ");
+
+        font_cyan();
+        print(commands[i].desc);
+        font_reset();
 
         if (i != COMMAND_COUNT - 1)
         {
@@ -207,10 +219,7 @@ void handler_jump()
 
 void handler_zero()
 {
-    char *param1 = strtok(NULL, " ");
-    word addr = strtol(param1, 0, 16);
-    memset((word *)addr, 0, MEMDUMP_BYTES);
-
+    memset((word *)0x1000, 0, 0x7000);
     print("OK");
 }
 
@@ -251,6 +260,11 @@ void handler_load()
     }
 
     print("Done!");
+}
+
+void handler_clear()
+{
+    screen_clear();
 }
 
 void command_not_found(char *command_name)
