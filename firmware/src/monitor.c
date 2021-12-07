@@ -151,7 +151,7 @@ void handler_help()
         if (commands[i].param2[0] != '\0')
         {
             print(" <");
-            print(commands[i].param1);
+            print(commands[i].param2);
             print(">");
         }
 
