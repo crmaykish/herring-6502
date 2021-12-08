@@ -9,11 +9,14 @@
 #include "memdump.h"
 #include "jump.h"
 
+#define PROGRAM_VERSION "1.5.0"
+#define RELEASE_DATE "2021-12-07"
+
+#define PROMPT "><(((°>"
+
 #define INPUT_BUFFER_SIZE 32
 #define COMMAND_MAX_LENGTH 6
 #define MEMDUMP_BYTES 128
-
-#define PROMPT "><(((°>"
 
 typedef struct
 {
@@ -107,16 +110,16 @@ void header()
     screen_clear();
 
     font_blue();
-    print(".·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·.\r\n");
+    print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
 
     font_green();
-    print("Herring Monitor v1.4 | Colin Maykish | Built 2021-12-06\r\n");
+    print("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
 
     font_red();
     print("github.com/crmaykish/herring-6502\r\n");
 
     font_blue();
-    print(".·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·.\r\n\r\n");
+    print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
 
     font_reset();
 }
