@@ -9,7 +9,7 @@
 #include "memdump.h"
 #include "jump.h"
 
-#define INPUT_BUFFER_SIZE 80
+#define INPUT_BUFFER_SIZE 32
 #define COMMAND_MAX_LENGTH 6
 #define MEMDUMP_BYTES 128
 
@@ -27,6 +27,7 @@ typedef struct
 void header();
 void prompt();
 void free_ram();
+byte readline(char *buffer);
 
 // Handler functions for each monitor command
 void handler_help();
@@ -73,7 +74,7 @@ int main()
 
         // Present the command prompt and wait for input
         prompt();
-        readline(buffer, true);
+        readline(buffer);
         print_newline();
 
         command = strtok(buffer, " ");
@@ -273,4 +274,43 @@ void command_not_found(char *command_name)
     print("Command not found: ");
     print(command_name);
     font_reset();
+}
+
+byte readline(char *buffer)
+{
+    byte count = 0;
+    byte in = acia_getc();
+
+    while (in != '\n' && in != '\r')
+    {
+        // Character is printable ASCII
+        if (in >= 0x20 && in < 0x7F)
+        {
+            acia_putc(in);
+
+            buffer[count] = in;
+            count++;
+        }
+
+        // Character is backspace
+        else if (in == 0x7F)
+        {
+            if (count != 0)
+            {
+                // Move cursor back one character and clear the previous character
+                count--;
+                buffer[count] = '\0';
+
+                cursor_move(CURSOR_LEFT, 1);
+                acia_putc(' ');
+                cursor_move(CURSOR_LEFT, 1);
+            }
+        }
+
+        in = acia_getc();
+    }
+
+    buffer[count] = 0;
+
+    return count;
 }

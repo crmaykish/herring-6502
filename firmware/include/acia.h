@@ -11,6 +11,4 @@ extern char acia_getc();
 extern void __fastcall__ acia_putc(byte);
 extern void __fastcall__ print(const byte *);
 
-byte readline(char *buffer, bool echo);
-
 #endif
