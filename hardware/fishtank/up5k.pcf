@@ -1,0 +1,34 @@
+set_io --warn-no-port DATA[0] 2
+set_io --warn-no-port DATA[1] 46
+set_io --warn-no-port DATA[2] 47
+set_io --warn-no-port DATA[3] 45
+set_io --warn-no-port DATA[4] 48
+set_io --warn-no-port DATA[5] 3
+set_io --warn-no-port DATA[6] 4
+set_io --warn-no-port DATA[7] 44
+
+set_io --warn-no-port ADDR[0] 6
+set_io --warn-no-port ADDR[1] 9
+set_io --warn-no-port ADDR[2] 11
+set_io --warn-no-port ADDR[3] 18
+set_io --warn-no-port ADDR[4] 19
+set_io --warn-no-port ADDR[5] 13
+set_io --warn-no-port ADDR[6] 21
+set_io --warn-no-port ADDR[7] 12
+set_io --warn-no-port ADDR[8] 10
+set_io --warn-no-port ADDR[9] 28
+set_io --warn-no-port ADDR[10] 38
+set_io --warn-no-port ADDR[11] 42
+set_io --warn-no-port ADDR[12] 36
+set_io --warn-no-port ADDR[13] 43
+set_io --warn-no-port ADDR[14] 34
+set_io --warn-no-port ADDR[15] 37
+
+set_io --warn-no-port RW 32 
+set_io --warn-no-port DEC0 25
+set_io --warn-no-port DEC1 27
+set_io --warn-no-port DEC2 26
+set_io --warn-no-port DEC3 31
+set_io --warn-no-port CLK_CPU 23
+
+set_io --warn-no-port CLK 20
