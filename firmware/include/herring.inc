@@ -20,8 +20,8 @@ ACIA_READY_TX = $10
 ACIA_RESET = $00
 ; RTS low, transmit interrupt disabled, receiver interrupt disabled, DTR low
 ACIA_COMMAND_INIT = $0B 
-; Baudrate 19200, 8 data bits, 1 stop bit
-ACIA_CONTROL_BAUD_19200 = %00011111
+; Baudrate 115200, 8 data bits, 1 stop bit
+ACIA_CONTROL_BAUD_115200 = %00010000
 
 ; Special ASCII characters
 ASCII_NEWLINE = $0A

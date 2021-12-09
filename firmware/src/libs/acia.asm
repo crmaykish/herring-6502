@@ -13,7 +13,7 @@ _acia_init:
     sta ACIA0_STATUS
     lda #ACIA_COMMAND_INIT
     sta ACIA0_COMMAND
-    lda #ACIA_CONTROL_BAUD_19200
+    lda #ACIA_CONTROL_BAUD_115200
     sta ACIA0_CONTROL
     rts
 
@@ -25,7 +25,7 @@ tx_check:
     beq tx_check
     pla
     sta ACIA0_DATA
-    ; jsr wdc_bug         ; Comment out for non-WDC 65C51s
+    jsr wdc_bug
     rts
 
 _acia_getc:
@@ -58,7 +58,13 @@ _acia_rx_ready:
     and #ACIA_READY_RX
     rts
 
-; From: http://forum.6502.org/viewtopic.php?f=4&t=2543&start=30
+; WD65C51 Bug Workaround
+;
+; Note: this seems to work with WDC65C51s running at 4 MHz,
+; but it does not work if the processor speed delay is actually set to 4 MHz
+; CDP65C51 works with or without this code enabled
+;
+; See: http://forum.6502.org/viewtopic.php?f=4&t=2543&start=30
 wdc_bug:
     phy
     phx
