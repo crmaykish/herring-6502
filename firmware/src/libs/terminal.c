@@ -3,29 +3,11 @@
 #include "acia.h"
 #include "print.h"
 
-void font_red()
+void term_set_color(char *color)
 {
-    print("\033[31m");
-}
-
-void font_green()
-{
-    print("\033[32m");
-}
-
-void font_blue()
-{
-    print("\033[34m");
-}
-
-void font_cyan()
-{
-    print("\033[36m");
-}
-
-void font_reset()
-{
-    print("\033[0m");
+    print("\033[");
+    print(color);
+    print("m");
 }
 
 void cursor_move(cursor_dir_e dir, byte steps)
