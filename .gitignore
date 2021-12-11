@@ -24,3 +24,4 @@ hardware/new_gpu/hardware.rpt
 *.fus
 *.jed
 *.pin
+*.lib
