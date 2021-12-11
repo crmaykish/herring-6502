@@ -4,11 +4,11 @@
 #include "acia.h"
 #include "print.h"
 
-#define MAX_COUNT 100
+#define MAX_COUNT 500
 
-bool is_prime(uint32_t p)
+bool is_prime(uint16_t p)
 {
-    uint32_t i;
+    uint16_t i;
 
     if (p < 2)
     {
@@ -35,11 +35,11 @@ bool is_prime(uint32_t p)
 int main()
 {
     uint16_t count = 1;
-    uint32_t p = 0;
+    uint16_t p = 0;
 
     print_line("Calculating primes...");
 
-    while (count <= 100)
+    while (count <= MAX_COUNT)
     {
         if (is_prime(p))
         {
