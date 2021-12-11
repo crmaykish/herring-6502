@@ -6,13 +6,14 @@
 #include "terminal.h"
 
 #define BOARD_WIDTH 40
-#define BOARD_HEIGHT 20
+#define BOARD_HEIGHT 22
 #define MAX_GENERATIONS 50
 
 static byte current[BOARD_WIDTH][BOARD_HEIGHT];
 static byte previous[BOARD_WIDTH][BOARD_HEIGHT];
 
 static byte cycles;
+static byte seed;
 
 void rand_prompt();
 
@@ -46,7 +47,6 @@ int main()
 
 void rand_prompt()
 {
-    byte seed = 0;
     byte seed_count = 0;
 
     print_line("Enter some random characters: ");
@@ -109,7 +109,8 @@ void draw_board()
     term_set_color(BG_COLOR_MAGENTA);
     print("Generations: ");
     print_dec(cycles);
-    print_newline();
+    print("           Seed: ");
+    print_dec(seed);
     term_set_color(DEFAULT_COLORS);
 }
 
@@ -151,26 +152,32 @@ void update_state()
 
 byte count_neighbors(byte x, byte y)
 {
-    byte living = 0; // Running total of live neighbors for a cell
-    int i, j;
+    // Living neighbors
+    byte living = 0;
 
-    // Loop through the offsets and make sure they are valid cell positions then count live neighbors
-    for (i = -1; i <= 1; i++)
-    {
-        for (j = -1; j <= 1; j++)
-        {
-            if (
-                (int)x + i >= 0 &&           // Neighbor plus offset should be above zero in the x-direction
-                (int)y + j >= 0 &&           // Neighbor plus offset should be above zero in the y-direction
-                (int)x + i < BOARD_HEIGHT && // Neighbor plus offset should be below the height of the board
-                (int)y + j < BOARD_WIDTH &&  // Neighbor plus offset should be below the width of the board
-                !(i == 0 && j == 0)          // Don't consider the cell its own neighbor
-            )
-            {
-                living += previous[x + i][y + j]; // If the neighbor is on the board, add its state to the living count
-            }
-        }
-    }
+    if (x > 0 && y > 0)
+        living += previous[x - 1][y - 1];
+
+    if (x > 0)
+        living += previous[x - 1][y];
+
+    if (x > 0 && y < BOARD_HEIGHT - 1)
+        living += previous[x - 1][y + 1];
+
+    if (y > 0)
+        living += previous[x][y - 1];
+
+    if (y < BOARD_HEIGHT - 1)
+        living += previous[x][y + 1];
+
+    if (x < BOARD_WIDTH - 1 && y > 0)
+        living += previous[x + 1][y - 1];
+
+    if (x < BOARD_WIDTH - 1)
+        living += previous[x + 1][y];
+
+    if (x < BOARD_WIDTH - 1 && y < BOARD_HEIGHT - 1)
+        living += previous[x + 1][y + 1];
 
     return living;
 }
