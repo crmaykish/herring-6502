@@ -44,6 +44,8 @@ void cursor_move(cursor_dir_e dir, byte steps);
 void cursor_set_col(byte col);
 void cursor_set_pos(byte row, byte col);
 
+void set_cursor_visible(bool visible);
+
 void screen_clear();
 
 #endif

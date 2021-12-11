@@ -1,7 +1,11 @@
 #include <stdlib.h>
+#include <stdbool.h>
 #include "terminal.h"
 #include "acia.h"
 #include "print.h"
+
+#define CURSOR_HIDE "\033[?25l"
+#define CURSOR_SHOW "\033[?25h"
 
 void term_set_color(char *color)
 {
@@ -33,6 +37,18 @@ void cursor_set_pos(byte row, byte col)
     acia_putc(';');
     print_dec(col);
     acia_putc('H');
+}
+
+void set_cursor_visible(bool visible)
+{
+    if (visible)
+    {
+        print(CURSOR_SHOW);
+    }
+    else
+    {
+        print(CURSOR_HIDE);
+    }
 }
 
 void screen_clear()
