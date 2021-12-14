@@ -11,7 +11,7 @@ void term_set_color(char *color)
 {
     print("\033[");
     print(color);
-    print("m");
+    acia_putc('m');
 }
 
 void cursor_move(cursor_dir_e dir, byte steps)
