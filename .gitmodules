@@ -1,0 +1,3 @@
+[submodule "firmware/libs/chip8"]
+	path = firmware/libs/chip8
+	url = git@github.com:crmaykish/chip8.git
