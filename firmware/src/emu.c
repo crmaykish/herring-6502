@@ -14,40 +14,66 @@
 
 #define LOCAL_ROM_ADDR (0x7000)
 
-static uint8_t pixel;
+bool running = true;
 
-void draw_byte(uint8_t p, uint8_t x, uint8_t y)
+void draw_p(bool on, uint8_t x, uint8_t y)
 {
-    // TODO: Not XORing the pixels on
-    // TODO: Not handling wrapping pixels around the screen
-
-    byte i;
-
     cursor_set_pos(y, x + x);
+    acia_putc(on ? PIXEL_ON : PIXEL_OFF);
+    acia_putc(on ? PIXEL_ON : PIXEL_OFF);
+}
 
-    for (i = 0; i < 8; i++)
+void poll_input()
+{
+    uint8_t input = 0xFF;
+
+    // Check for serial input
+    if (acia_rx_ready())
     {
+        input = acia_getc();
 
-        if ((x + i) < CHIP8_SCREEN_WIDTH)
+        switch (input)
         {
-            pixel = (p & (1 << (7 - i))) > 0 ? PIXEL_ON : PIXEL_OFF;
-
-            // Draw two characters to get the pixel proportions right
-            acia_putc(pixel);
-            acia_putc(pixel);
+        case 0x1B: // ESC
+            input = 0xFF;
+            running = false;
+            break;
+        case 0x30: // 0
+        case 0x31: // 1
+        case 0x32: // 2
+        case 0x33: // 3
+        case 0x34: // 4
+        case 0x35: // 5
+        case 0x36: // 6
+        case 0x37: // 7
+        case 0x38: // 8
+        case 0x39: // 9
+            input -= 0x30;
+            break;
+        default:
+            break;
         }
+    }
+
+    if (input != 0xFF)
+    {
+        chip8_press_key(input);
+
+        cursor_set_pos(0, 0);
+        print("key: ");
+        print_dec(input);
     }
 }
 
 int main()
 {
     chip8_status_e status;
-    uint8_t input;
+    chip8_run_state_e run_state;
 
     rand_prompt();
 
     // Initialize the CHIP-8 emulator
-    chip8_init(&rand_byte, &draw_byte);
+    chip8_init(&rand_byte, &draw_p, &screen_clear);
 
     // Load the CHIP-8 ROM file into the emulator's system memory from local memory
     status = chip8_load_rom((uint8_t *)LOCAL_ROM_ADDR, CHIP8_ROM_MAX_SIZE);
@@ -62,28 +88,34 @@ int main()
     screen_clear();
     set_cursor_visible(false);
 
-    while (status == CHIP8_SUCCESS)
+    while (running)
     {
-        // Check for serial input
-        if (acia_rx_ready())
-        {
-            input = acia_getc();
+        run_state = chip8_get_run_state();
 
-            if (input == 0x1B)
-            {
-                // If ESC was pressed, stop the emulator
-                break;
-            }
+        switch (run_state)
+        {
+        case CHIP8_STATE_RUNNING:
+            poll_input();
+            status = chip8_cycle();
+            break;
+        case CHIP8_STATE_WAIT_FOR_INPUT:
+            poll_input();
+            break;
+        default:
+            running = false;
+            break;
         }
 
-        status = chip8_cycle();
+        chip8_tick_timers();
     }
 
     term_set_color(DEFAULT_COLORS);
     screen_clear();
     set_cursor_visible(true);
 
-    print("Emulator stopped with status: ");
+    print("Emulator stopped with state = ");
+    print_dec(run_state);
+    print(", status = ");
     print_dec(status);
     return 0;
 }
