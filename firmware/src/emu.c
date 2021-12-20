@@ -9,18 +9,22 @@
 
 #include "chip8.h"
 
-#define PIXEL_ON '#'
-#define PIXEL_OFF ' '
-
 #define LOCAL_ROM_ADDR (0x7000)
 
 bool running = true;
 
-void draw_p(bool on, uint8_t x, uint8_t y)
+void draw_p(uint8_t x, uint8_t y, chip8_pixel_state_e p)
 {
     cursor_set_pos(y, x + x);
-    acia_putc(on ? PIXEL_ON : PIXEL_OFF);
-    acia_putc(on ? PIXEL_ON : PIXEL_OFF);
+    acia_putc(p == CHIP8_PIXEL_ON ? '#' : ' ');
+}
+
+void draw_screen(bool clear)
+{
+    if (clear)
+    {
+        screen_clear();
+    }
 }
 
 void poll_input()
@@ -55,13 +59,11 @@ void poll_input()
         }
     }
 
+    // TODO: A-F keys
+
     if (input != 0xFF)
     {
         chip8_press_key(input);
-
-        cursor_set_pos(0, 0);
-        print("key: ");
-        print_dec(input);
     }
 }
 
@@ -70,10 +72,11 @@ int main()
     chip8_status_e status;
     chip8_run_state_e run_state;
 
-    rand_prompt();
-
     // Initialize the CHIP-8 emulator
-    chip8_init(&rand_byte, &draw_p, &screen_clear);
+    chip8_init();
+    chip8_set_set_pixel_func(&draw_p);
+    chip8_set_redraw_screen_func(&draw_screen);
+    // TODO: set the random byte function
 
     // Load the CHIP-8 ROM file into the emulator's system memory from local memory
     status = chip8_load_rom((uint8_t *)LOCAL_ROM_ADDR, CHIP8_ROM_MAX_SIZE);
@@ -87,6 +90,8 @@ int main()
 
     screen_clear();
     set_cursor_visible(false);
+
+    running = true;
 
     while (running)
     {
