@@ -16,15 +16,18 @@ bool running = true;
 void draw_p(uint8_t x, uint8_t y, chip8_pixel_state_e p)
 {
     cursor_set_pos(y, x + x);
-    acia_putc(p == CHIP8_PIXEL_ON ? '#' : ' ');
-}
 
-void draw_screen(bool clear)
-{
-    if (clear)
+    if (p == CHIP8_PIXEL_ON)
     {
-        screen_clear();
+        term_set_color(BG_COLOR_BRIGHT_GREEN);
     }
+    else
+    {
+        term_set_color(DEFAULT_COLORS);
+    }
+
+    acia_putc(' ');
+    acia_putc(' ');
 }
 
 void poll_input()
@@ -75,7 +78,7 @@ int main()
     // Initialize the CHIP-8 emulator
     chip8_init();
     chip8_set_set_pixel_func(&draw_p);
-    chip8_set_redraw_screen_func(&draw_screen);
+    chip8_set_clear_screen_func(&screen_clear);
     // TODO: set the random byte function
 
     // Load the CHIP-8 ROM file into the emulator's system memory from local memory
@@ -111,6 +114,7 @@ int main()
             break;
         }
 
+        // TODO: Timers don't tick at a constant rate, use an actual timer from the VIA
         chip8_tick_timers();
     }
 

@@ -53,5 +53,6 @@ void set_cursor_visible(bool visible)
 
 void screen_clear()
 {
+    term_set_color(DEFAULT_COLORS);
     print("\033[2J\033[H");
 }
