@@ -28,20 +28,11 @@ char getc()
 
 void putc(uint8_t c)
 {
-    uint8_t delay = 0xFF; // TODO: this might be more delay than necessary
-
     while ((PEEK(ACIA0_STATUS) & ACIA_READY_TX) == 0)
     {
     }
 
     POKE(ACIA0_DATA, c);
-
-    // Delay loop to work around the WDC65C51 hardware bug
-    // See: http://forum.6502.org/viewtopic.php?f=4&t=2543&start=30
-    while (delay > 0)
-    {
-        delay--;
-    }
 }
 
 void puts(const uint8_t *s)
