@@ -243,12 +243,6 @@ void handler_load()
     {
         in = acia_getc();
 
-        // Don't store the first DE magic byte that comes in
-        if (in == 0xDE && in_count == 0)
-        {
-            continue;
-        }
-
         POKE(addr + in_count, in);
 
         if (in == 0xDE)
@@ -262,6 +256,9 @@ void handler_load()
 
         in_count++;
     }
+
+    // Remove the magic bytes from the end of the firmware in RAM
+    memset((word *)(addr + in_count - 3), 0, 3);
 
     print("Done!");
 }
