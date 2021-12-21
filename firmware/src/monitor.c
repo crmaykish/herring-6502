@@ -3,14 +3,10 @@
 #include <peekpoke.h>
 #include <6502.h>
 #include "herring.h"
-#include "acia.h"
-#include "terminal.h"
-#include "print.h"
-#include "memdump.h"
-#include "jump.h"
+#include "serial.h"
 
-#define PROGRAM_VERSION "1.5.0"
-#define RELEASE_DATE "2021-12-07"
+#define PROGRAM_VERSION "1.5.1"
+#define RELEASE_DATE "2021-12-21"
 
 #define PROMPT "><(((°>"
 
@@ -30,7 +26,9 @@ typedef struct
 void header();
 void prompt();
 void free_ram();
-byte readline(char *buffer);
+uint8_t readline(char *buffer);
+
+void memdump(uint16_t address, uint8_t bytes);
 
 // Handler functions for each monitor command
 void handler_help();
@@ -54,21 +52,21 @@ static const command_t commands[] = {
     {"peek", "addr", "", "Peek at a memory address", handler_peek},
     {"poke", "addr", "val", "Poke a value into memory", handler_poke},
     {"dump", "addr", "", "Dump memory in hex and ASCII", handler_dump},
-    {"jump", "addr", "", "Jump to address", handler_jump},
+    {"jump", "", "", "Jump to address program RAM (0x1000)", handler_jump},
     {"zero", "", "", "Clear program memory (0x1000-0x7FFF)", handler_zero},
     {"load", "addr", "", "Load a program over serial", handler_load},
     {"clear", "", "", "Clear the screen", handler_clear}};
 
-static const byte COMMAND_COUNT = sizeof(commands) / sizeof(command_t);
+static const uint8_t COMMAND_COUNT = sizeof(commands) / sizeof(command_t);
 
 int main()
 {
-    byte i;
+    uint8_t i;
     char buffer[INPUT_BUFFER_SIZE];
     char *command;
     bool command_handled;
 
-    acia_init();
+    serial_init();
     header();
 
     while (true)
@@ -78,7 +76,7 @@ int main()
         // Present the command prompt and wait for input
         prompt();
         readline(buffer);
-        print_newline();
+        print_line(NULL);
 
         command = strtok(buffer, " ");
 
@@ -99,7 +97,7 @@ int main()
             command_not_found(command);
         }
 
-        print_newline();
+        print_line(NULL);
     }
 
     return 0;
@@ -107,29 +105,29 @@ int main()
 
 void header()
 {
-    screen_clear();
+    term_clear();
 
-    term_set_color(FG_COLOR_BRIGHT_BLUE);
-    print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
+    term_set_color(TERM_FG_BRIGHT_BLUE);
+    puts("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
 
-    term_set_color(FG_COLOR_BRIGHT_GREEN);
-    print("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
+    term_set_color(TERM_FG_BRIGHT_GREEN);
+    puts("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
 
-    term_set_color(FG_COLOR_BRIGHT_RED);
-    print("github.com/crmaykish/herring-6502\r\n");
+    term_set_color(TERM_FG_BRIGHT_RED);
+    puts("github.com/crmaykish/herring-6502\r\n");
 
-    term_set_color(FG_COLOR_BRIGHT_BLUE);
-    print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
+    term_set_color(TERM_FG_BRIGHT_BLUE);
+    puts("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
 
-    term_set_color(DEFAULT_COLORS);
+    term_set_color(TERM_RESET);
 }
 
 void prompt()
 {
-    term_set_color(FG_COLOR_CYAN);
-    print(PROMPT);
-    term_set_color(DEFAULT_COLORS);
-    print(" ");
+    term_set_color(TERM_FG_CYAN);
+    puts(PROMPT);
+    term_set_color(TERM_RESET);
+    puts(" ");
 }
 
 void free_ram()
@@ -137,59 +135,59 @@ void free_ram()
     size_t free_ram = _heapmemavail();
 
     print_dec(free_ram);
-    print(" bytes free");
+    puts(" bytes free");
 }
 
 void handler_help()
 {
-    byte i = 0;
+    uint8_t i = 0;
 
     print_line("Available commands:");
 
     for (i = 0; i < COMMAND_COUNT; i++)
     {
-        term_set_color(FG_COLOR_BRIGHT_GREEN);
-        print(commands[i].name);
-        term_set_color(DEFAULT_COLORS);
+        term_set_color(TERM_FG_BRIGHT_GREEN);
+        puts(commands[i].name);
+        term_set_color(TERM_RESET);
 
         if (commands[i].param1[0] != '\0')
         {
-            print(" <");
-            print(commands[i].param1);
-            print(">");
+            puts(" <");
+            puts(commands[i].param1);
+            puts(">");
         }
         if (commands[i].param2[0] != '\0')
         {
-            print(" <");
-            print(commands[i].param2);
-            print(">");
+            puts(" <");
+            puts(commands[i].param2);
+            puts(">");
         }
 
-        print(" : ");
+        puts(" : ");
 
-        term_set_color(FG_COLOR_CYAN);
-        print(commands[i].desc);
-        term_set_color(DEFAULT_COLORS);
+        term_set_color(TERM_FG_CYAN);
+        puts(commands[i].desc);
+        term_set_color(TERM_RESET);
 
         if (i != COMMAND_COUNT - 1)
         {
-            print_newline();
+            print_line(NULL);
         }
     }
 }
 
 void handler_info()
 {
-    print("CPU: ");
-    print(cpu_names[getcpu()]);
-    print("\r\nRAM: ");
+    puts("CPU: ");
+    puts(cpu_names[getcpu()]);
+    puts("\r\nRAM: ");
     free_ram();
 }
 
 void handler_peek()
 {
     char *param1 = strtok(NULL, " ");
-    word addr = strtol(param1, 0, 16);
+    uint16_t addr = strtol(param1, 0, 16);
 
     print_hex(PEEK(addr));
 }
@@ -199,49 +197,47 @@ void handler_poke()
     char *param1 = strtok(NULL, " ");
     char *param2 = strtok(NULL, " ");
 
-    word addr = strtol(param1, 0, 16);
-    byte val = strtol(param2, 0, 16);
+    uint16_t addr = strtol(param1, 0, 16);
+    uint8_t val = strtol(param2, 0, 16);
 
     POKE(addr, val);
-    print("OK");
+    puts("OK");
 }
 
 void handler_dump()
 {
     char *param1 = strtok(NULL, " ");
-    word addr = strtol(param1, 0, 16);
+    uint16_t addr = strtol(param1, 0, 16);
 
     memdump(addr, MEMDUMP_BYTES);
 }
 
 void handler_jump()
 {
-    char *param1 = strtok(NULL, " ");
-    word addr = strtol(param1, 0, 16);
-    jump_to(addr);
+    __asm__("jmp $1000");
 }
 
 void handler_zero()
 {
-    memset((word *)0x1000, 0, 0x7000);
-    print("OK");
+    memset((uint16_t *)0x1000, 0, 0x7000);
+    puts("OK");
 }
 
 void handler_load()
 {
-    word in_count = 0;
-    byte magic_count = 0;
-    byte in = 0;
+    uint16_t in_count = 0;
+    uint8_t magic_count = 0;
+    uint8_t in = 0;
     char *param1 = strtok(NULL, " ");
-    word addr = strtol(param1, 0, 16);
+    uint16_t addr = strtol(param1, 0, 16);
 
-    print("Loading into: 0x");
+    puts("Loading into: 0x");
     print_hex(addr);
     print_line("...");
 
     while (magic_count != 3)
     {
-        in = acia_getc();
+        in = getc();
 
         POKE(addr + in_count, in);
 
@@ -258,35 +254,35 @@ void handler_load()
     }
 
     // Remove the magic bytes from the end of the firmware in RAM
-    memset((word *)(addr + in_count - 3), 0, 3);
+    memset((uint16_t *)(addr + in_count - 3), 0, 3);
 
-    print("Done!");
+    puts("Done!");
 }
 
 void handler_clear()
 {
-    screen_clear();
+    term_clear();
 }
 
 void command_not_found(char *command_name)
 {
-    term_set_color(FG_COLOR_RED);
-    print("Command not found: ");
-    print(command_name);
-    term_set_color(DEFAULT_COLORS);
+    term_set_color(TERM_FG_RED);
+    puts("Command not found: ");
+    puts(command_name);
+    term_set_color(TERM_RESET);
 }
 
-byte readline(char *buffer)
+uint8_t readline(char *buffer)
 {
-    byte count = 0;
-    byte in = acia_getc();
+    uint8_t count = 0;
+    uint8_t in = getc();
 
     while (in != '\n' && in != '\r')
     {
         // Character is printable ASCII
         if (in >= 0x20 && in < 0x7F)
         {
-            acia_putc(in);
+            putc(in);
 
             buffer[count] = in;
             count++;
@@ -301,16 +297,52 @@ byte readline(char *buffer)
                 count--;
                 buffer[count] = '\0';
 
-                cursor_move(CURSOR_LEFT, 1);
-                acia_putc(' ');
-                cursor_move(CURSOR_LEFT, 1);
+                term_cursor_move(TERM_CURSOR_LEFT, 1);
+                putc(' ');
+                term_cursor_move(TERM_CURSOR_LEFT, 1);
             }
         }
 
-        in = acia_getc();
+        in = getc();
     }
 
     buffer[count] = 0;
 
     return count;
+}
+
+void memdump(uint16_t address, uint8_t bytes)
+{
+    uint16_t i = 0;
+    uint8_t b = 0;
+
+    print_hex(address);
+    puts("  ");
+
+    while (i < bytes)
+    {
+        b = PEEK(address + i);
+        print_hex(b);
+        putc(' ');
+
+        i++;
+
+        if (i % 16 == 0 && i < bytes)
+        {
+            puts(" |");
+            print_string_bin((char *)(address + i - 16), 16);
+
+            puts("|\r\n");
+            print_hex(address + i);
+            puts("  ");
+        }
+        else if (i % 8 == 0)
+        {
+            putc(' ');
+        }
+    }
+
+    putc('|');
+    print_string_bin((char *)(address + i - 16), 16);
+    putc('|');
 }

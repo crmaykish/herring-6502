@@ -5,8 +5,6 @@
 
 .import initlib
 
-.include "herring.inc"
-
 .segment  "STARTUP"
 
 _init:
