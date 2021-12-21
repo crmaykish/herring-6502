@@ -7,7 +7,7 @@ SLEEP_TIME=0.05
 
 echo "Sending ${FILE} to ${DEVICE}"
 
-stty 115200 -F ${DEVICE}
+stty 230400 -F ${DEVICE}
 
 INDEX=0
 FILE_SIZE=$(wc -c <${FILE})

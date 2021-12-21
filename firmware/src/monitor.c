@@ -109,26 +109,26 @@ void header()
 {
     screen_clear();
 
-    font_blue();
+    term_set_color(FG_COLOR_BRIGHT_BLUE);
     print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
 
-    font_green();
+    term_set_color(FG_COLOR_BRIGHT_GREEN);
     print("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
 
-    font_red();
+    term_set_color(FG_COLOR_BRIGHT_RED);
     print("github.com/crmaykish/herring-6502\r\n");
 
-    font_blue();
+    term_set_color(FG_COLOR_BRIGHT_BLUE);
     print("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
 
-    font_reset();
+    term_set_color(DEFAULT_COLORS);
 }
 
 void prompt()
 {
-    font_cyan();
+    term_set_color(FG_COLOR_CYAN);
     print(PROMPT);
-    font_reset();
+    term_set_color(DEFAULT_COLORS);
     print(" ");
 }
 
@@ -148,9 +148,9 @@ void handler_help()
 
     for (i = 0; i < COMMAND_COUNT; i++)
     {
-        font_green();
+        term_set_color(FG_COLOR_BRIGHT_GREEN);
         print(commands[i].name);
-        font_reset();
+        term_set_color(DEFAULT_COLORS);
 
         if (commands[i].param1[0] != '\0')
         {
@@ -167,9 +167,9 @@ void handler_help()
 
         print(" : ");
 
-        font_cyan();
+        term_set_color(FG_COLOR_CYAN);
         print(commands[i].desc);
-        font_reset();
+        term_set_color(DEFAULT_COLORS);
 
         if (i != COMMAND_COUNT - 1)
         {
@@ -273,10 +273,10 @@ void handler_clear()
 
 void command_not_found(char *command_name)
 {
-    font_red();
+    term_set_color(FG_COLOR_RED);
     print("Command not found: ");
     print(command_name);
-    font_reset();
+    term_set_color(DEFAULT_COLORS);
 }
 
 byte readline(char *buffer)

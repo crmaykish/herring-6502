@@ -6,12 +6,12 @@ A8 DEC7 DEC6 DEC5 DEC4 DEC3 DEC2 DEC1 DEC0 VCC
 
 /DEC0 = CLK * /RWB
 /DEC1 = A15 * A14 * A13
-/DEC2 = A15 * /A14 * /A13 * /A12 * /A11 * /A10
-/DEC3 = A15 * /A14 * /A13 * /A12 * /A11 * A10
-/DEC4 = A15 * /A14 * /A13 * /A12 * A11 * /A10
-/DEC5 = A15 * /A14 * /A13 * /A12 * A11 * A10
-DEC6 = A15 * /A14 * /A13 * A12 * /A11 * /A10 * CLK
-DEC7 = VCC
+/DEC2 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8
+/DEC3 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8
+/DEC4 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * A9 * /A8
+/DEC5 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * A9 * A8
+/DEC6 = A15 * /A14 * /A13 * /A12 * /A11 * A10 * /A9 * /A8
+DEC7 = A15 * /A14 * /A13 * /A12 * /A11 * A10 * /A9 * A8
 
 DESCRIPTION
 Decodes Herring's address range to peripheral enable pins
@@ -24,9 +24,9 @@ RWB: 6502 read/write pin
 Outputs:
 DEC0: RAM Write enable flag
 DEC1: ROM enable (0xE000 - 0xFFFF)
-DEC2: ACIA enable (0x8000)
-DEC3: Peripheral enable (0x8400)
-DEC4 = Peripheral enable (0x8800)
-DEC5 = Peripheral enable (0x8C00)
-DEC6 = LCD Enabled, active high (0x9000)
-DEC7 = Bus Enable (always HIGH)
+DEC2: ACIA0 (0x8000 - 0x80FF)
+DEC3: VIA0  (0x8100 - 0x81FF)
+DEC4: ACIA0 (0x8200 - 0x82FF)
+DEC5 = PER1 (0x8300 - 0x83FF)
+DEC6 = PER2 (0x8400 - 0x84FF)
+DEC7 = PER3 (0x8500 - 0x85FF) (Active High)
