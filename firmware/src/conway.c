@@ -4,6 +4,7 @@
 #include "acia.h"
 #include "print.h"
 #include "terminal.h"
+#include "rand_utils.h"
 
 #define BOARD_WIDTH 40
 #define BOARD_HEIGHT 22
@@ -14,8 +15,6 @@ static byte previous[BOARD_WIDTH][BOARD_HEIGHT];
 
 static byte cycles;
 static byte seed;
-
-void rand_prompt();
 
 void init_board();
 void draw_board();
@@ -43,23 +42,6 @@ int main()
     set_cursor_visible(true);
 
     return 0;
-}
-
-void rand_prompt()
-{
-    byte seed_count = 0;
-
-    print_line("Enter some random characters: ");
-
-    while (seed_count < 10)
-    {
-        seed ^= acia_getc();
-        seed <<= 1;
-        acia_putc('.');
-        seed_count++;
-    }
-
-    srand(seed);
 }
 
 void init_board()
