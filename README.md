@@ -20,7 +20,7 @@ The memory map is set up in the following way:
 7. 0x8500 - 0x85FF: Optional peripheral
 8. 0xE000 - 0xFFFF: 8KB ROM
 
-There's currently a large gap of unused address space between 0x8600 and 0xDFFF (about 23K). This could be used for additional RAM or ROM or for a peripheral in need of a larger address space such as a framebuffer video card. The memory map can be reconfigured by updated the GAL chip on the CPU board. See `hardware/address_decoder/gal`.
+There's currently a large gap of unused address space between 0x8600 and 0xDFFF (about 23K). This could be used for additional RAM or ROM or for a peripheral in need of a larger address space such as a framebuffer video card. The memory map can be reconfigured by updating the GAL chip on the CPU board. See `hardware/address_decoder_gal`.
 
 Individual component boards are connected to the backplane via the 40-pin system bus. Most of the pins on the bus come directly from the 65C02 plus a few for peripheral support. They are mapped from left to right in the following order:
 
