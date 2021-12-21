@@ -36,7 +36,7 @@ void handler_info();
 void handler_peek();
 void handler_poke();
 void handler_dump();
-void handler_jump();
+void handler_run();
 void handler_zero();
 void handler_load();
 void handler_clear();
@@ -52,7 +52,7 @@ static const command_t commands[] = {
     {"peek", "addr", "", "Peek at a memory address", handler_peek},
     {"poke", "addr", "val", "Poke a value into memory", handler_poke},
     {"dump", "addr", "", "Dump memory in hex and ASCII", handler_dump},
-    {"jump", "", "", "Jump to address program RAM (0x1000)", handler_jump},
+    {"run", "", "", "Jump to program RAM (0x1000)", handler_run},
     {"zero", "", "", "Clear program memory (0x1000-0x7FFF)", handler_zero},
     {"load", "addr", "", "Load a program over serial", handler_load},
     {"clear", "", "", "Clear the screen", handler_clear}};
@@ -212,9 +212,9 @@ void handler_dump()
     memdump(addr, MEMDUMP_BYTES);
 }
 
-void handler_jump()
+void handler_run()
 {
-    __asm__("jmp $1000");
+    __asm__("jsr %w", PROGRAM_RAM);
 }
 
 void handler_zero()
