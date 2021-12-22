@@ -256,6 +256,8 @@ void handler_load()
     // Remove the magic bytes from the end of the firmware in RAM
     memset((uint16_t *)(addr + in_count - 3), 0, 3);
 
+    print_dec(in_count - 3);
+    print_line(" bytes read");
     puts("Done!");
 }
 
