@@ -14,21 +14,29 @@ RAM_LIB = config/ram.lib
 MONITOR_SRC = src/monitor.c src/serial.c
 HELLO_SRC = src/hello.c src/serial.c
 CONWAY_SRC = src/conway.c src/serial.c
+CHIP8_SRC = src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
 
 .PHONY: all clean
 
-all: monitor hello conway
+all: monitor hello conway chip8
 
 # Firmware applications
 
+# Herring Monitor/Bootloader
 monitor: $(MONITOR_SRC) | build_dir rom_lib
 	$(CC) $(CFLAGS) -C $(ROM_CFG) $(MONITOR_SRC) $(ROM_LIB) -o build/monitor.bin
 
+# Hello World
 hello: $(HELLO_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(HELLO_SRC) $(RAM_LIB) -o build/hello.bin
 
+# Game of life
 conway: $(CONWAY_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_SRC) $(RAM_LIB) -o build/conway.bin
+
+# CHIP-8 Emulator
+chip8: $(CHIP8_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -I libs/chip8/include -C $(RAM_CFG) $(CHIP8_SRC) $(RAM_LIB) -o build/chip8.bin
 
 # Standard libraries
 

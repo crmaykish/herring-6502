@@ -10,12 +10,10 @@ void serial_init()
     POKE(ACIA0_CONTROL, ACIA_CONTROL_BAUD);
 }
 
-// TODO: implement this in a better way
-// pass a pointer to a char to fill with data, return true or false if it read anything
-// bool serial_rx_ready()
-// {
-//     return (PEEK(ACIA0_STATUS) & ACIA_READY_RX);
-// }
+bool serial_byte_available()
+{
+    return (PEEK(ACIA0_STATUS) & ACIA_READY_RX);
+}
 
 char getc()
 {

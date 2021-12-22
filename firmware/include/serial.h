@@ -44,7 +44,7 @@ typedef uint8_t term_cursor_dir_e;
 
 // === Serial port control === //
 void serial_init();
-// bool serial_rx_ready();
+bool serial_byte_available();
 
 // === Low level serial I/O === //
 char getc();
