@@ -97,8 +97,6 @@ void draw_board()
     term_set_color(TERM_BG_MAGENTA);
     puts("Generations: ");
     print_dec(cycles);
-    puts("           Seed: ");
-    print_dec(seed);
     term_set_color(TERM_RESET);
 }
 
