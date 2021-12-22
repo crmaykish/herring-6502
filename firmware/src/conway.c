@@ -24,11 +24,12 @@ void rand_prompt();
 
 int main()
 {
+    print_line("Conway's Game of Life");
     rand_prompt();
 
     term_cursor_set_vis(false);
     term_clear();
-    
+
     init_board();
 
     while (cycles <= MAX_GENERATIONS)
