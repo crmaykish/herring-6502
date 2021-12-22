@@ -39,6 +39,9 @@
 // Baudrate 1/16 oscillator, 8 data bits, 1 stop bit
 #define ACIA_CONTROL_BAUD 0b00010000
 
+// Baudrate 9600, 8 data bits, 1 stop bit
+#define ACIA_CONTROL_BAUD_9600 0b00011110
+
 // Useful ASCII characters
 #define ASCII_NEWLINE 0x0A
 #define ASCII_RETURN 0x0D

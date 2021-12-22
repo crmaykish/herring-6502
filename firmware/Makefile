@@ -14,10 +14,11 @@ MONITOR_SRC = src/monitor.c src/serial.c
 HELLO_SRC = src/hello.c src/serial.c
 CONWAY_SRC = src/conway.c src/serial.c
 CHIP8_SRC = src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
+USB_SRC = src/usb.c src/serial.c
 
 .PHONY: all clean
 
-all: monitor hello conway chip8
+all: monitor hello conway chip8 usb
 
 # Firmware applications
 
@@ -36,6 +37,10 @@ conway: $(CONWAY_SRC) | build_dir ram_lib
 # CHIP-8 Emulator
 chip8: $(CHIP8_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -I libs/chip8/include -C $(RAM_CFG) $(CHIP8_SRC) $(RAM_LIB) -o build/chip8.bin
+
+# USB
+usb: $(USB_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(USB_SRC) $(RAM_LIB) -o build/usb.bin
 
 # Standard libraries
 
