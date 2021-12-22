@@ -2,9 +2,8 @@ CC = cl65
 CA = ca65
 AR = ar65
 
-# TODO: Research additional optimization flags (Os, Oi, Or), can they be used in all cases?
-
-CFLAGS = -O -t none --cpu 65c02 --static-locals -I include
+# Note: -Oi seems to cause some issues
+CFLAGS = -Osr -t none --cpu 65c02 --static-locals -I include
 
 ROM_CFG = config/rom.cfg
 RAM_CFG = config/ram.cfg
@@ -14,10 +13,11 @@ RAM_LIB = config/ram.lib
 
 MONITOR_SRC = src/monitor.c src/serial.c
 HELLO_SRC = src/hello.c src/serial.c
+CONWAY_SRC = src/conway.c src/serial.c
 
 .PHONY: all clean
 
-all: monitor hello
+all: monitor hello conway
 
 # Firmware applications
 
@@ -26,6 +26,9 @@ monitor: $(MONITOR_SRC) | build_dir rom_lib
 
 hello: $(HELLO_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(HELLO_SRC) $(RAM_LIB) -o build/hello.bin
+
+conway: $(CONWAY_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_SRC) $(RAM_LIB) -o build/conway.bin
 
 # Standard libraries
 
