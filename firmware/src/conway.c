@@ -27,30 +27,27 @@ int main()
     rand_prompt();
 
     term_cursor_set_vis(false);
+    term_clear();
+    
+    init_board();
 
-    while (true)
+    while (cycles <= MAX_GENERATIONS)
     {
-        term_clear();
-        init_board();
-
-        while (cycles <= MAX_GENERATIONS)
+        if (serial_byte_available())
         {
-            if (serial_byte_available())
+            in = getc();
+
+            if (in == ASCII_ESC)
             {
-                in = getc();
-
-                if (in == ASCII_ESC)
-                {
-                    term_clear();
-                    term_cursor_set_vis(true);
-                    return 0;
-                }
+                term_clear();
+                term_cursor_set_vis(true);
+                return 0;
             }
-
-            update_state();
-            draw_board();
-            cycles++;
         }
+
+        update_state();
+        draw_board();
+        cycles++;
     }
 }
 
