@@ -43,5 +43,6 @@
 #define ASCII_NEWLINE 0x0A
 #define ASCII_RETURN 0x0D
 #define ASCII_ZERO 0x00
+#define ASCII_ESC 0x1B
 
 #endif

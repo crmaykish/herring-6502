@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "serial.h"
+#include "herring.h"
 
 #define BOARD_WIDTH 30
 #define BOARD_HEIGHT 20
@@ -13,6 +14,7 @@ static uint8_t previous[BOARD_WIDTH][BOARD_HEIGHT];
 static uint8_t cycles;
 static uint16_t seed;
 static uint8_t i, j;
+static uint8_t in;
 
 void init_board();
 void draw_board();
@@ -25,20 +27,31 @@ int main()
     rand_prompt();
 
     term_cursor_set_vis(false);
-    term_clear();
 
-    init_board();
-
-    while (cycles <= MAX_GENERATIONS)
+    while (true)
     {
-        update_state();
-        draw_board();
-        cycles++;
+        term_clear();
+        init_board();
+
+        while (cycles <= MAX_GENERATIONS)
+        {
+            if (serial_byte_available())
+            {
+                in = getc();
+
+                if (in == ASCII_ESC)
+                {
+                    term_clear();
+                    term_cursor_set_vis(true);
+                    return 0;
+                }
+            }
+
+            update_state();
+            draw_board();
+            cycles++;
+        }
     }
-
-    term_cursor_set_vis(true);
-
-    return 0;
 }
 
 void init_board()

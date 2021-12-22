@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "serial.h"
+#include "herring.h"
 #include "chip8.h"
 
 #define LOCAL_ROM_ADDR (0x7000)
@@ -36,7 +37,7 @@ void poll_input()
 
         switch (input)
         {
-        case 0x1B: // ESC
+        case ASCII_ESC:
             input = 0xFF;
             running = false;
             break;
