@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <peekpoke.h>
 #include "serial.h"
 #include "herring.h"
@@ -15,7 +16,7 @@ bool serial_byte_available()
     return (PEEK(ACIA0_STATUS) & ACIA_READY_RX);
 }
 
-char getc()
+char serial_getc()
 {
     while ((PEEK(ACIA0_STATUS) & ACIA_READY_RX) == 0)
     {
@@ -24,7 +25,7 @@ char getc()
     return PEEK(ACIA0_DATA);
 }
 
-void putc(uint8_t c)
+void serial_putc(uint8_t c)
 {
     while ((PEEK(ACIA0_STATUS) & ACIA_READY_TX) == 0)
     {
@@ -33,35 +34,15 @@ void putc(uint8_t c)
     POKE(ACIA0_DATA, c);
 }
 
-void puts(const uint8_t *s)
+void serial_puts(const uint8_t *s)
 {
     uint8_t i = 0;
 
     while (s[i] != ASCII_ZERO)
     {
-        putc(s[i]);
+        serial_putc(s[i]);
         ++i;
     }
-}
-
-void print_hex(uint16_t w)
-{
-    char s[5] = {0};
-    utoa(w, s, 16);
-
-    if (w < 0x10)
-    {
-        putc('0');
-    }
-
-    puts(s);
-}
-
-void print_dec(uint16_t w)
-{
-    char s[6] = {0};
-    utoa(w, s, 10);
-    puts(s);
 }
 
 void print_string_bin(char *str, uint8_t max)
@@ -72,67 +53,46 @@ void print_string_bin(char *str, uint8_t max)
     {
         if (str[i] >= 32 && str[i] < 127)
         {
-            putc(str[i]);
+            serial_putc(str[i]);
         }
         else
         {
-            putc('.');
+            serial_putc('.');
         }
 
         i++;
     }
 }
 
-void print_line(char *str)
-{
-    if (str != 0)
-    {
-        puts(str);
-    }
-
-    putc(ASCII_NEWLINE);
-    putc(ASCII_RETURN);
-}
-
 void term_set_color(char *color)
 {
-    puts("\033[");
-    puts(color);
-    putc('m');
+    serial_puts("\033[");
+    serial_puts(color);
+    serial_putc('m');
 }
 
 void term_cursor_move(term_cursor_dir_e dir, uint8_t steps)
 {
-    char command[10];
-    utoa(steps, command, 10);
-    puts("\033[");
-    puts(command);
-    putc((char)dir);
+    printf("\033[%d%c", steps, dir);
 }
 
 void term_cursor_set_x(uint8_t x)
 {
-    puts("\033[");
-    print_dec(x);
-    putc('G');
+    printf("\033[%dG", x);
 }
 
 void term_cursor_set_pos(uint8_t x, uint8_t y)
 {
-    puts("\033[");
-    print_dec(y);
-    putc(';');
-    print_dec(x);
-    putc('H');
+    printf("\033[%d;%dH", x, y);
 }
 
 void term_cursor_set_vis(bool visible)
 {
-    puts(visible ? TERM_CURSOR_SHOW : TERM_CURSOR_HIDE);
+    serial_puts(visible ? TERM_CURSOR_SHOW : TERM_CURSOR_HIDE);
 }
 
 void term_clear()
 {
     term_set_color(TERM_RESET);
-    puts("\033[2J\033[H");
+    serial_puts("\033[2J\033[H");
 }

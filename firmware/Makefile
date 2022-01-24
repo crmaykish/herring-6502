@@ -10,10 +10,12 @@ RAM_CFG = config/ram.cfg
 ROM_LIB = config/rom.lib
 RAM_LIB = config/ram.lib
 
-MONITOR_SRC = src/monitor.c src/serial.c
-HELLO_SRC = src/hello.c src/serial.c
-CONWAY_SRC = src/conway.c src/serial.c
-CHIP8_SRC = src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
+COMMON_SRC = src/herring.c
+
+MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
+HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c
+CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
+CHIP8_SRC = $(COMMON_SRC) src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
 
 .PHONY: all clean
 

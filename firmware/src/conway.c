@@ -1,7 +1,10 @@
 #include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
-#include "serial.h"
 #include "herring.h"
+#include "serial.h"
 
 #define BOARD_WIDTH 30
 #define BOARD_HEIGHT 20
@@ -24,7 +27,7 @@ void rand_prompt();
 
 int main()
 {
-    print_line("Conway's Game of Life");
+    printf("Conway's Game of Life\r\n");
     rand_prompt();
 
     term_cursor_set_vis(false);
@@ -36,7 +39,7 @@ int main()
     {
         if (serial_byte_available())
         {
-            in = getc();
+            in = serial_getc();
 
             if (in == ASCII_ESC)
             {
@@ -70,7 +73,7 @@ void draw_board()
     term_cursor_set_pos(0, 0);
 
     term_set_color(TERM_BG_MAGENTA);
-    print_line("Conway's Game of Life");
+    printf("Conway's Game of Life\r\n");
     term_set_color(TERM_RESET);
 
     for (j = 0; j < BOARD_HEIGHT; ++j)
@@ -80,21 +83,22 @@ void draw_board()
             if (current[i][j] == 1)
             {
                 term_set_color(TERM_BG_BRIGHT_GREEN);
-                puts("  ");
+                serial_putc(' ');
+                serial_putc(' ');
             }
             else
             {
                 term_set_color(TERM_RESET);
-                puts("  ");
+                serial_putc(' ');
+                serial_putc(' ');
             }
         }
 
-        print_line(0);
+        printf("\r\n");
     }
 
     term_set_color(TERM_BG_MAGENTA);
-    puts("Generations: ");
-    print_dec(cycles);
+    printf("Generations: %d", cycles);
     term_set_color(TERM_RESET);
 }
 
@@ -169,13 +173,13 @@ void rand_prompt()
 {
     uint8_t seed_count = 0;
 
-    print_line("Enter some random characters: ");
+    printf("Enter some random characters:\r\n");
 
     while (seed_count < 10)
     {
-        seed += getc();
+        seed += serial_getc();
         seed <<= 1;
-        putc('.');
+        printf(".");
         seed_count++;
     }
 
