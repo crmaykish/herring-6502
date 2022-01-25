@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include <stdint.h>
 #include <peekpoke.h>
@@ -5,166 +6,128 @@
 #include "serial.h"
 #include "usb.h"
 
-void ls();
-void cat(char *file_name);
+// void ls();
+// void cat(char *file_name);
 
-void delay(uint16_t x)
+void usb_reset_module()
 {
-    uint16_t i = 0;
+    printf("Resetting CH376S USB module... ");
+    usb_send_command(CMD_RESET_ALL);
 
-    while (i < x)
+    delay(0x2000);
+
+    printf("Done!\r\n");
+}
+
+void usb_check_exists();
+
+void usb_set_host_mode()
+{
+    printf("Setting USB Host Mode...\r\n");
+
+    usb_send_command(CMD_SET_MODE);
+    usb_send_byte(USB_HOST_MODE);
+
+    delay(0x1000);
+
+    printf("response: %02X\r\n", usb_get_byte());
+}
+
+void usb_set_file_name(char *filename)
+{
+    printf("Set file name: %s\r\n", filename);
+    usb_send_command(CMD_SET_FILENAME);
+    usb_send_string(filename);
+}
+
+uint8_t usb_check_for_interrupts()
+{
+    uint8_t response = 0;
+
+    usb_wait_for_interrupt();
+
+    usb_send_command(CMD_GET_STATUS);
+
+    response = usb_get_byte();
+
+    printf("int response: %02X\r\n", response);
+
+    return response;
+}
+
+void usb_open_file()
+{
+    printf("open file\r\n");
+    usb_send_command(CMD_FILE_OPEN);
+    usb_check_for_interrupts();
+}
+
+void usb_read_file()
+{
+    uint8_t length = 0;
+    uint8_t i = 0;
+    char *buffer = (char *)0x7000;
+
+    printf("read bytes\r\n");
+    usb_send_command(CMD_BYTE_READ);
+    usb_send_byte(0xFE);
+    usb_send_byte(0x00);
+
+    if (usb_check_for_interrupts() == USB_DISK_READ)
     {
-        i++;
+        printf("good\r\n");
+
+        usb_send_command(CMD_READ_USB_DATA0);
+
+        length = usb_get_byte();
+
+        printf("length: %d\r\n", length);
+
+        for (i = 0; i < length; i++)
+        {
+            usb_send_command(CMD_BYTE_RD_GO);
+            buffer[i] = usb_get_byte();
+        }
+
+        buffer[i] = 0;
+
+        printf("file contents: %s\r\n", buffer);
     }
 }
 
 int main()
 {
-    // Set up second serial port
-    POKE(ACIA1_STATUS, ACIA_RESET);
-    POKE(ACIA1_COMMAND, ACIA_COMMAND_INIT);
-    POKE(ACIA1_CONTROL, ACIA_CONTROL_BAUD_9600);
+    usb_reset_module();
+    usb_check_exists();
+    usb_set_host_mode();
 
-    usb_send_command(CMD_RESET_ALL);
+    usb_set_file_name("WORDS.TXT");
 
-    delay(0xFFF0);
+    usb_open_file();
 
-    usb_send_command(CMD_CHECK_EXIST);
-    usb_send_byte(0x01);
+    usb_read_file();
 
-    if (usb_get_byte() != 0xFE)
-    {
-        print_line("USB ping failed.");
-        return 1;
-    }
-
-    // print_line("Set USB host mode");
-    usb_send_command(CMD_SET_MODE);
-    usb_send_byte(USB_HOST_MODE);
-
-    ls();
-
-    cat("WORDS.TXT");
-
-    print_line("Exiting");
+    printf("Exiting.\r\n");
 
     return 0;
 }
 
-void ls()
+void usb_check_exists()
 {
-    uint8_t i;
-    uint8_t in;
-    uint8_t next_status = 0;
-    uint8_t data_length = 0;
-    char fat_file_info[32] = {0};
-    char file_name[9];
-    char file_ext[4];
+    uint8_t usb_response = 0;
 
-    usb_send_command(CMD_SET_FILENAME);
-    usb_send_string("*");
-    usb_get_byte();
+    printf("Checking for CH376S USB module... ");
+    usb_send_command(CMD_CHECK_EXIST);
+    usb_send_byte(0x55);
 
-    // print_line("Open file");
-    usb_send_command(CMD_FILE_OPEN);
-    in = usb_get_byte();
+    usb_response = usb_get_byte();
 
-    if (in == USB_DISK_READ)
+    if (usb_response == 0xAA)
     {
-        // read FAT info
-
-        while (next_status != USB_FILE_NOT_FOUND)
-        {
-
-            usb_send_command(CMD_READ_USB_DATA0);
-            data_length = usb_get_byte();
-            // puts("data length: ");
-            // print_hex(file_length);
-            // print_line(0);
-
-            for (i = 0; i < data_length; i++)
-            {
-                fat_file_info[i] = usb_get_byte();
-            }
-
-            // Parse out the file name and size from the FAT info
-            strncpy(file_name, fat_file_info, (strchr(fat_file_info, ' ') - fat_file_info));
-            strncpy(file_ext, &fat_file_info[8], 3);
-
-            puts(file_name);
-            putc('.');
-            puts(file_ext);
-            putc(' ');
-            print_hex(fat_file_info[31]);
-            print_hex(fat_file_info[30]);
-            print_hex(fat_file_info[29]);
-            print_hex(fat_file_info[28]);
-
-            print_line(0);
-
-            // enumerate next file until file not found
-            usb_send_command(CMD_NEXT_FILE);
-            next_status = usb_get_byte();
-        }
+        printf("Done!\r\n");
     }
-
-    print_line(0);
-
-    // print_line("Close file");
-    usb_send_command(CMD_FILE_CLOSE);
-    usb_send_byte(0x00);
-}
-
-void cat(char *file_name)
-{
-    uint8_t in = 0;
-    uint8_t i = 0;
-
-    uint8_t file_buffer[0x255] = {0};
-    uint8_t file_index = 0;
-    uint8_t file_length;
-
-    // Set filename
-    // print_line("Set filename");
-    usb_send_command(CMD_SET_FILENAME);
-    usb_send_string(file_name);
-    usb_get_byte(); // Read the response and ignore it
-
-    // Open file
-    // print_line("Open file");
-    usb_send_command(CMD_FILE_OPEN);
-    usb_get_byte();
-
-    // Read the file content
-    // print_line("Read file");
-    usb_send_command(CMD_BYTE_READ);
-    usb_send_byte(254); // request up to 254 bytes
-    usb_send_byte(0x00);
-
-    in = usb_get_byte();
-
-    if (in == USB_DISK_READ)
+    else
     {
-        // read the file data
-        usb_send_command(CMD_READ_USB_DATA0);
-
-        // read the data length
-        file_length = usb_get_byte();
-
-        for (i = 0; i < file_length; i++)
-        {
-            file_buffer[file_index] = usb_get_byte();
-            file_index++;
-        }
+        printf("\r\nError: Could not find CH376S. Response: %02X\r\n", usb_response);
     }
-
-    // print_line("Close file");
-    usb_send_command(CMD_FILE_CLOSE);
-    usb_send_byte(0x00);
-    usb_get_byte();
-
-    print_line("\r\nFile content: ");
-    puts(file_buffer);
-
-    print_line(0);
 }

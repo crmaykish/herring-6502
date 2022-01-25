@@ -1,6 +1,8 @@
 #ifndef HERRING_H
 #define HERRING_H
 
+#include <stdint.h>
+
 // Start of program RAM
 #define PROGRAM_RAM 0x1000
 
@@ -47,5 +49,11 @@
 #define ASCII_RETURN 0x0D
 #define ASCII_ZERO 0x00
 #define ASCII_ESC 0x1B
+
+// USB storage
+#define USB_DATA_PORT 0x8300
+#define USB_COMMAND_PORT 0x8301
+
+void delay(uint16_t x);
 
 #endif
