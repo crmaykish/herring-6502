@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -22,8 +23,8 @@ void draw_p(uint8_t x, uint8_t y, chip8_pixel_state_e p)
         term_set_color(TERM_RESET);
     }
 
-    putc(' ');
-    putc(' ');
+    serial_putc(' ');
+    serial_putc(' ');
 }
 
 void poll_input()
@@ -33,7 +34,7 @@ void poll_input()
     // Check for serial input
     if (serial_byte_available())
     {
-        input = getc();
+        input = serial_getc();
 
         switch (input)
         {
@@ -82,8 +83,7 @@ int main()
 
     if (status != CHIP8_SUCCESS)
     {
-        puts("Error loading ROM, Status: ");
-        print_hex(status);
+        printf("Error loading ROM, Status: %d", status);
         return 0;
     }
 
@@ -118,9 +118,6 @@ int main()
     term_clear();
     term_cursor_set_vis(true);
 
-    puts("Emulator stopped with state = ");
-    print_dec(run_state);
-    puts(", status = ");
-    print_dec(status);
+    printf("Emulator stopped with state = %d, status = %d", run_state, status);
     return 0;
 }

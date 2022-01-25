@@ -1,12 +1,13 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <peekpoke.h>
 #include <6502.h>
 #include "herring.h"
 #include "serial.h"
 
-#define PROGRAM_VERSION "1.5.1"
-#define RELEASE_DATE "2021-12-21"
+#define PROGRAM_VERSION "1.5.2"
+#define RELEASE_DATE "2022-01-24"
 
 #define PROMPT "><(((°>"
 
@@ -76,7 +77,7 @@ int main()
         // Present the command prompt and wait for input
         prompt();
         readline(buffer);
-        print_line(NULL);
+        printf("\r\n");
 
         command = strtok(buffer, " ");
 
@@ -97,7 +98,7 @@ int main()
             command_not_found(command);
         }
 
-        print_line(NULL);
+        printf("\r\n");
     }
 
     return 0;
@@ -108,16 +109,16 @@ void header()
     term_clear();
 
     term_set_color(TERM_FG_BRIGHT_BLUE);
-    puts("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
+    printf("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
 
     term_set_color(TERM_FG_BRIGHT_GREEN);
-    puts("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
+    printf("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
 
     term_set_color(TERM_FG_BRIGHT_RED);
-    puts("github.com/crmaykish/herring-6502\r\n");
+    printf("github.com/crmaykish/herring-6502\r\n");
 
     term_set_color(TERM_FG_BRIGHT_BLUE);
-    puts("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
+    printf("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n\r\n");
 
     term_set_color(TERM_RESET);
 }
@@ -125,62 +126,58 @@ void header()
 void prompt()
 {
     term_set_color(TERM_FG_CYAN);
-    puts(PROMPT);
+    printf("%s ", PROMPT);
     term_set_color(TERM_RESET);
-    puts(" ");
 }
 
 void free_ram()
 {
-    size_t free_ram = _heapmemavail();
-
-    print_dec(free_ram);
-    puts(" bytes free");
+    printf("%d bytes free", _heapmemavail());
 }
 
 void handler_help()
 {
     uint8_t i = 0;
 
-    print_line("Available commands:");
+    printf("Available commands:\r\n");
 
     for (i = 0; i < COMMAND_COUNT; i++)
     {
         term_set_color(TERM_FG_BRIGHT_GREEN);
-        puts(commands[i].name);
+        printf(commands[i].name);
         term_set_color(TERM_RESET);
 
         if (commands[i].param1[0] != '\0')
         {
-            puts(" <");
-            puts(commands[i].param1);
-            puts(">");
+            printf(" <");
+            printf(commands[i].param1);
+            printf(">");
         }
         if (commands[i].param2[0] != '\0')
         {
-            puts(" <");
-            puts(commands[i].param2);
-            puts(">");
+            printf(" <");
+            printf(commands[i].param2);
+            printf(">");
         }
 
-        puts(" : ");
+        printf(" : ");
 
         term_set_color(TERM_FG_CYAN);
-        puts(commands[i].desc);
+        printf(commands[i].desc);
         term_set_color(TERM_RESET);
 
         if (i != COMMAND_COUNT - 1)
         {
-            print_line(NULL);
+            printf("\r\n");
         }
     }
 }
 
 void handler_info()
 {
-    puts("CPU: ");
-    puts(cpu_names[getcpu()]);
-    puts("\r\nRAM: ");
+    printf("CPU: ");
+    printf(cpu_names[getcpu()]);
+    printf("\r\nRAM: ");
     free_ram();
 }
 
@@ -189,7 +186,7 @@ void handler_peek()
     char *param1 = strtok(NULL, " ");
     uint16_t addr = strtol(param1, 0, 16);
 
-    print_hex(PEEK(addr));
+    printf("%02X", PEEK(addr));
 }
 
 void handler_poke()
@@ -201,7 +198,7 @@ void handler_poke()
     uint8_t val = strtol(param2, 0, 16);
 
     POKE(addr, val);
-    puts("OK");
+    printf("OK");
 }
 
 void handler_dump()
@@ -220,7 +217,7 @@ void handler_run()
 void handler_zero()
 {
     memset((uint16_t *)0x1000, 0, 0x7000);
-    puts("OK");
+    printf("OK");
 }
 
 void handler_load()
@@ -231,13 +228,11 @@ void handler_load()
     char *param1 = strtok(NULL, " ");
     uint16_t addr = strtol(param1, 0, 16);
 
-    puts("Loading into: 0x");
-    print_hex(addr);
-    print_line("...");
+    printf("Loading into: 0x%04X...", addr);
 
     while (magic_count != 3)
     {
-        in = getc();
+        in = serial_getc();
 
         POKE(addr + in_count, in);
 
@@ -256,9 +251,7 @@ void handler_load()
     // Remove the magic bytes from the end of the firmware in RAM
     memset((uint16_t *)(addr + in_count - 3), 0, 3);
 
-    print_dec(in_count - 3);
-    print_line(" bytes read");
-    puts("Done!");
+    printf("%d bytes read\r\nDone!", in_count - 3);
 }
 
 void handler_clear()
@@ -269,22 +262,22 @@ void handler_clear()
 void command_not_found(char *command_name)
 {
     term_set_color(TERM_FG_RED);
-    puts("Command not found: ");
-    puts(command_name);
+    printf("Command not found: ");
+    printf(command_name);
     term_set_color(TERM_RESET);
 }
 
 uint8_t readline(char *buffer)
 {
     uint8_t count = 0;
-    uint8_t in = getc();
+    uint8_t in = serial_getc();
 
     while (in != '\n' && in != '\r')
     {
         // Character is printable ASCII
         if (in >= 0x20 && in < 0x7F)
         {
-            putc(in);
+            serial_putc(in);
 
             buffer[count] = in;
             count++;
@@ -300,12 +293,12 @@ uint8_t readline(char *buffer)
                 buffer[count] = '\0';
 
                 term_cursor_move(TERM_CURSOR_LEFT, 1);
-                putc(' ');
+                serial_putc(' ');
                 term_cursor_move(TERM_CURSOR_LEFT, 1);
             }
         }
 
-        in = getc();
+        in = serial_getc();
     }
 
     buffer[count] = 0;
@@ -318,33 +311,29 @@ void memdump(uint16_t address, uint8_t bytes)
     uint16_t i = 0;
     uint8_t b = 0;
 
-    print_hex(address);
-    puts("  ");
+    printf("%04X  ", address);
 
     while (i < bytes)
     {
         b = PEEK(address + i);
-        print_hex(b);
-        putc(' ');
+        printf("%02X ", b);
 
         i++;
 
         if (i % 16 == 0 && i < bytes)
         {
-            puts(" |");
+            printf(" |");
             print_string_bin((char *)(address + i - 16), 16);
 
-            puts("|\r\n");
-            print_hex(address + i);
-            puts("  ");
+            printf("|\r\n%04X  ", address + i);
         }
         else if (i % 8 == 0)
         {
-            putc(' ');
+            serial_putc(' ');
         }
     }
 
-    putc('|');
+    serial_putc('|');
     print_string_bin((char *)(address + i - 16), 16);
-    putc('|');
+    serial_putc('|');
 }

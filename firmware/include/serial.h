@@ -47,15 +47,12 @@ void serial_init();
 bool serial_byte_available();
 
 // === Low level serial I/O === //
-char getc();
-void putc(uint8_t);
-void puts(const uint8_t *);
+char serial_getc();
+void serial_putc(uint8_t);
+void serial_puts(const uint8_t *);
 
 // === String formatting functions === //
-void print_hex(uint16_t w);
-void print_dec(uint16_t w);
 void print_string_bin(char *str, uint8_t max);
-void print_line(char *str);
 
 // === Terminal font colors and control === //
 void term_set_color(char *color);
