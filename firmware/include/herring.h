@@ -9,6 +9,17 @@
 #define VIA0_PORTA 0x8101
 #define VIA0_DDRB 0x8102
 #define VIA0_DDRA 0x8103
+#define VIA0_T1CL 0x8104
+#define VIA0_T1CH 0x8105
+#define VIA0_T1LL 0x8106
+#define VIA0_T1LH 0x8107
+#define VIA0_T2CL 0x8108
+#define VIA0_T2CH 0x8109
+#define VIA0_SR 0x810A
+#define VIA0_ACR 0x810B
+#define VIA0_PCR 0x810C
+#define VIA0_IFR 0x810D
+#define VIA0_IER 0x810E
 
 // VIA DDR control
 #define VIA_OUTPUT 0xFF
