@@ -10,7 +10,7 @@ RAM_CFG = config/ram.cfg
 ROM_LIB = config/rom.lib
 RAM_LIB = config/ram.lib
 
-COMMON_SRC = src/herring.c
+COMMON_SRC = src/herring.c src/delay.c
 
 MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
 HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c
