@@ -59,8 +59,8 @@
 #define ASCII_ZERO 0x00
 #define ASCII_ESC 0x1B
 
-// USB storage
-#define USB_DATA_PORT 0x8300
-#define USB_COMMAND_PORT 0x8301
+// CH376S Registers
+#define CH376S_DATA 0x8300
+#define CH376S_COMMAND 0x8301
 
 #endif

@@ -2,8 +2,8 @@
 #include "herring.h"
 
 // Pointers to the memory-mapped registers of the CH376S module
-static volatile uint8_t *data_port = (uint8_t *)USB_DATA_PORT;
-static volatile uint8_t *command_port = (uint8_t *)USB_COMMAND_PORT;
+static volatile uint8_t *data_port = (uint8_t *)CH376S_DATA;
+static volatile uint8_t *command_port = (uint8_t *)CH376S_COMMAND;
 
 void ch376s_send_command(uint8_t command)
 {
