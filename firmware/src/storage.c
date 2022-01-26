@@ -1,20 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
-#include <peekpoke.h>
+
 #include "herring.h"
 #include "serial.h"
 #include "usb.h"
+#include "delay.h"
 
-// void ls();
-// void cat(char *file_name);
+uint8_t readline(char *buffer);
 
 void usb_reset_module()
 {
     printf("Resetting CH376S USB module... ");
     usb_send_command(CMD_RESET_ALL);
 
-    delay(0x2000);
+    delay(10);
 
     printf("Done!\r\n");
 }
@@ -28,7 +28,7 @@ void usb_set_host_mode()
     usb_send_command(CMD_SET_MODE);
     usb_send_byte(USB_HOST_MODE);
 
-    delay(0x1000);
+    delay(1);
 
     printf("response: %02X\r\n", usb_get_byte());
 }
@@ -50,7 +50,7 @@ uint8_t usb_check_for_interrupts()
 
     response = usb_get_byte();
 
-    printf("int response: %02X\r\n", response);
+    // printf("int response: %02X\r\n", response);
 
     return response;
 }
@@ -65,46 +65,64 @@ void usb_open_file()
 void usb_read_file()
 {
     uint8_t length = 0;
-    uint8_t i = 0;
-    char *buffer = (char *)0x7000;
+    uint16_t i = 0;
+    char buffer[256];
+    bool done = false;
 
-    printf("read bytes\r\n");
+    uint8_t int_resp = 0;
+
+    printf("Reading file contents\r\n");
+
     usb_send_command(CMD_BYTE_READ);
-    usb_send_byte(0xFE);
     usb_send_byte(0x00);
+    usb_send_byte(0x20);
 
-    if (usb_check_for_interrupts() == USB_DISK_READ)
+    while (!done)
     {
-        printf("good\r\n");
+        int_resp = usb_check_for_interrupts();
 
-        usb_send_command(CMD_READ_USB_DATA0);
-
-        length = usb_get_byte();
-
-        printf("length: %d\r\n", length);
-
-        for (i = 0; i < length; i++)
+        if (int_resp == USB_DISK_READ)
         {
-            usb_send_command(CMD_BYTE_RD_GO);
-            buffer[i] = usb_get_byte();
+            usb_send_command(CMD_READ_USB_DATA0);
+
+            length = usb_get_byte();
+
+            for (i = 0; i < length; i++)
+            {
+                usb_send_command(CMD_BYTE_RD_GO);
+                buffer[i] = usb_get_byte();
+            }
+
+            buffer[i] = 0;
+
+            serial_puts(buffer);
         }
-
-        buffer[i] = 0;
-
-        printf("file contents: %s\r\n", buffer);
+        else if (int_resp == USB_SUCCESS_NO_DATA)
+        {
+            printf("NO DATA\r\n");
+            done = true;
+        }
     }
+
+    printf("\r\nDone!\r\n");
 }
 
 int main()
 {
+    char file_name[14];
+
     usb_reset_module();
     usb_check_exists();
     usb_set_host_mode();
 
-    usb_set_file_name("WORDS.TXT");
+    printf("Enter file name: ");
 
+    readline(file_name);
+
+    printf("\r\n");
+
+    usb_set_file_name(file_name);
     usb_open_file();
-
     usb_read_file();
 
     printf("Exiting.\r\n");
@@ -130,4 +148,28 @@ void usb_check_exists()
     {
         printf("\r\nError: Could not find CH376S. Response: %02X\r\n", usb_response);
     }
+}
+
+uint8_t readline(char *buffer)
+{
+    uint8_t count = 0;
+    uint8_t in = serial_getc();
+
+    while (in != '\n' && in != '\r')
+    {
+        // Character is printable ASCII
+        if (in >= 0x20 && in < 0x7F)
+        {
+            serial_putc(in);
+
+            buffer[count] = in;
+            count++;
+        }
+
+        in = serial_getc();
+    }
+
+    buffer[count] = 0;
+
+    return count;
 }

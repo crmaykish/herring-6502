@@ -2,7 +2,7 @@ CC = cl65
 CA = ca65
 AR = ar65
 
-CFLAGS = -Osi -t none --cpu 65c02 --static-locals -I include
+CFLAGS = -O -t none --cpu 65c02 --static-locals -I include
 
 ROM_CFG = config/rom.cfg
 RAM_CFG = config/ram.cfg

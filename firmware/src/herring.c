@@ -13,14 +13,3 @@ int write(int fd, const char *buf, unsigned count)
     return i;
 }
 #pragma warn(unused-param, pop)
-
-
-void delay(uint16_t x)
-{
-    volatile uint16_t i = 0;
-
-    while (i < x)
-    {
-        i++;
-    }
-}
