@@ -43,76 +43,77 @@ void usb_set_file_name(char *filename)
 
 uint8_t usb_check_for_interrupts()
 {
-    uint8_t response = 0;
-
+    // TODO: Add a timeout
     while (!ch376s_has_interrupt())
     {
     }
 
     ch376s_send_command(CH376S_CMD_GET_STATUS);
 
-    response = ch376s_get_byte();
-
-    // printf("int response: %02X\r\n", response);
-
-    return response;
+    return ch376s_get_byte();
 }
 
-void usb_open_file()
+bool usb_open_file()
 {
-    printf("open file\r\n");
     ch376s_send_command(CH376S_CMD_FILE_OPEN);
-    usb_check_for_interrupts();
+    return (usb_check_for_interrupts() == CH376S_USB_INT_SUCCESS);
 }
 
-void usb_read_file()
+uint16_t usb_read_file(uint8_t *buffer, uint16_t max_length)
 {
-    uint8_t length = 0;
-    uint16_t i = 0;
-    char buffer[256];
+    uint16_t total_bytes_read = 0;
+    uint8_t bytes_to_read = 0;
+    uint8_t i = 0;
+    uint8_t interrupt_response_code = 0;
     bool done = false;
-
-    uint8_t int_resp = 0;
 
     printf("Reading file contents\r\n");
 
     ch376s_send_command(CH376S_CMD_BYTE_READ);
-    ch376s_send_byte(0x00);
-    ch376s_send_byte(0x20);
+    ch376s_send_byte(max_length & 0xFF);
+    ch376s_send_byte((max_length & 0xFF00) >> 8);
 
     while (!done)
     {
-        int_resp = usb_check_for_interrupts();
+        interrupt_response_code = usb_check_for_interrupts();
 
-        if (int_resp == CH376S_USB_INT_DISK_READ)
+        if (interrupt_response_code == CH376S_USB_INT_DISK_READ)
         {
             ch376s_send_command(CH376S_CMD_READ_USB_DATA0);
 
-            length = ch376s_get_byte();
+            bytes_to_read = ch376s_get_byte();
 
-            for (i = 0; i < length; i++)
+            for (i = 0; i < bytes_to_read; i++)
             {
                 ch376s_send_command(CH376S_CMD_BYTE_RD_GO);
-                buffer[i] = ch376s_get_byte();
+
+                buffer[total_bytes_read] = ch376s_get_byte();
+
+                total_bytes_read++;
             }
-
-            buffer[i] = 0;
-
-            serial_puts(buffer);
         }
-        else if (int_resp == CH376S_USB_INT_SUCCESS)
+        else if (interrupt_response_code == CH376S_USB_INT_SUCCESS)
         {
             printf("No more data\r\n");
             done = true;
         }
+        else
+        {
+            printf("Cannot read file. Code: %02X\r\n", interrupt_response_code);
+            done = true;
+        }
     }
 
-    printf("\r\nDone!\r\n");
+    // Add a trailing zero to the buffer
+    buffer[total_bytes_read] = 0;
+
+    return total_bytes_read;
 }
 
 int main()
 {
     char file_name[14];
+    uint16_t file_size = 0;
 
     usb_reset_module();
     usb_check_exists();
@@ -125,8 +126,18 @@ int main()
     printf("\r\n");
 
     usb_set_file_name(file_name);
-    usb_open_file();
-    usb_read_file();
+
+    if (!usb_open_file())
+    {
+        printf("Could not open file\r\n");
+        return 1;
+    }
+
+    file_size = usb_read_file((uint8_t *)0x5000, 0x2000);
+
+    printf("Read %d bytes\r\n", file_size);
+
+    printf("File contents: %s\r\n", (uint8_t *)0x5000);
 
     printf("Exiting.\r\n");
 
