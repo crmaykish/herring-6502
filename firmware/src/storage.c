@@ -1,18 +1,19 @@
 #include <stdio.h>
-#include <string.h>
 #include <stdint.h>
 
-#include "herring.h"
+#include "ch376s.h"
 #include "serial.h"
-#include "usb.h"
 #include "delay.h"
+
+#define CHECK_EXIST_REQUEST_VAL 0x55
+#define CHECK_EXIST_RESPONSE_VAL 0xAA
 
 uint8_t readline(char *buffer);
 
 void usb_reset_module()
 {
     printf("Resetting CH376S USB module... ");
-    usb_send_command(CMD_RESET_ALL);
+    ch376s_send_command(CH376S_CMD_RESET_ALL);
 
     delay(10);
 
@@ -25,30 +26,32 @@ void usb_set_host_mode()
 {
     printf("Setting USB Host Mode...\r\n");
 
-    usb_send_command(CMD_SET_MODE);
-    usb_send_byte(USB_HOST_MODE);
+    ch376s_send_command(CH376S_CMD_SET_MODE);
+    ch376s_send_byte(CH376S_USB_HOST_MODE);
 
     delay(1);
 
-    printf("response: %02X\r\n", usb_get_byte());
+    printf("response: %02X\r\n", ch376s_get_byte());
 }
 
 void usb_set_file_name(char *filename)
 {
     printf("Set file name: %s\r\n", filename);
-    usb_send_command(CMD_SET_FILENAME);
-    usb_send_string(filename);
+    ch376s_send_command(CH376S_CMD_SET_FILENAME);
+    ch376s_send_string(filename);
 }
 
 uint8_t usb_check_for_interrupts()
 {
     uint8_t response = 0;
 
-    usb_wait_for_interrupt();
+    while (!ch376s_has_interrupt())
+    {
+    }
 
-    usb_send_command(CMD_GET_STATUS);
+    ch376s_send_command(CH376S_CMD_GET_STATUS);
 
-    response = usb_get_byte();
+    response = ch376s_get_byte();
 
     // printf("int response: %02X\r\n", response);
 
@@ -58,7 +61,7 @@ uint8_t usb_check_for_interrupts()
 void usb_open_file()
 {
     printf("open file\r\n");
-    usb_send_command(CMD_FILE_OPEN);
+    ch376s_send_command(CH376S_CMD_FILE_OPEN);
     usb_check_for_interrupts();
 }
 
@@ -73,33 +76,33 @@ void usb_read_file()
 
     printf("Reading file contents\r\n");
 
-    usb_send_command(CMD_BYTE_READ);
-    usb_send_byte(0x00);
-    usb_send_byte(0x20);
+    ch376s_send_command(CH376S_CMD_BYTE_READ);
+    ch376s_send_byte(0x00);
+    ch376s_send_byte(0x20);
 
     while (!done)
     {
         int_resp = usb_check_for_interrupts();
 
-        if (int_resp == USB_DISK_READ)
+        if (int_resp == CH376S_USB_INT_DISK_READ)
         {
-            usb_send_command(CMD_READ_USB_DATA0);
+            ch376s_send_command(CH376S_CMD_READ_USB_DATA0);
 
-            length = usb_get_byte();
+            length = ch376s_get_byte();
 
             for (i = 0; i < length; i++)
             {
-                usb_send_command(CMD_BYTE_RD_GO);
-                buffer[i] = usb_get_byte();
+                ch376s_send_command(CH376S_CMD_BYTE_RD_GO);
+                buffer[i] = ch376s_get_byte();
             }
 
             buffer[i] = 0;
 
             serial_puts(buffer);
         }
-        else if (int_resp == USB_SUCCESS_NO_DATA)
+        else if (int_resp == CH376S_USB_INT_SUCCESS)
         {
-            printf("NO DATA\r\n");
+            printf("No more data\r\n");
             done = true;
         }
     }
@@ -135,12 +138,12 @@ void usb_check_exists()
     uint8_t usb_response = 0;
 
     printf("Checking for CH376S USB module... ");
-    usb_send_command(CMD_CHECK_EXIST);
-    usb_send_byte(0x55);
+    ch376s_send_command(CH376S_CMD_CHECK_EXIST);
+    ch376s_send_byte(CHECK_EXIST_REQUEST_VAL);
 
-    usb_response = usb_get_byte();
+    usb_response = ch376s_get_byte();
 
-    if (usb_response == 0xAA)
+    if (usb_response == CHECK_EXIST_RESPONSE_VAL)
     {
         printf("Done!\r\n");
     }
