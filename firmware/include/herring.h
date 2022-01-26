@@ -60,7 +60,7 @@
 #define ASCII_ESC 0x1B
 
 // CH376S Registers
-#define CH376S_DATA 0x8300
-#define CH376S_COMMAND 0x8301
+#define CH376S_DATA 0x8400
+#define CH376S_COMMAND 0x8401
 
 #endif
