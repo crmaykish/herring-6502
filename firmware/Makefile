@@ -44,7 +44,7 @@ chip8: $(CHIP8_SRC) | build_dir ram_lib
 
 # USB
 usb: $(USB_SRC) | build_dir ram_lib
-	$(CC) $(CFLAGS) -C $(RAM_CFG) $(USB_SRC) $(RAM_LIB) -o build/usb.bin
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(USB_SRC) $(RAM_LIB) -o build/usb.bin -l usb.list
 
 # Standard libraries
 
@@ -67,4 +67,4 @@ build_dir:
 	@mkdir -p build
 
 clean:
-	@$(RM) -rf build src/*.o config/*.lib config/*.o
+	@$(RM) -rf build src/*.o config/*.lib config/*.o build/*.map build/*.list

@@ -1,18 +1,16 @@
+#include <peekpoke.h>
+
 #include "ch376s.h"
 #include "herring.h"
 
-// Pointers to the memory-mapped registers of the CH376S module
-static volatile uint8_t *data_port = (uint8_t *)CH376S_DATA;
-static volatile uint8_t *command_port = (uint8_t *)CH376S_COMMAND;
-
 void ch376s_send_command(uint8_t command)
 {
-    *command_port = command;
+    POKE(CH376S_COMMAND, command);
 }
 
 void ch376s_send_byte(uint8_t b)
 {
-    *data_port = b;
+    POKE(CH376S_DATA, b);
 }
 
 void ch376s_send_string(char *s)
@@ -31,10 +29,15 @@ void ch376s_send_string(char *s)
 
 uint8_t ch376s_get_byte()
 {
-    return *data_port;
+    return PEEK(CH376S_DATA);
 }
 
 bool ch376s_has_interrupt()
 {
-    return ((*command_port & CH376S_PARA_STATE_INTB) == 0);
+    return ((PEEK(CH376S_COMMAND) & CH376S_PARA_STATE_INTB) == 0);
+}
+
+bool ch376s_is_busy()
+{
+    return ((PEEK(CH376S_COMMAND) & CH376S_PARA_STATE_BZ) != 0);
 }

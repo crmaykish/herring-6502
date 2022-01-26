@@ -29,6 +29,7 @@
 
 // Status register bits
 #define CH376S_PARA_STATE_INTB 0b10000000
+#define CH376S_PARA_STATE_BZ 0b00010000
 
 // USB command bytes
 #define CH376S_CMD_SET_BAUDRATE 0x02
@@ -55,5 +56,6 @@ void ch376s_send_byte(uint8_t b);
 void ch376s_send_string(char *s);
 uint8_t ch376s_get_byte();
 bool ch376s_has_interrupt();
+bool ch376s_is_busy();
 
 #endif
