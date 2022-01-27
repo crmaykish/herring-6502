@@ -3,41 +3,64 @@
 #include "ch376s.h"
 #include "herring.h"
 
+char getc1()
+{
+    while ((PEEK(ACIA1_STATUS) & ACIA_READY_RX) == 0)
+    {
+    }
+
+    return PEEK(ACIA1_DATA);
+}
+
+void putc1(uint8_t c)
+{
+    while ((PEEK(ACIA1_STATUS) & ACIA_READY_TX) == 0)
+    {
+    }
+
+    POKE(ACIA1_DATA, c);
+}
+
+void puts1(const uint8_t *s)
+{
+    uint8_t i = 0;
+
+    while (s[i] != ASCII_ZERO)
+    {
+        putc1(s[i]);
+        ++i;
+    }
+}
+
 void ch376s_send_command(uint8_t command)
 {
-    POKE(CH376S_COMMAND, command);
+    putc1(0x57);
+    putc1(0xAB);
+    putc1(command);
 }
 
 void ch376s_send_byte(uint8_t b)
 {
-    POKE(CH376S_DATA, b);
+    putc1(b);
 }
 
 void ch376s_send_string(char *s)
 {
-    uint8_t i = 0;
-
-    while (s[i] != 0)
-    {
-        ch376s_send_byte((uint8_t)s[i]);
-        i++;
-    }
-
-    // Always end a string by sending a zero
-    ch376s_send_byte(0);
+    puts1(s);
+    putc1(0x00);
 }
 
 uint8_t ch376s_get_byte()
 {
-    return PEEK(CH376S_DATA);
+    return getc1();
 }
 
 bool ch376s_has_interrupt()
 {
-    return ((PEEK(CH376S_COMMAND) & CH376S_PARA_STATE_INTB) == 0);
+    return false;
 }
 
 bool ch376s_is_busy()
 {
-    return ((PEEK(CH376S_COMMAND) & CH376S_PARA_STATE_BZ) != 0);
+    return false;
 }

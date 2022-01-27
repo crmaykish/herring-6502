@@ -13,35 +13,12 @@
 
 #define INTERRUPT_TIMEOUT 100
 
-static uint8_t check_for_interrupts()
-{
-    uint8_t count = 0;
-
-    while (!ch376s_has_interrupt())
-    {
-        // serial_putc('.');
-        delay(1);
-
-        if (count == INTERRUPT_TIMEOUT)
-        {
-            printf("timeout\r\n");
-            ch376s_send_command(CH376S_CMD_GET_STATUS);
-            return 0;
-        }
-
-        count++;
-    }
-
-    ch376s_send_command(CH376S_CMD_GET_STATUS);
-    return ch376s_get_byte();
-}
-
 void usb_reset_module()
 {
     printf("Resetting CH376S USB module");
     ch376s_send_command(CH376S_CMD_RESET_ALL);
 
-    delay(30);
+    delay(10);
 
     printf(" Done!\r\n");
 }
@@ -53,8 +30,6 @@ void usb_check_exists()
     printf("Checking for CH376S USB module... ");
     ch376s_send_command(CH376S_CMD_CHECK_EXIST);
     ch376s_send_byte(CHECK_EXIST_REQUEST_VAL);
-
-    delay(10);
 
     usb_response = ch376s_get_byte();
 
@@ -71,17 +46,17 @@ void usb_check_exists()
 void usb_set_host_mode()
 {
     printf("Setting USB Host Mode\r\n");
-
     ch376s_send_command(CH376S_CMD_SET_MODE);
     ch376s_send_byte(CH376S_USB_HOST_MODE);
-
-    delay(1);
-
-    printf("\r\nresponse: %02X\r\n", ch376s_get_byte());
 }
 
 bool file_io_init()
 {
+    // set up ACIA
+    POKE(ACIA1_STATUS, ACIA_RESET);
+    POKE(ACIA1_COMMAND, ACIA_COMMAND_INIT);
+    POKE(ACIA1_CONTROL, ACIA_CONTROL_BAUD);
+
     usb_reset_module();
     usb_check_exists();
     usb_set_host_mode();
@@ -91,44 +66,41 @@ bool file_io_init()
 
 uint16_t file_read(char *filename, uint8_t *buffer, uint16_t max_length)
 {
-    // TODO: limit reading bytes to the max_length param
-
     uint16_t total_bytes_read = 0;
     uint8_t bytes_to_read = 0;
     uint8_t i = 0;
-    uint8_t interrupt_response_code = 0;
+    uint8_t response = 0;
     bool done = false;
 
     // Set file name
     ch376s_send_command(CH376S_CMD_SET_FILENAME);
     ch376s_send_string(filename);
 
-    delay(1);
+    ch376s_get_byte();
 
     // Open file
     ch376s_send_command(CH376S_CMD_FILE_OPEN);
 
-    delay(1);
+    response = ch376s_get_byte();
 
-    interrupt_response_code = check_for_interrupts();
-
-    if (interrupt_response_code != CH376S_USB_INT_SUCCESS)
+    if (response != CH376S_USB_INT_SUCCESS)
     {
-        printf("Failed to open file: %02X\r\n", interrupt_response_code);
+        printf("Failed to open file: %02X\r\n", response);
     }
 
-    delay(1);
+    // Read up to max_length bytes
+    ch376s_send_command(CH376S_CMD_BYTE_READ);
+    ch376s_send_byte(max_length & 0xFF);
+    ch376s_send_byte((max_length & 0xFF00) >> 8);
+
+    // NOTE: I think this limits reading files up to 64KB
+    // How do we continue if the file is larger?
+
+    response = ch376s_get_byte();
 
     while (!done)
     {
-        // Read up to 255 bytes at a time
-        ch376s_send_command(CH376S_CMD_BYTE_READ);
-        ch376s_send_byte(0xFF);
-        ch376s_send_byte(0x00);
-
-        interrupt_response_code = check_for_interrupts();
-
-        if (interrupt_response_code == CH376S_USB_INT_DISK_READ)
+        if (response == CH376S_USB_INT_DISK_READ)
         {
             // File data is available, get the number of bytes to read
             ch376s_send_command(CH376S_CMD_READ_USB_DATA0);
@@ -137,12 +109,11 @@ uint16_t file_read(char *filename, uint8_t *buffer, uint16_t max_length)
             for (i = 0; i < bytes_to_read; i++)
             {
                 // Read each byte individually and store them in the buffer
-                ch376s_send_command(CH376S_CMD_BYTE_RD_GO);
                 buffer[total_bytes_read] = ch376s_get_byte();
                 total_bytes_read++;
             }
         }
-        else if (interrupt_response_code == CH376S_USB_INT_SUCCESS)
+        else if (response == CH376S_USB_INT_SUCCESS)
         {
             // No more file data available
             printf("Done reading file\r\n");
@@ -150,9 +121,82 @@ uint16_t file_read(char *filename, uint8_t *buffer, uint16_t max_length)
         }
         else
         {
-            printf("Could not read file. Code: %02X\r\n", interrupt_response_code);
+            printf("Could not read file. Code: %02X\r\n", response);
             done = true;
         }
+
+        ch376s_send_command(CH376S_CMD_BYTE_RD_GO);
+        response = ch376s_get_byte();
+    }
+
+    buffer[total_bytes_read] = 0;
+
+    return total_bytes_read;
+}
+
+uint16_t file_read_continue(char *filename, uint8_t *buffer, uint16_t max_length)
+{
+    uint16_t total_bytes_read = 0;
+    uint8_t bytes_to_read = 0;
+    uint8_t i = 0;
+    uint8_t response = 0;
+    bool done = false;
+
+    // // Set file name
+    // ch376s_send_command(CH376S_CMD_SET_FILENAME);
+    // ch376s_send_string(filename);
+
+    // ch376s_get_byte();
+
+    // // Open file
+    // ch376s_send_command(CH376S_CMD_FILE_OPEN);
+
+    // response = ch376s_get_byte();
+
+    // if (response != CH376S_USB_INT_SUCCESS)
+    // {
+    //     printf("Failed to open file: %02X\r\n", response);
+    // }
+
+    // Read up to max_length bytes
+    ch376s_send_command(CH376S_CMD_BYTE_READ);
+    ch376s_send_byte(max_length & 0xFF);
+    ch376s_send_byte((max_length & 0xFF00) >> 8);
+
+    // NOTE: I think this limits reading files up to 64KB
+    // How do we continue if the file is larger?
+
+    response = ch376s_get_byte();
+
+    while (!done)
+    {
+        if (response == CH376S_USB_INT_DISK_READ)
+        {
+            // File data is available, get the number of bytes to read
+            ch376s_send_command(CH376S_CMD_READ_USB_DATA0);
+            bytes_to_read = ch376s_get_byte();
+
+            for (i = 0; i < bytes_to_read; i++)
+            {
+                // Read each byte individually and store them in the buffer
+                buffer[total_bytes_read] = ch376s_get_byte();
+                total_bytes_read++;
+            }
+        }
+        else if (response == CH376S_USB_INT_SUCCESS)
+        {
+            // No more file data available
+            printf("Done reading file\r\n");
+            done = true;
+        }
+        else
+        {
+            printf("Could not read file. Code: %02X\r\n", response);
+            done = true;
+        }
+
+        ch376s_send_command(CH376S_CMD_BYTE_RD_GO);
+        response = ch376s_get_byte();
     }
 
     buffer[total_bytes_read] = 0;

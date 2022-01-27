@@ -13,4 +13,6 @@ bool file_io_init();
 
 uint16_t file_read(char *filename, uint8_t *buffer, uint16_t max_length);
 
+uint16_t file_read_continue(char *filename, uint8_t *buffer, uint16_t max_length);
+
 #endif

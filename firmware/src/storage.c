@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <peekpoke.h>
 
+#include "herring.h"
 #include "ch376s.h"
 #include "file_io.h"
 #include "serial.h"
+#include "delay.h"
 
 #define CHECK_EXIST_REQUEST_VAL 0x55
 #define CHECK_EXIST_RESPONSE_VAL 0xAA
@@ -15,11 +18,7 @@ int main()
     char file_name[14];
     uint16_t file_size = 0;
 
-    if (!file_io_init())
-    {
-        printf("Failed to initialize File I/O\r\n");
-        return 1;
-    }
+    file_io_init();
 
     printf("Enter file name: ");
 
@@ -27,11 +26,17 @@ int main()
 
     printf("\r\n");
 
-    file_size = file_read(file_name, (uint8_t *)0x5000, 0x2000);
-
+    file_size = file_read(file_name, (uint8_t *)0x5000, 500);
     printf("Read %d bytes\r\n", file_size);
-
     printf("File contents: %s\r\n", (uint8_t *)0x5000);
+
+    file_size = file_read_continue(file_name, (uint8_t *)0x6000, 600);
+    printf("Read %d bytes\r\n", file_size);
+    printf("File contents: %s\r\n", (uint8_t *)0x6000);
+
+    file_size = file_read_continue(file_name, (uint8_t *)0x6000, 600);
+    printf("Read %d bytes\r\n", file_size);
+    printf("File contents: %s\r\n", (uint8_t *)0x6000);
 
     printf("Exiting.\r\n");
 
