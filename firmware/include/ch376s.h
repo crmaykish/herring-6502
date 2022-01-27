@@ -60,4 +60,6 @@ uint8_t ch376s_get_byte();
 
 size_t ch376s_file_read(char *filename, uint8_t *buffer, size_t max_length);
 
+void ch376s_file_list();
+
 #endif

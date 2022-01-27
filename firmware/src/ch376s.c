@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <peekpoke.h>
 
 #include "ch376s.h"
@@ -136,6 +137,72 @@ size_t ch376s_file_read(char *filename, uint8_t *buffer, size_t max_length)
     buffer[total_bytes_read] = 0;
 
     return total_bytes_read;
+}
+
+void ch376s_file_list()
+{
+    uint8_t i;
+    uint8_t in;
+    uint8_t next_status = 0;
+    uint8_t data_length = 0;
+    uint32_t file_size = 0;
+    char fat_file_info[32] = {0};
+    char file_name[9];
+    char file_ext[4];
+
+    printf("Listing root folder...\r\n");
+    ch376s_send_command(CH376S_CMD_SET_FILENAME);
+    ch376s_send_string("*");
+    ch376s_get_byte();
+
+    ch376s_send_command(CH376S_CMD_FILE_OPEN);
+    in = ch376s_get_byte();
+
+    if (in == CH376S_USB_INT_DISK_READ)
+    {
+        // read FAT info
+
+        while (next_status != CH376S_ERR_MISS_FILE)
+        {
+
+            ch376s_send_command(CH376S_CMD_READ_USB_DATA0);
+            data_length = ch376s_get_byte();
+
+            for (i = 0; i < data_length; i++)
+            {
+                fat_file_info[i] = ch376s_get_byte();
+            }
+
+            // Parse out the file name and size from the FAT info
+            strncpy(file_name, fat_file_info, (strchr(fat_file_info, ' ') - fat_file_info));
+            strncpy(file_ext, &fat_file_info[8], 3);
+
+            file_size = 0;
+
+            file_size += ((uint32_t)(fat_file_info[31]) << 24);
+            file_size += ((uint32_t)(fat_file_info[30]) << 16);
+            file_size += ((uint32_t)(fat_file_info[29]) << 8);
+            file_size += ((uint32_t)(fat_file_info[28]));
+
+            printf("%s.%s    %ld\r\n", file_name, file_ext, file_size);
+
+            memset(file_name, 0, 9);
+            memset(file_ext, 0, 4);
+
+            // enumerate next file until file not found
+            ch376s_send_command(CH376S_CMD_NEXT_FILE);
+            next_status = ch376s_get_byte();
+        }
+    }
+    else
+    {
+        printf("Could not get file list\r\n");
+    }
+
+    printf("\r\n");
+
+    ch376s_send_command(CH376S_CMD_FILE_CLOSE);
+    ch376s_send_byte(0x00);
 }
 
 static char getc1()

@@ -15,6 +15,8 @@ int main()
 
     ch376s_init();
 
+    ch376s_file_list();
+
     printf("Enter file name: ");
 
     readline(file_name);

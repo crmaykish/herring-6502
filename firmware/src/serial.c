@@ -32,6 +32,11 @@ void serial_putc(uint8_t c)
     }
 
     POKE(ACIA0_DATA, c);
+
+    if (c == 0x0A)
+    {
+        serial_putc(0x0D);
+    }
 }
 
 void serial_puts(const uint8_t *s)
@@ -40,11 +45,6 @@ void serial_puts(const uint8_t *s)
 
     while (s[i] != ASCII_ZERO)
     {
-        if (s[i] == 0x0A)
-        {
-            serial_putc(0x0D);
-        }
-
         serial_putc(s[i]);
         ++i;
     }
