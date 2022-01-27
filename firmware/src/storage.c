@@ -3,13 +3,8 @@
 #include <peekpoke.h>
 
 #include "herring.h"
-#include "ch376s.h"
-#include "file_io.h"
 #include "serial.h"
-#include "delay.h"
-
-#define CHECK_EXIST_REQUEST_VAL 0x55
-#define CHECK_EXIST_RESPONSE_VAL 0xAA
+#include "ch376s.h"
 
 uint8_t readline(char *buffer);
 
@@ -18,7 +13,7 @@ int main()
     char file_name[14];
     uint16_t file_size = 0;
 
-    file_io_init();
+    ch376s_init();
 
     printf("Enter file name: ");
 
@@ -26,17 +21,9 @@ int main()
 
     printf("\r\n");
 
-    file_size = file_read(file_name, (uint8_t *)0x5000, 500);
+    file_size = ch376s_file_read(file_name, (uint8_t *)0x5000, 0x8000 - 0x5000);
     printf("Read %d bytes\r\n", file_size);
-    printf("File contents: %s\r\n", (uint8_t *)0x5000);
-
-    file_size = file_read_continue(file_name, (uint8_t *)0x6000, 600);
-    printf("Read %d bytes\r\n", file_size);
-    printf("File contents: %s\r\n", (uint8_t *)0x6000);
-
-    file_size = file_read_continue(file_name, (uint8_t *)0x6000, 600);
-    printf("Read %d bytes\r\n", file_size);
-    printf("File contents: %s\r\n", (uint8_t *)0x6000);
+    printf("File contents:\r\n%s\r\n", (uint8_t *)0x5000);
 
     printf("Exiting.\r\n");
 

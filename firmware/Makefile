@@ -18,7 +18,7 @@ MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
 HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c
 CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
 CHIP8_SRC = $(COMMON_SRC) src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
-USB_SRC = $(COMMON_SRC) src/storage.c src/ch376s.c src/file_io.c src/serial.c
+USB_SRC = $(COMMON_SRC) src/storage.c src/ch376s.c src/serial.c
 
 .PHONY: all clean
 

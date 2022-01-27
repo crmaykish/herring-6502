@@ -1,7 +1,7 @@
 /**
  * @file ch376s.h
  * @author Colin Maykish (crmaykish@gmail.com)
- * @brief Low level control commands for the CH376S USB module in parallel mode
+ * @brief Control API for the CH376S USB module in UART mode
  * @date 2022-01-26
  * 
  * @copyright Copyright (c) 2022
@@ -10,6 +10,7 @@
 #ifndef CH376S_H
 #define CH376S_H
 
+#include <stddef.h>
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -51,11 +52,12 @@
 // Mode values
 #define CH376S_USB_HOST_MODE 0x05
 
+void ch376s_init();
 void ch376s_send_command(uint8_t command);
 void ch376s_send_byte(uint8_t b);
 void ch376s_send_string(char *s);
 uint8_t ch376s_get_byte();
-bool ch376s_has_interrupt();
-bool ch376s_is_busy();
+
+size_t ch376s_file_read(char *filename, uint8_t *buffer, size_t max_length);
 
 #endif
