@@ -1,0 +1,27 @@
+GAL16V8
+HER3_DEC
+
+CLK RWB A9 A10 A11 A12 A13 A14 A15 GND
+A8 U3 U2 U1 U0 VIAEN ACIAEN ROMEN RAMWR VCC
+
+/RAMWR = CLK * /RWB
+/ROMEN = A15 * A14 * A13
+
+/ACIAEN = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8
+/VIAEN = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8
+/U0 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * A9 * /A8
+/U1 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * A9 * A8
+/U2 = A15 * /A14 * /A13 * /A12 * /A11 * A10 * /A9 * /A8
+/U3 = A15 * /A14 * /A13 * /A12 * /A11 * A10 * /A9 * A8
+
+DESCRIPTION
+Decodes Herring's address range to peripheral enable pins
+
+RAM: 0x0000
+ACIA: 0x8000
+VIA: 0x8100
+ROM: 0xE000
+U0: 0x8200
+U1: 0x8300
+U2: 0x8400
+U3: 0x8500
