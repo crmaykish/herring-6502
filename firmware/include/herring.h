@@ -4,26 +4,46 @@
 // Start of program RAM
 #define PROGRAM_RAM 0x1000
 
-// VIA registers
-#define VIA0_PORTB 0x8100
-#define VIA0_PORTA 0x8101
-#define VIA0_DDRB 0x8102
-#define VIA0_DDRA 0x8103
-#define VIA0_T1CL 0x8104
-#define VIA0_T1CH 0x8105
-#define VIA0_T1LL 0x8106
-#define VIA0_T1LH 0x8107
-#define VIA0_T2CL 0x8108
-#define VIA0_T2CH 0x8109
-#define VIA0_SR 0x810A
-#define VIA0_ACR 0x810B
-#define VIA0_PCR 0x810C
-#define VIA0_IFR 0x810D
-#define VIA0_IER 0x810E
+#define VIA0 0x8100
+#define VIA1 0x8180
 
 // VIA DDR control
 #define VIA_OUTPUT 0xFF
 #define VIA_INPUT 0x00
+
+// VIA0 registers
+#define VIA0_PORTB VIA0 + 0x0
+#define VIA0_PORTA VIA0 + 0x1
+#define VIA0_DDRB VIA0 + 0x2
+#define VIA0_DDRA VIA0 + 0x3
+#define VIA0_T1CL VIA0 + 0x4
+#define VIA0_T1CH VIA0 + 0x5
+#define VIA0_T1LL VIA0 + 0x6
+#define VIA0_T1LH VIA0 + 0x7
+#define VIA0_T2CL VIA0 + 0x8
+#define VIA0_T2CH VIA0 + 0x9
+#define VIA0_SR VIA0 + 0xA
+#define VIA0_ACR VIA0 + 0xB
+#define VIA0_PCR VIA0 + 0xC
+#define VIA0_IFR VIA0 + 0xD
+#define VIA0_IER VIA0 + 0xE
+
+// VIA1 registers
+#define VIA1_PORTB VIA0 + 0x0
+#define VIA1_PORTA VIA0 + 0x1
+#define VIA1_DDRB VIA0 + 0x2
+#define VIA1_DDRA VIA0 + 0x3
+#define VIA1_T1CL VIA0 + 0x4
+#define VIA1_T1CH VIA0 + 0x5
+#define VIA1_T1LL VIA0 + 0x6
+#define VIA1_T1LH VIA0 + 0x7
+#define VIA1_T2CL VIA0 + 0x8
+#define VIA1_T2CH VIA0 + 0x9
+#define VIA1_SR VIA0 + 0xA
+#define VIA1_ACR VIA0 + 0xB
+#define VIA1_PCR VIA0 + 0xC
+#define VIA1_IFR VIA0 + 0xD
+#define VIA1_IER VIA0 + 0xE
 
 // ACIA 0 registers
 #define ACIA0_DATA 0x8000
@@ -32,10 +52,10 @@
 #define ACIA0_CONTROL 0x8003
 
 // ACIA 1 registers
-#define ACIA1_DATA 0x8200
-#define ACIA1_STATUS 0x8201
-#define ACIA1_COMMAND 0x8202
-#define ACIA1_CONTROL 0x8203
+#define ACIA1_DATA 0x8080
+#define ACIA1_STATUS 0x8081
+#define ACIA1_COMMAND 0x8082
+#define ACIA1_CONTROL 0x8083
 
 // ACIA flags
 #define ACIA_READY_RX 0x08
