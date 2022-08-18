@@ -17,13 +17,14 @@ COMMON_SRC = src/herring.c src/delay.c
 MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
 HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c
 CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
-FB_DEMO_SRC = $(COMMON_SRC) src/fb_demo.c src/serial.c
+CONWAY_VGA_SRC = $(COMMON_SRC) src/conway_vga.c src/serial.c src/vga.c
+FB_DEMO_SRC = $(COMMON_SRC) src/fb_demo.c src/serial.c src/vga.c
 TEXTMODE_DEMO_SRC = $(COMMON_SRC) src/textmode_demo.c src/serial.c
 CHIP8_SRC = $(COMMON_SRC) src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
 
 .PHONY: all clean
 
-all: monitor hello conway chip8 fb_demo textmode_demo
+all: monitor hello conway chip8 fb_demo textmode_demo conway_vga
 
 # Firmware applications
 
@@ -38,6 +39,9 @@ hello: $(HELLO_SRC) | build_dir ram_lib
 # Game of life
 conway: $(CONWAY_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_SRC) $(RAM_LIB) -o build/conway.bin
+
+conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_VGA_SRC) $(RAM_LIB) -o build/conway_vga.bin
 
 # CHIP-8 Emulator
 chip8: $(CHIP8_SRC) | build_dir ram_lib

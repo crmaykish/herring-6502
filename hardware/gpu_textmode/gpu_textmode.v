@@ -96,27 +96,29 @@ module gpu_textmode(
                 end
             WRITING:
                 begin
+                    state <= IDLE;
+
                     case (addr_in)
                         2'b00:
-                            state <= IDLE;
+                            begin
+                                case (data_in)
+                                    // New Line
+                                    8'h0A: cursor_y <= cursor_y + 2;
+                                    // Return
+                                    8'h0D: cursor_x <= 0;
+                                    // Printable character
+                                    default:
+                                        begin
+                                            framebuffer[cursor_y][cursor_x] <= data_in;
+                                            cursor_x <= cursor_x + 1;
 
-                            case (data_in)
-                                // New Line
-                                8'h0A: cursor_y <= cursor_y + 2;
-                                // Return
-                                8'h0D: cursor_x <= 0;
-                                // Printable character
-                                default:
-                                    begin
-                                        framebuffer[cursor_y][cursor_x] <= data_in;
-                                        cursor_x <= cursor_x + 1;
-
-                                        if (cursor_x == 78) begin
-                                            cursor_x <= 0;
-                                            cursor_y <= cursor_y + 2;
+                                            if (cursor_x == 78) begin
+                                                cursor_x <= 0;
+                                                cursor_y <= cursor_y + 2;
+                                            end
                                         end
-                                    end
-                            endcase
+                                endcase
+                            end
                         2'b01:
                             begin
                                 cursor_x <= 0;
