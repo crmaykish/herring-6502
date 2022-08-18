@@ -4,15 +4,17 @@ IO_DEC
 A7 A8 A9 A10 A11 A12 A13 A14 A15 GND
 DEC5 DEC4 DEC3 DEC2 DEC1 VIA1 VIA0 ACIA1 ACIA0 VCC
 
-/ACIA0 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8 * /A7
-/ACIA1 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8 * A7
-/VIA0 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8 * /A7
-/VIA1 = A15 * /A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8 * A7
+/ACIA0 = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8 * /A7
+/ACIA1 = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8 * A7
+/VIA0 = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8 * /A7
+/VIA1 = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8 * A7
+/DEC1 = A15 * /A14
 
 DESCRIPTION
 Decoder for Herring I/O board
 
-ACIA0 : 0x8000
-ACIA1 : 0x8080
-VIA0  : 0x8100
-VIA1  : 0x8180
+ACIA0 : 0xC000
+ACIA1 : 0xC080
+VIA0  : 0xC100
+VIA1  : 0xC180
+DEC1 : 0x8000 - BFFF

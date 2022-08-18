@@ -1,8 +1,8 @@
 set_io --warn-no-port VGA_RED 28
 set_io --warn-no-port VGA_GREEN 38
 set_io --warn-no-port VGA_BLUE 42
-set_io --warn-no-port VGA_HSYNC 36
-set_io --warn-no-port VGA_VSYNC 43
+set_io --warn-no-port VGA_HSYNC 43
+set_io --warn-no-port VGA_VSYNC 36
 
 set_io --warn-no-port DATA[0] 2
 set_io --warn-no-port DATA[1] 46

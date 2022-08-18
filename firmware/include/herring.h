@@ -4,8 +4,8 @@
 // Start of program RAM
 #define PROGRAM_RAM 0x1000
 
-#define VIA0 0x8100
-#define VIA1 0x8180
+#define VIA0 0xC100
+#define VIA1 0xC180
 
 // VIA DDR control
 #define VIA_OUTPUT 0xFF
@@ -46,16 +46,16 @@
 #define VIA1_IER VIA0 + 0xE
 
 // ACIA 0 registers
-#define ACIA0_DATA 0x8000
-#define ACIA0_STATUS 0x8001
-#define ACIA0_COMMAND 0x8002
-#define ACIA0_CONTROL 0x8003
+#define ACIA0_DATA 0xC000
+#define ACIA0_STATUS 0xC001
+#define ACIA0_COMMAND 0xC002
+#define ACIA0_CONTROL 0xC003
 
 // ACIA 1 registers
-#define ACIA1_DATA 0x8080
-#define ACIA1_STATUS 0x8081
-#define ACIA1_COMMAND 0x8082
-#define ACIA1_CONTROL 0x8083
+#define ACIA1_DATA 0xC080
+#define ACIA1_STATUS 0xC081
+#define ACIA1_COMMAND 0xC082
+#define ACIA1_CONTROL 0xC083
 
 // ACIA flags
 #define ACIA_READY_RX 0x08
@@ -80,7 +80,7 @@
 #define ASCII_ESC 0x1B
 
 // CH376S Registers
-#define CH376S_DATA 0x8400
-#define CH376S_COMMAND 0x8401
+// #define CH376S_DATA 0x8400
+// #define CH376S_COMMAND 0x8401
 
 #endif

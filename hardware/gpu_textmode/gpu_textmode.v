@@ -1,6 +1,7 @@
 module gpu_textmode(
     input RW, CE, CLK_CPU,
     input [6:0] DATA,
+    input [1:0] ADDR,
     input CLK,
     output VGA_RED, VGA_GREEN, VGA_BLUE,
     output VGA_HSYNC, VGA_VSYNC
@@ -36,11 +37,11 @@ module gpu_textmode(
 
     // TODO: explore storing the font in SPRAM instead of BRAM
 
-    // Font ROM (64 x 8 x 8)
-    reg [7:0] font [0:63][0:7];
+    // Font ROM (128 x 8 x 8)
+    reg [7:0] font [0:127][0:7];
 
     // Character buffer
-    reg [6:0] framebuffer[0:59][0:79];
+    reg [7:0] framebuffer[0:59][0:79];
 
     initial begin
         // Load the font character set
@@ -48,14 +49,14 @@ module gpu_textmode(
     end
 
     // Indices into the framebuffer
-    wire [6:0] fb_x = pixel_x[10:3];
-    wire [6:0] fb_y = pixel_y[10:3];
+    wire [7:0] fb_x = pixel_x[10:3];
+    wire [7:0] fb_y = pixel_y[10:3];
 
     // Indices into the font table
     wire [2:0] sp_x = pixel_x - (fb_x << 3);
     wire [2:0] sp_y = pixel_y - (fb_y << 3);
 
-    reg [6:0] sprite_index;
+    reg [7:0] sprite_index;
     reg sprite_pixel;
 
     always @(posedge CLK_PIXEL) begin
@@ -73,6 +74,7 @@ module gpu_textmode(
     reg [20:0] cursor_y = 0;
 
     reg [7:0] data_in = 0;
+    reg [1:0] addr_in = 0;
 
     parameter IDLE = 3'b000;
     parameter WRITING = 3'b001;
@@ -88,34 +90,38 @@ module gpu_textmode(
                 begin
                     if (~CE && ~RW) begin
                         data_in <= DATA;
+                        addr_in <= ADDR;
                         state <= WRITING;
                     end
                 end
             WRITING:
                 begin
-                    state <= IDLE;
+                    case (addr_in)
+                        2'b00:
+                            state <= IDLE;
 
-                    case (data_in)
-                        // New Line
-                        8'h0A: cursor_y <= cursor_y + 2;
-                        // Return
-                        8'h0D: cursor_x <= 0;
-                        8'h7F:
+                            case (data_in)
+                                // New Line
+                                8'h0A: cursor_y <= cursor_y + 2;
+                                // Return
+                                8'h0D: cursor_x <= 0;
+                                // Printable character
+                                default:
+                                    begin
+                                        framebuffer[cursor_y][cursor_x] <= data_in;
+                                        cursor_x <= cursor_x + 1;
+
+                                        if (cursor_x == 78) begin
+                                            cursor_x <= 0;
+                                            cursor_y <= cursor_y + 2;
+                                        end
+                                    end
+                            endcase
+                        2'b01:
                             begin
                                 cursor_x <= 0;
                                 cursor_y <= 0;
                                 state <= CLEARING;
-                            end
-                        // Printable character
-                        default:
-                            begin
-                                framebuffer[cursor_y][cursor_x] <= data_in;
-                                cursor_x <= cursor_x + 1;
-
-                                if (cursor_x == 78) begin
-                                    cursor_x <= 0;
-                                    cursor_y <= cursor_y + 2;
-                                end
                             end
                     endcase
                 end
