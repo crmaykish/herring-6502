@@ -6,10 +6,11 @@
 #include "herring.h"
 #include "serial.h"
 #include "vga.h"
+#include "delay.h"
 
 #define BOARD_WIDTH (FB_WIDTH / 2)
 #define BOARD_HEIGHT (FB_HEIGHT / 2)
-#define MAX_GENERATIONS 100
+#define MAX_GENERATIONS 64
 #define RANDOM_SEED_FILL 20
 
 static uint8_t current[BOARD_WIDTH][BOARD_HEIGHT];
@@ -25,7 +26,7 @@ void update_state();
 uint8_t count_neighbors(uint8_t x, uint8_t y);
 void rand_prompt();
 
-int main()
+void main()
 {
     fb_clear();
 
@@ -34,16 +35,20 @@ int main()
 
     term_clear();
 
-    init_board();
-
-    while (cycles <= MAX_GENERATIONS)
+    while (true)
     {
-        update_state();
-        draw_board();
-        cycles++;
-    }
+        fb_clear();
+        init_board();
 
-    return 0;
+        while (cycles <= MAX_GENERATIONS)
+        {
+            update_state();
+            draw_board();
+            cycles++;
+        }
+
+        delay(200);
+    }
 }
 
 void init_board()
