@@ -41,7 +41,7 @@ module gpu_textmode(
     reg [7:0] font [0:127][0:7];
 
     // Character buffer
-    reg [7:0] framebuffer[0:59][0:79];
+    reg [10:0] framebuffer[0:59][0:79];
 
     initial begin
         // Load the font character set
@@ -59,14 +59,19 @@ module gpu_textmode(
     reg [7:0] sprite_index;
     reg sprite_pixel;
 
+    reg [2:0] sprite_color;
+
     always @(posedge CLK_PIXEL) begin
-        sprite_index <= framebuffer[fb_y][fb_x];
+        sprite_index <= framebuffer[fb_y][fb_x][7:0];
         sprite_pixel <= font[sprite_index][sp_y][sp_x ^ 3'b111];
+        sprite_color <= framebuffer[fb_y][fb_x][10:8];
     end
 
     // Assign the VGA signals to the current pixel in the framebuffer
-    assign VGA_GREEN = on_screen && sprite_pixel;
-
+    assign VGA_RED = on_screen && sprite_pixel && sprite_color[0];
+    assign VGA_GREEN = on_screen && sprite_pixel && sprite_color[1];
+    // assign VGA_BLUE = on_screen && sprite_pixel && sprite_color[2];
+    assign VGA_BLUE = VGA_RED;  // TODO: why does adding the blue channel cause distortion?
 
     // === CPU interface and state machine === //
 
@@ -75,6 +80,7 @@ module gpu_textmode(
 
     reg [7:0] data_in = 0;
     reg [1:0] addr_in = 0;
+    reg[2:0] color_in = 3'b001;
 
     parameter IDLE = 3'b000;
     parameter WRITING = 3'b001;
@@ -109,7 +115,7 @@ module gpu_textmode(
                                     // Printable character
                                     default:
                                         begin
-                                            framebuffer[cursor_y][cursor_x] <= data_in;
+                                            framebuffer[cursor_y][cursor_x] <= {color_in, data_in};
                                             cursor_x <= cursor_x + 1;
 
                                             if (cursor_x == 78) begin
@@ -119,12 +125,14 @@ module gpu_textmode(
                                         end
                                 endcase
                             end
-                        2'b01:
+                        2'b01:  // Clear screen
                             begin
                                 cursor_x <= 0;
                                 cursor_y <= 0;
                                 state <= CLEARING;
                             end
+                        2'b10:  // Set color
+                            color_in <= data_in[2:0];
                     endcase
                 end
             CLEARING:

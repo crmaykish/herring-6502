@@ -50,25 +50,6 @@ void serial_puts(const uint8_t *s)
     }
 }
 
-void print_string_bin(char *str, uint8_t max)
-{
-    uint8_t i = 0;
-
-    while (i < max)
-    {
-        if (str[i] >= 32 && str[i] < 127)
-        {
-            serial_putc(str[i]);
-        }
-        else
-        {
-            serial_putc('.');
-        }
-
-        i++;
-    }
-}
-
 void term_set_color(char *color)
 {
     serial_puts("\033[");

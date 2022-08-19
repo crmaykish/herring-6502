@@ -70,11 +70,11 @@ void draw_board()
     {
         for (i = 0; i < BOARD_WIDTH; ++i)
         {
-            SET_PIXEL(i, j, (current[i][j] == 1) ? 2 : 0);
+            FB_SET_PIXEL(i, j, (current[i][j] == 1) ? 2 : 0);
         }
     }
 
-    SWAP_BUFFERS();
+    FB_SWAP_BUFFERS();
 }
 
 void update_state()

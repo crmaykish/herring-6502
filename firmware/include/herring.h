@@ -1,6 +1,8 @@
 #ifndef HERRING_H
 #define HERRING_H
 
+#include <stdint.h>
+
 // Start of program RAM
 #define PROGRAM_RAM 0x1000
 
@@ -82,5 +84,18 @@
 // CH376S Registers
 // #define CH376S_DATA 0x8400
 // #define CH376S_COMMAND 0x8401
+
+// VGA Card
+#define VGA0 0x8000
+
+#define VGA_TEXTMODE_DATA VGA0
+#define VGA_TEXTMODE_CLEAR_COMMAND VGA0 + 1
+#define VGA_TEXTMODE_SET_COLOR_COMMAND VGA0 + 2
+
+#define VGA_FB_DATA VGA0
+#define VGA_FB_SWAP_DATA 0x40
+
+// === String formatting functions === //
+void print_string_bin(char *str, uint8_t max);
 
 #endif

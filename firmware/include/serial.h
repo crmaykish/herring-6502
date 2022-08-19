@@ -51,9 +51,6 @@ char serial_getc();
 void serial_putc(uint8_t);
 void serial_puts(const uint8_t *);
 
-// === String formatting functions === //
-void print_string_bin(char *str, uint8_t max);
-
 // === Terminal font colors and control === //
 void term_set_color(char *color);
 void term_cursor_move(term_cursor_dir_e dir, uint8_t steps);

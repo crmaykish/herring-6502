@@ -4,17 +4,7 @@
 #include <stdio.h>
 #include "serial.h"
 #include "delay.h"
-
-void vga_print(char *s)
-{
-    uint8_t i = 0;
-
-    while (s[i] != ASCII_ZERO)
-    {
-        POKE(0x8000, s[i]);
-        ++i;
-    }
-}
+#include "vga.h"
 
 void memdump(uint16_t address, uint8_t bytes)
 {
@@ -52,9 +42,9 @@ int main()
 {
     char a;
 
-    // clear screen
-    POKE(0x8001, 0x00);
-    delay(20);
+    textmode_clear();
+
+    TEXTMODE_SET_COLOR(VGA_GREEN);
 
     printf("dump 1000\r\n");
 

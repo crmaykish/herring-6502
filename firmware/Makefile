@@ -18,13 +18,12 @@ MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
 HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c
 CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
 CONWAY_VGA_SRC = $(COMMON_SRC) src/conway_vga.c src/serial.c src/vga.c
-FB_DEMO_SRC = $(COMMON_SRC) src/fb_demo.c src/serial.c src/vga.c
-TEXTMODE_DEMO_SRC = $(COMMON_SRC) src/textmode_demo.c src/serial.c
+TEXTMODE_DEMO_SRC = $(COMMON_SRC) src/textmode_demo.c src/serial.c src/vga.c
 CHIP8_SRC = $(COMMON_SRC) src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
 
 .PHONY: all clean
 
-all: monitor hello conway chip8 fb_demo textmode_demo conway_vga
+all: monitor hello conway chip8 textmode_demo conway_vga
 
 # Firmware applications
 
@@ -40,18 +39,15 @@ hello: $(HELLO_SRC) | build_dir ram_lib
 conway: $(CONWAY_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_SRC) $(RAM_LIB) -o build/conway.bin
 
-conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
-	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_VGA_SRC) $(RAM_LIB) -o build/conway_vga.bin
-
 # CHIP-8 Emulator
 chip8: $(CHIP8_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -I libs/chip8/include -C $(RAM_CFG) $(CHIP8_SRC) $(RAM_LIB) -o build/chip8.bin
 
-fb_demo: $(FB_DEMO_SRC) | build_dir ram_lib
-	$(CC) $(CFLAGS) -C $(RAM_CFG) $(FB_DEMO_SRC) $(RAM_LIB) -o build/fb_demo.bin
-
 textmode_demo: $(TEXTMODE_DEMO_SRC) | build_dir ram_lib
-	$(CC) $(CFLAGS) -C $(RAM_CFG) $(TEXTMODE_DEMO_SRC) $(RAM_LIB) -o build/textmode_demo.bin
+	$(CC) $(CFLAGS) -DVGA_TEXTMODE_ENABLE -C $(RAM_CFG) $(TEXTMODE_DEMO_SRC) $(RAM_LIB) -o build/textmode_demo.bin
+
+conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_VGA_SRC) $(RAM_LIB) -o build/conway_vga.bin
 
 # Standard libraries
 
