@@ -4,6 +4,7 @@
 #include "serial.h"
 #include "delay.h"
 #include "herring.h"
+#include "spi.h"
 
 #define SCLK 0
 #define MOSI 1
@@ -19,110 +20,18 @@ static uint8_t CMD17[6] = {0x40 + 17, 0x00, 0x00, 0x00, 0x00, 0x01};
 
 static uint8_t block[512] = {0};
 
-void gpio_put(uint8_t pin, bool val)
-{
-    if (val)
-    {
-        MEM(VIA1_PORTA) |= (1 << pin);
-    }
-    else
-    {
-        MEM(VIA1_PORTA) &= ~(1 << pin);
-    }
-}
-
-bool gpio_get(uint8_t pin)
-{
-    return ((MEM(VIA1_PORTA) & (1 << pin)) > 0);
-}
-
-uint8_t spi_read_byte()
-{
-    uint8_t in = 0;
-    int i;
-
-    gpio_put(SCLK, false);
-
-    // delay(1);
-
-    // enable SD card
-    gpio_put(CS, false);
-
-    gpio_put(MOSI, true);
-
-    // delay(1);
-
-    for (i = 7; i >= 0; i--)
-    {
-        gpio_put(SCLK, true);
-
-        // delay(1);
-
-        if (gpio_get(MISO))
-        {
-            in |= (1 << i);
-        }
-
-        gpio_put(SCLK, false);
-
-        // delay(1);
-    }
-
-    // disable SD card
-    gpio_put(CS, true);
-
-    return in;
-}
-
-void spi_write_byte(uint8_t b)
-{
-    int i;
-
-    gpio_put(SCLK, false);
-    // delay(1);
-
-    gpio_put(CS, false);
-    // delay(1);
-
-    for (i = 7; i >= 0; i--)
-    {
-        if (b & (1 << i))
-        {
-            gpio_put(MOSI, true);
-        }
-        else
-        {
-            gpio_put(MOSI, false);
-        }
-
-        // delay(1);
-
-        gpio_put(SCLK, true);
-
-        // delay(1);
-
-        gpio_put(SCLK, false);
-    }
-
-    // delay(1);
-
-    gpio_put(CS, true);
-
-    // delay(1);
-}
-
 void sd_send_command(uint8_t command[6])
 {
     int i;
     for (i = 0; i < 6; i++)
     {
-        spi_write_byte(command[i]);
+        spi_transfer(command[i]);
     }
 }
 
 uint8_t sd_wait_result()
 {
-    uint8_t response = spi_read_byte();
+    uint8_t response = spi_transfer(SPI_EMPTY);
     int count = 0;
 
     while (response == 0xFF && count < 10)
@@ -130,7 +39,7 @@ uint8_t sd_wait_result()
         printf("waiting for response\r\n");
         // delay(10);
 
-        response = spi_read_byte();
+        response = spi_transfer(SPI_EMPTY);
         count++;
     }
 
@@ -166,12 +75,12 @@ void sd_read_block(uint32_t block_num, uint8_t *block_data)
 
     for (i = 0; i < 512; i++)
     {
-        block_data[i] = spi_read_byte();
+        block_data[i] = spi_transfer(SPI_EMPTY);
     }
 
     // read the 16 bit CRC
-    spi_read_byte();
-    spi_read_byte();
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
 
     printf("read block: %d\r\n", block_num);
 }
@@ -209,24 +118,17 @@ int main()
 
     printf("SD card test\r\n");
 
-    MEM(VIA1_DDRA) = 0b111111011;
-
-    // delay(10);
-
-    gpio_put(CS, true);
-    gpio_put(MOSI, true);
+    spi_init();
 
     printf("Warming up SD card...\r\n");
 
     for (i = 0; i < 80; i++)
     {
         gpio_put(SCLK, true);
-        // delay(1);
         gpio_put(SCLK, false);
-        // delay(1);
     }
 
-    first_byte = spi_read_byte();
+    first_byte = spi_transfer(SPI_EMPTY);
 
     printf("Read first byte: %02X\r\n", first_byte);
 
@@ -246,19 +148,19 @@ int main()
 
     printf("CMD8 response: %02X\r\n", response);
 
-    spi_read_byte();
-    spi_read_byte();
-    spi_read_byte();
-    spi_read_byte();
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
 
     sd_send_command(CMD58);
     response = sd_wait_result();
     printf("CMD58 response: %02X\r\n", response);
 
-    spi_read_byte();
-    spi_read_byte();
-    spi_read_byte();
-    spi_read_byte();
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
+    spi_transfer(SPI_EMPTY);
 
     init = false;
 
