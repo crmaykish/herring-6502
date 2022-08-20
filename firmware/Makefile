@@ -15,7 +15,7 @@ RAM_LIB = config/ram.lib
 COMMON_SRC = src/herring.c src/delay.c
 
 MONITOR_SRC = $(COMMON_SRC) src/monitor.c src/serial.c
-HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c src/spi.c
+HELLO_SRC = $(COMMON_SRC) src/hello.c src/serial.c src/spi.c src/sd.c
 CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
 CONWAY_VGA_SRC = $(COMMON_SRC) src/conway_vga.c src/serial.c src/vga.c
 TEXTMODE_DEMO_SRC = $(COMMON_SRC) src/textmode_demo.c src/serial.c src/vga.c
