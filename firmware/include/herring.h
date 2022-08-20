@@ -31,21 +31,21 @@
 #define VIA0_IER VIA0 + 0xE
 
 // VIA1 registers
-#define VIA1_PORTB VIA0 + 0x0
-#define VIA1_PORTA VIA0 + 0x1
-#define VIA1_DDRB VIA0 + 0x2
-#define VIA1_DDRA VIA0 + 0x3
-#define VIA1_T1CL VIA0 + 0x4
-#define VIA1_T1CH VIA0 + 0x5
-#define VIA1_T1LL VIA0 + 0x6
-#define VIA1_T1LH VIA0 + 0x7
-#define VIA1_T2CL VIA0 + 0x8
-#define VIA1_T2CH VIA0 + 0x9
-#define VIA1_SR VIA0 + 0xA
-#define VIA1_ACR VIA0 + 0xB
-#define VIA1_PCR VIA0 + 0xC
-#define VIA1_IFR VIA0 + 0xD
-#define VIA1_IER VIA0 + 0xE
+#define VIA1_PORTB VIA1 + 0x0
+#define VIA1_PORTA VIA1 + 0x1
+#define VIA1_DDRB VIA1 + 0x2
+#define VIA1_DDRA VIA1 + 0x3
+#define VIA1_T1CL VIA1 + 0x4
+#define VIA1_T1CH VIA1 + 0x5
+#define VIA1_T1LL VIA1 + 0x6
+#define VIA1_T1LH VIA1 + 0x7
+#define VIA1_T2CL VIA1 + 0x8
+#define VIA1_T2CH VIA1 + 0x9
+#define VIA1_SR VIA1 + 0xA
+#define VIA1_ACR VIA1 + 0xB
+#define VIA1_PCR VIA1 + 0xC
+#define VIA1_IFR VIA1 + 0xD
+#define VIA1_IER VIA1 + 0xE
 
 // ACIA 0 registers
 #define ACIA0_DATA 0xC000
@@ -94,6 +94,9 @@
 
 #define VGA_FB_DATA VGA0
 #define VGA_FB_SWAP_DATA 0x40
+
+// Utilities
+#define MEM(address) (*(volatile unsigned char *)(address))
 
 // === String formatting functions === //
 void print_string_bin(char *str, uint8_t max);
