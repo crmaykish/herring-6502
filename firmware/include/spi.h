@@ -16,6 +16,8 @@
 
 #define SPI_EMPTY 0xFF
 
+#define SPI_RETRY_LIMIT 10
+
 // GPIO control
 void gpio_put(uint8_t pin, bool val);
 bool gpio_get(uint8_t pin);
