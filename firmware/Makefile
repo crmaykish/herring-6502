@@ -20,10 +20,11 @@ CONWAY_SRC = $(COMMON_SRC) src/conway.c src/serial.c
 CONWAY_VGA_SRC = $(COMMON_SRC) src/conway_vga.c src/serial.c src/vga.c
 TEXTMODE_DEMO_SRC = $(COMMON_SRC) src/textmode_demo.c src/serial.c src/vga.c
 CHIP8_SRC = $(COMMON_SRC) src/chip8_emulator.c src/serial.c libs/chip8/src/chip8.c
+ASSEMBLER_SRC = $(COMMON_SRC) src/opcodes_6502.c src/assembler.c src/serial.c
 
 .PHONY: all clean
 
-all: monitor hello conway chip8 textmode_demo conway_vga
+all: monitor hello conway chip8 textmode_demo conway_vga assembler
 
 # Firmware applications
 
@@ -48,6 +49,9 @@ textmode_demo: $(TEXTMODE_DEMO_SRC) | build_dir ram_lib
 
 conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_VGA_SRC) $(RAM_LIB) -o build/conway_vga.bin
+
+assembler: $(ASSEMBLER_SRC) | build_dir ram_lib
+	$(CC) $(CFLAGS) -C $(RAM_CFG) $(ASSEMBLER_SRC) $(RAM_LIB) -o build/assembler.bin
 
 # Standard libraries
 
