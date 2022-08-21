@@ -8,6 +8,7 @@
 
 #define VIA0 0xC100
 #define VIA1 0xC180
+#define VIA2 0xC200
 
 // VIA DDR control
 #define VIA_OUTPUT 0xFF
@@ -46,6 +47,23 @@
 #define VIA1_PCR VIA1 + 0xC
 #define VIA1_IFR VIA1 + 0xD
 #define VIA1_IER VIA1 + 0xE
+
+// VIA2 registers
+#define VIA2_PORTB VIA2 + 0x0
+#define VIA2_PORTA VIA2 + 0x1
+#define VIA2_DDRB VIA2 + 0x2
+#define VIA2_DDRA VIA2 + 0x3
+#define VIA2_T1CL VIA2 + 0x4
+#define VIA2_T1CH VIA2 + 0x5
+#define VIA2_T1LL VIA2 + 0x6
+#define VIA2_T1LH VIA2 + 0x7
+#define VIA2_T2CL VIA2 + 0x8
+#define VIA2_T2CH VIA2 + 0x9
+#define VIA2_SR VIA2 + 0xA
+#define VIA2_ACR VIA2 + 0xB
+#define VIA2_PCR VIA2 + 0xC
+#define VIA2_IFR VIA2 + 0xD
+#define VIA2_IER VIA2 + 0xE
 
 // ACIA 0 registers
 #define ACIA0_DATA 0xC000

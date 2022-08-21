@@ -5,14 +5,16 @@
 #include "herring.h"
 
 // The register containing the GPIO pins used for SPI
-#define SPI_IO_PORT VIA1_PORTA
-#define SPI_IO_DDR VIA1_DDRA
+#define SPI_IO_PORT VIA2_PORTB
+#define SPI_IO_DDR VIA2_DDRB
 
 // Define the pin numbers relative to the IO_PORT register
-#define SCLK 0
-#define MOSI 1
-#define MISO 2
-#define CS 3
+#define SCLK 4
+#define MISO 5
+#define MOSI 6
+#define CS 7
+
+#define SPI_IO_MASK ((1 << CS) | (1 << MOSI) | (1 << SCLK))
 
 #define SPI_EMPTY 0xFF
 

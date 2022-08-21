@@ -2,6 +2,8 @@
 #include "spi.h"
 #include "delay.h"
 
+#include <stdio.h>
+
 void gpio_put(uint8_t pin, bool val)
 {
     if (val)
@@ -22,7 +24,9 @@ bool gpio_get(uint8_t pin)
 void spi_init()
 {
     // Set MISO to input, other pins to output
-    MEM(SPI_IO_DDR) = 0b111111011;
+    MEM(SPI_IO_DDR) = SPI_IO_MASK;
+
+    printf("SPI IO MASK: %02X\r\n", SPI_IO_MASK);
 
     // Default state of the SPI pins
     gpio_put(CS, true);
