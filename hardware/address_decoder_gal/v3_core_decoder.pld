@@ -6,7 +6,7 @@ U1 U0 R W VIA UART ROM RAM RAMWR VCC
 
 W = /R
 /RAMWR = CLK * /R
-/RAM = A15
+RAM = A15
 /ROM = A15 * A14 * A13
 /UART = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8
 /VIA = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8
