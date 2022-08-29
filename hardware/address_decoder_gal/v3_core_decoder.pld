@@ -1,0 +1,22 @@
+GAL16V8
+CORE_V3
+
+CLK A8 A9 A10 A11 A12 A13 A14 A15 GND
+U1 U0 R W VIA UART ROM RAM RAMWR VCC
+
+W = /R
+/RAMWR = CLK * /R
+/RAM = A15
+/ROM = A15 * A14 * A13
+/UART = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * /A8
+/VIA = A15 * A14 * /A13 * /A12 * /A11 * /A10 * /A9 * A8
+
+U0 = GND
+
+DESCRIPTION
+Decoder for Herring Core board v3
+
+UART : 0xC000
+VIA : 0xC100
+
+USER1 is input only...
