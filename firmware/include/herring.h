@@ -99,6 +99,23 @@
 #define ASCII_ZERO 0x00
 #define ASCII_ESC 0x1B
 
+// 16C550 UART
+#define UART_BASE 0xC200
+#define UART_RHR (UART_BASE)
+#define UART_THR (UART_BASE)
+#define UART_IER (UART_BASE + 1)
+#define UART_ISR (UART_BASE + 2)
+#define UART_LCR (UART_BASE + 3)
+#define UART_MCR (UART_BASE + 4)
+#define UART_LSR (UART_BASE + 5)
+#define UART_MSR (UART_BASE + 6)
+#define UART_SPR (UART_BASE + 7)
+#define UART_DLL_LSB (UART_BASE)
+#define UART_DLL_MSB (UART_BASE + 1)
+
+#define UART_RX_READY_FLAG 0b00000001
+#define UART_TX_READY_FLAG 0b00100000
+
 // CH376S Registers
 // #define CH376S_DATA 0x8400
 // #define CH376S_COMMAND 0x8401
