@@ -6,33 +6,37 @@
 
 void serial_init()
 {
-    POKE(UART_LCR, 0x80);
-    POKE(UART_DLL_LSB, 0x01); // Set baudrate to OSC / 16 / 1 = 115200
-    POKE(UART_DLL_MSB, 0x00); // Set 0 to upper byte of baudrate clock divider
-    POKE(UART_LCR, 0x03);     // 8 data bits, 1 stop bit, no parity, disable baud rate latch
+    POKE(ACIA0_STATUS, ACIA_RESET);
+    POKE(ACIA0_COMMAND, ACIA_COMMAND_INIT);
+    POKE(ACIA0_CONTROL, ACIA_CONTROL_BAUD);
 }
 
 bool serial_byte_available()
 {
-    return (PEEK(UART_LSR) & UART_RX_READY_FLAG);
+    return (PEEK(ACIA0_STATUS) & ACIA_READY_RX);
 }
 
 char serial_getc()
 {
-    while ((PEEK(UART_LSR) & UART_RX_READY_FLAG) == 0)
+    while ((PEEK(ACIA0_STATUS) & ACIA_READY_RX) == 0)
     {
     }
 
-    return PEEK(UART_RHR);
+    return PEEK(ACIA0_DATA);
 }
 
 void serial_putc(uint8_t c)
 {
-    while ((PEEK(UART_LSR) & UART_TX_READY_FLAG) == 0)
+    while ((PEEK(ACIA0_STATUS) & ACIA_READY_TX) == 0)
     {
     }
 
-    POKE(UART_THR, c);
+    POKE(ACIA0_DATA, c);
+
+    if (c == 0x0A)
+    {
+        serial_putc(0x0D);
+    }
 }
 
 void serial_puts(const uint8_t *s)

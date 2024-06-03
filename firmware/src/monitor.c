@@ -6,8 +6,8 @@
 #include "herring.h"
 #include "serial.h"
 
-#define PROGRAM_VERSION "1.6.0"
-#define RELEASE_DATE "2022-08-17"
+#define PROGRAM_VERSION "1.6.1"
+#define RELEASE_DATE "2024-06-02"
 
 #define PROMPT "><(((°>"
 
