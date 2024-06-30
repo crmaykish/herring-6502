@@ -6,8 +6,7 @@
 #include "herring.h"
 #include "serial.h"
 
-#define PROGRAM_VERSION "1.6.1"
-#define RELEASE_DATE "2024-06-02"
+#define RELEASE_DATE "2024-06-29"
 
 #define PROMPT "><(((°>"
 
@@ -112,7 +111,11 @@ void header()
     printf("..·´¯`·..·´¯`·..·´¯`·..·´¯`·..·´¯`·..´¯`·..·´¯`·..·´¯`·..\r\n");
 
     term_set_color(TERM_FG_BRIGHT_GREEN);
-    printf("Herring Monitor " PROGRAM_VERSION " | Colin Maykish | Built: " RELEASE_DATE "\r\n");
+    printf("  _  _             _              __ ___  __ ___\r\n");
+    printf(" | || |___ _ _ _ _(_)_ _  __ _   / /| __|/  \\_  )\r\n");
+    printf(" | __ / -_) '_| '_| | ' \\/ _` | / _ \\__ \\ () / /\r\n");
+    printf(" |_||_\\___|_| |_| |_|_||_\\__, | \\___/___/\\__/___|\r\n");
+    printf("  Colin Maykish          |___/   " RELEASE_DATE "\r\n");
 
     term_set_color(TERM_FG_BRIGHT_RED);
     printf("github.com/crmaykish/herring-6502\r\n");
