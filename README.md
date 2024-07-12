@@ -7,20 +7,12 @@ The system bus is exposed as single-row 40-pin female headers using standard 0.1
 
 ## Hardware
 
-The base configuration has 8KB of ROM, 32KB of RAM and runs at a clock frequency between 1 and 12 MHz. The first serial port functions as the console, additional ports can be installed and used for other purposes. GPIO pins are available on the VIA board.
-
 The memory map is set up in the following way:
 
-1. 0x0000 - 0x7FFF: 32KB RAM
-2. 0x8000 - 0x80FF: Serial port 1
-3. 0x8100 - 0x81FF: VIA 1 (GPIO chip)
-4. 0x8200 - 0x82FF: Serial port 2
-5. 0x8300 - 0x83FF: Optional peripheral
-6. 0x8400 - 0x84FF: Optional peripheral
-7. 0x8500 - 0x85FF: Optional peripheral
-8. 0xE000 - 0xFFFF: 8KB ROM
-
-There's currently a large gap of unused address space between 0x8600 and 0xDFFF (about 23K). This could be used for additional RAM or ROM or for a peripheral in need of a larger address space such as a framebuffer video card. The memory map can be reconfigured by updating the GAL chip on the CPU board. See `hardware/address_decoder_gal`.
+1. 0x0000 - 0x7FFF: Low RAM (32K)
+2. 0x8000 - 0xBFFF: Bankable RAM (16K pages)
+3. 0xC000 - 0xDFFF: Memory-mapped I/O (8K)
+4. 0xE000 - 0xFFFF: ROM (8K)
 
 Individual component boards are connected to the backplane via the 40-pin system bus. Most of the pins on the bus come directly from the 65C02 plus a few for peripheral support. They are mapped from left to right in the following order:
 
