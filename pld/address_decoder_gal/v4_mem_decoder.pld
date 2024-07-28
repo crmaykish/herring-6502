@@ -1,0 +1,37 @@
+GAL16V18
+MEM_DEC
+
+// TODO pins
+
+A14RAM = /A15 * A14
+       +  A15 * /A14 * A14VIA
+
+A15RAM = A15 * /A14 * A15VIA
+
+A16RAM = A15 * /A14 * A16VIA
+
+A17RAM = A15 * /A14 * A17VIA
+
+A18RAM = A15 * /A14 * A17VIA
+
+/CSRAM = /A15
+       +  A15 /A14
+
+/CSROM = A15 * A14 * A13
+
+/RAMWR = /RW * CLK
+
+DESCRIPTION
+
+if /A15, no banking, select fixed ram, drive A15-A18 on RAM low
+if A15 and /14, use VIA to drive A14-A18 on RAM -- this means the first two banks will be the fixed ram, that seems fine
+if A15 and A14 and /A13, I/O
+if A15 * A14 * A13, map ROM direct
+
+32 RAM banks
+
+Memory Map:
+RAM (Fixed):    0x0000 - 0x7FFF (32KB)
+RAM (Bank):     0x8000 - 0xBFFF (16KB)
+I/O (Fixed):    0xC000 - 0xDFFF (8 KB) (handled by the I/O decoder PLD)
+ROM (Fixed):     0xE000 - 0xFFFF (8KB)

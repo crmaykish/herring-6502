@@ -1,0 +1,26 @@
+GAL16V8
+IO_DEC
+
+// TODO pins
+
+/CS0 = A15 * A14 * /A13 * /A12 * /A11 * /A10
+/CS1 = A15 * A14 * /A13 * /A12 * /A11 * A10
+/CS2 = A15 * A14 * /A13 * /A12 * A11 * /A10
+/CS3 = A15 * A14 * /A13 * /A12 * A11 * A10
+/CS4 = A15 * A14 * /A13 * A12 * /A11 * /A10
+/CS5 = A15 * A14 * /A13 * A12 * /A11 * A10
+/CS6 = A15 * A14 * /A13 * A12 * A11 * /A10
+/CS7 = A15 * A14 * /A13 * A12 * A11 * A10
+
+DESCRIPTION
+
+Decode address space from 0xC000-0xE000 into 8 even blocks of 0x400 for I/O devices
+
+CS0 at 0xC000
+CS1 at 0xC400
+CS2 at 0xC800
+CS3 at 0xCC00
+CS4 at 0xD000
+CS5 at 0xD400
+CS6 at 0xD800
+CS7 at 0xDC00
