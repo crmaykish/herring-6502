@@ -5878,6 +5878,12 @@
 		)
 	)
 	(junction
+		(at 85.09 157.48)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "0a4c04d0-cf41-4f3c-8284-5ae3eadfdd1e")
+	)
+	(junction
 		(at 383.54 95.25)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6094,6 +6100,18 @@
 		(uuid "a5984343-2b1a-4194-bdea-dd3120f593a9")
 	)
 	(junction
+		(at 85.09 162.56)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b04f0e5f-8b45-4302-80f8-43d9328914c2")
+	)
+	(junction
+		(at 85.09 160.02)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "b2e9bff4-a502-4128-a196-cdc70662b819")
+	)
+	(junction
 		(at 358.14 87.63)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -6270,6 +6288,16 @@
 			(type default)
 		)
 		(uuid "010f5a81-ce89-4c15-9ac7-4cef86263b6e")
+	)
+	(wire
+		(pts
+			(xy 85.09 162.56) (xy 85.09 165.1)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "033945dd-1d46-482a-8018-c8b52f214f9b")
 	)
 	(wire
 		(pts
@@ -6733,6 +6761,16 @@
 	)
 	(wire
 		(pts
+			(xy 85.09 160.02) (xy 85.09 162.56)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "64eec107-eece-4183-953f-07217eb30147")
+	)
+	(wire
+		(pts
 			(xy 364.49 83.82) (xy 370.84 83.82)
 		)
 		(stroke
@@ -6970,6 +7008,16 @@
 			(type default)
 		)
 		(uuid "a1413ba1-c3a9-4047-9083-9e8193aa4c2e")
+	)
+	(wire
+		(pts
+			(xy 85.09 157.48) (xy 85.09 160.02)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a612899a-6760-4416-b27a-8e7ee95604e1")
 	)
 	(wire
 		(pts
@@ -7413,16 +7461,6 @@
 		)
 		(uuid "49bc9b74-75e3-46da-a99f-2da09346fc3b")
 	)
-	(text "TODO: pullup on IRQ exp\n"
-		(exclude_from_sim no)
-		(at 365.252 48.514 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "715ab77a-3715-4b48-8c82-709937d4c828")
-	)
 	(text "512KB Flash ROM\n(8KB usable)\n"
 		(exclude_from_sim no)
 		(at 130.81 249.174 0)
@@ -7458,16 +7496,6 @@
 			)
 		)
 		(uuid "c2c97460-f9ed-475d-a861-7a9862eecd13")
-	)
-	(text "TODO: power and user LEDs"
-		(exclude_from_sim no)
-		(at 369.316 61.468 0)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-		)
-		(uuid "cacbe2aa-9da1-4cb2-9027-5f6483394f0b")
 	)
 	(global_label "A13"
 		(shape input)
@@ -7619,6 +7647,28 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "{slash}IRQ0"
+		(shape input)
+		(at 92.71 157.48 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "069b62d5-f4b8-4353-b192-5b37d27c3f00")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 101.4405 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -7817,6 +7867,28 @@
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "{slash}IRQ1"
+		(shape input)
+		(at 92.71 160.02 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "0dbe45e2-06a5-45dc-b535-5787fb7b5133")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 101.4405 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
 				(hide yes)
 			)
 		)
@@ -11473,6 +11545,28 @@
 			)
 		)
 	)
+	(global_label "{slash}IRQ2"
+		(shape input)
+		(at 92.71 162.56 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "d9a0fea3-1bcc-4769-9919-5005c6f653ae")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 101.4405 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
 	(global_label "A11"
 		(shape input)
 		(at 118.11 199.39 180)
@@ -12036,6 +12130,28 @@
 		(uuid "f8c045f9-ceb2-45be-89d4-27d52698c0a0")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 222.476 184.15 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+	)
+	(global_label "{slash}IRQ3"
+		(shape input)
+		(at 92.71 165.1 0)
+		(fields_autoplaced yes)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left)
+		)
+		(uuid "f8e69353-3951-4191-8b8f-a3e2551421ff")
+		(property "Intersheetrefs" "${INTERSHEET_REFS}"
+			(at 101.4405 165.1 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -13148,6 +13264,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 88.9 157.48 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "2f2f8aef-9492-4656-9a60-5f6fc6e14a2f")
+		(property "Reference" "R7"
+			(at 87.63 157.48 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "R"
+			(at 87.6301 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 88.9 155.702 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 88.9 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 88.9 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "955ee86b-7ff2-449a-bf9f-f52ce7d122af")
+		)
+		(pin "2"
+			(uuid "fc44221d-269f-407c-a03e-e48651a3789f")
+		)
+		(instances
+			(project "herring-v4-cpu-board"
+				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
+					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "74xx:74HC245")
 		(at 127 45.72 0)
 		(unit 1)
@@ -13435,7 +13621,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Package_DIP:DIP-32_W15.24mm"
+		(property "Footprint" "Socket:DIP_Socket-32_W11.9_W12.7_W15.24_W17.78_W18.5_3M_232-1285-00-0602J"
 			(at 133.35 194.31 0)
 			(effects
 				(font
@@ -14303,6 +14489,76 @@
 		)
 	)
 	(symbol
+		(lib_id "Device:R")
+		(at 88.9 160.02 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "7786a793-5356-41cc-b58b-59284e563797")
+		(property "Reference" "R8"
+			(at 87.63 160.02 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "R"
+			(at 87.6301 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 88.9 158.242 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 88.9 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 88.9 160.02 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "0416b6bf-b0f5-49d2-8d26-c14e06a194e6")
+		)
+		(pin "2"
+			(uuid "f2744d99-749a-446c-a63c-35a6ca57b1d1")
+		)
+		(instances
+			(project "herring-v4-cpu-board"
+				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
+					(reference "R8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "Device:C")
 		(at 377.19 80.01 0)
 		(unit 1)
@@ -14741,6 +14997,76 @@
 			(project "herring-v4-cpu-board"
 				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
 					(reference "C6")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 88.9 165.1 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "80389be5-6408-4522-9ac8-ab8509bc6b44")
+		(property "Reference" "R10"
+			(at 87.63 165.1 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "R"
+			(at 87.6301 167.64 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 88.9 163.322 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 88.9 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 88.9 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "138675e5-c3e9-422c-93a5-9214e1e1b24c")
+		)
+		(pin "2"
+			(uuid "540d94f1-5dd4-4edc-821d-4faacb6afa9a")
+		)
+		(instances
+			(project "herring-v4-cpu-board"
+				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
+					(reference "R10")
 					(unit 1)
 				)
 			)
@@ -15927,6 +16253,72 @@
 	)
 	(symbol
 		(lib_id "power:+5V")
+		(at 85.09 157.48 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "b7093830-9125-4a82-b3c2-0cf04a428b05")
+		(property "Reference" "#PWR034"
+			(at 85.09 161.29 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Value" "+5V"
+			(at 85.09 152.4 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" ""
+			(at 85.09 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 85.09 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Power symbol creates a global label with name \"+5V\""
+			(at 85.09 157.48 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "ecba3506-4bb3-41bd-9f4e-24335c224d90")
+		)
+		(instances
+			(project ""
+				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
+					(reference "#PWR034")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
 		(at 270.51 104.14 0)
 		(unit 1)
 		(exclude_from_sim no)
@@ -16184,6 +16576,76 @@
 			(project ""
 				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
 					(reference "#PWR01")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Device:R")
+		(at 88.9 162.56 270)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(uuid "cf59ce74-466d-4329-9ab3-4b6669137f7e")
+		(property "Reference" "R9"
+			(at 87.63 162.56 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "R"
+			(at 87.6301 165.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+				(hide yes)
+			)
+		)
+		(property "Footprint" "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal"
+			(at 88.9 160.782 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "~"
+			(at 88.9 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "Resistor"
+			(at 88.9 162.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "1"
+			(uuid "634ce086-d009-4201-a47b-20d1251699fd")
+		)
+		(pin "2"
+			(uuid "c6d0b9ec-8b06-4d39-acb1-f313906255a1")
+		)
+		(instances
+			(project "herring-v4-cpu-board"
+				(path "/94a8a6ac-ecc9-45c4-8646-1823ba28375c"
+					(reference "R9")
 					(unit 1)
 				)
 			)
