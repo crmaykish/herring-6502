@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "herring")(type "KiCad")(uri "/home/colin/Workspace/herring-6502/hardware/herring-v4-cpu-board/herring.kicad_sym")(options "")(descr ""))
+)

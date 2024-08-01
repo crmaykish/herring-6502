@@ -1,0 +1,37 @@
+GAL22V10
+GLUE
+
+CLK BE RW A15 A14 A13 A12 A11 A10 A9 A8 GND
+IRQ0 IRQ1 IRQ2 IRQ3 IRQ BUF MEMREQ IOREQ MEMWR ROM RAM VCC
+
+/RAM =  /A15
+       + A15 * /A14
+       + A15 * A14 * /A13
+       + A15 * A14 * A13 * /A12
+       + A15 * A14 * A13 * A12 * /A11
+       + A15 * A14 * A13 * A12 * A11 * /A10
+       + A15 * A14 * A13 * A12 * A11 * A10 * /A9
+       + A15 * A14 * A13 * A12 * A11 * A10 * A9 * /A8
+
+/ROM = A15 * A14 * A13
+
+/IOREQ = VCC         ; TODO
+
+/MEMREQ = VCC        ; TODO
+
+/MEMWR = /RW * CLK
+
+/IRQ = /IRQ0 + /IRQ1 + /IRQ2 + /IRQ3
+
+/BUF = BE
+
+DESCRIPTION
+
+Memory Map:
+RAM (Fixed):    0x0000 - 0xDEFF (56KB - 256 bytes)
+I/O (Fixed):    0xDF00 - 0xDFFF (256 byes)
+ROM (Fixed):     0xE000 - 0xFFFF (8KB)
+
+Buffers are active whenever Bus-Enable is HIGH
+
+CPU IRQ pin is active when any of IRQ0-3 is active
