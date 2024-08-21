@@ -1,3 +1,0 @@
-(sym_lib_table
-  (lib (name "herring")(type "KiCad")(uri "${KIPRJMOD}/herring.kicad_sym")(options "")(descr ""))
-)
