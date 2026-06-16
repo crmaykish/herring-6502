@@ -2,6 +2,9 @@ CC = cl65
 CA = ca65
 AR = ar65
 
+# Locate the cc65 lib dir from cl65
+CC65_LIB_DIR := $(shell dirname $$(cl65 --print-target-path))/lib
+
 # TODO: the optimization flags are having weird effects on the USB code
 # Might be the way I'm doing register access. PEEK/POKE might be better
 CFLAGS = -O -t none --cpu 65c02 --static-locals -I include
@@ -55,13 +58,13 @@ conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
 # Only rebuild when the crt0 files change
 
 rom_lib:
-	cp /usr/share/cc65/lib/supervision.lib config/rom.lib
-	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_rom.asm 
+	cp $(CC65_LIB_DIR)/supervision.lib config/rom.lib
+	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_rom.asm
 	$(AR) a config/rom.lib config/crt0.o
 
 ram_lib:
-	cp /usr/share/cc65/lib/supervision.lib config/ram.lib
-	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_ram.asm 
+	cp $(CC65_LIB_DIR)/supervision.lib config/ram.lib
+	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_ram.asm
 	$(AR) a config/ram.lib config/crt0.o
 
 # Cleanup
