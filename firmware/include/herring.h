@@ -99,10 +99,6 @@
 #define ASCII_ZERO 0x00
 #define ASCII_ESC 0x1B
 
-// CH376S Registers
-// #define CH376S_DATA 0x8400
-// #define CH376S_COMMAND 0x8401
-
 // VGA Card
 #define VGA0 0x8000
 
@@ -116,7 +112,6 @@
 // Utilities
 #define MEM(address) (*(volatile unsigned char *)(address))
 
-// === String formatting functions === //
 void print_string_bin(char *str, uint8_t max);
 
 #endif

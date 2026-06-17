@@ -5,8 +5,6 @@ AR = ar65
 # Locate the cc65 lib dir from cl65
 CC65_LIB_DIR := $(shell dirname $$(cl65 --print-target-path))/lib
 
-# TODO: the optimization flags are having weird effects on the USB code
-# Might be the way I'm doing register access. PEEK/POKE might be better
 CFLAGS = -O -t none --cpu 65c02 --static-locals -I include
 
 ROM_CFG = config/rom.cfg
@@ -52,16 +50,13 @@ textmode_demo: $(TEXTMODE_DEMO_SRC) | build_dir ram_lib
 conway_vga: $(CONWAY_VGA_SRC) | build_dir ram_lib
 	$(CC) $(CFLAGS) -C $(RAM_CFG) $(CONWAY_VGA_SRC) $(RAM_LIB) -o build/conway_vga.bin
 
-# Standard libraries
-
-# TODO: don't really need to build the libs every time we build firmware
-# Only rebuild when the crt0 files change
-
+# Standard library (ROM)
 rom_lib:
 	cp $(CC65_LIB_DIR)/supervision.lib config/rom.lib
 	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_rom.asm
 	$(AR) a config/rom.lib config/crt0.o
 
+# Standard library (RAM)
 ram_lib:
 	cp $(CC65_LIB_DIR)/supervision.lib config/ram.lib
 	$(CA) -t none --cpu 65c02 -o config/crt0.o config/crt0_ram.asm
