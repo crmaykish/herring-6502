@@ -75,9 +75,17 @@ always @(posedge clk_6502) begin
     cs_acia_d <= cs_acia;
 end
 
+// RAM (32KB)
+reg [7:0] ram[0:32767];
+reg [7:0] ram_out;
+always @(posedge clk_6502) begin
+    if (we && cs_ram) ram[address_bus[14:0]] <= data_bus_out;
+    ram_out <= ram[address_bus[14:0]];
+end
+
 // Data Bus Read Mux
 always @(*) begin
-    if (cs_ram_d) data_bus_in = 8'h00;          // TODO: RAM
+    if (cs_ram_d) data_bus_in = ram_out;
     else if (cs_bank_d) data_bus_in = 8'h00;    // TODO: RAM bank
     else if (cs_sys_d) data_bus_in = 8'h00;     // TODO: system register
     else if (cs_gpio_d) data_bus_in = gpio_out;
@@ -86,7 +94,7 @@ always @(*) begin
     else data_bus_in = 8'b00;
 end
 
-// Data Bus Writes
+// Data I/O Bus Writes
 always @(posedge clk_6502) begin
     if (we) begin
         if (cs_gpio) gpio <= data_bus_out;
