@@ -8,7 +8,7 @@
 
 #define RELEASE_DATE "2024-06-29"
 
-#define PROMPT "><(((°>"
+#define PROMPT ">"
 
 #define INPUT_BUFFER_SIZE 32
 #define COMMAND_MAX_LENGTH 6
