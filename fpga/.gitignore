@@ -1,0 +1,14 @@
+# Third-party soft cores (fetched by ./get_cores.sh)
+cores/
+
+# Gowin build output
+impl/
+*.fs
+
+# Generated ROM image (built from firmware/build/monitor.bin -> rom.hex)
+*.hex
+
+# Simulation artifacts
+*.vvp
+*.vcd
+*.json
