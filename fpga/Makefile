@@ -28,11 +28,11 @@ cores:
 
 # Load the bitstream into SRAM (volatile)
 prog: $(BIT)
-	$(LOADER) -b tangnano20k $(BIT)
+	$(LOADER) -b tangnano9k $(BIT)
 
 # Load the bitstream into SPI flash (persistent)
 flash: $(BIT)
-	$(LOADER) -b tangnano20k -f $(BIT)
+	$(LOADER) -b tangnano9k -f $(BIT)
 
 clean:
 	rm -rf impl

@@ -1,7 +1,6 @@
 # Herring-F
-# Target: Tang Nano 20k (Gowin GW2AR-18C)
-
-set_device -name GW2AR-18C GW2AR-LV18QN88C8/I7
+# Target: Tang Nano 9k (Gowin GW1NR-9C)
+set_device -name GW1NR-9C GW1NR-LV9QN88PC6/I5
 
 add_file herring_f.cst
 add_file herring_f.sdc
