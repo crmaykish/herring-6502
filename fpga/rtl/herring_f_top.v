@@ -1,4 +1,7 @@
-module herring_f_top (
+module herring_f_top #(
+    parameter BAUD   = 115200   // ACIA console baud rate (firmware must set CONTROL SBR=0).
+                                // baud_nco hits this accurately at 27 MHz (~0.001% error).
+) (
     input  wire       clk_27,
     output wire [5:0] led,
 
@@ -12,14 +15,9 @@ reg [7:0] data_bus_in;
 wire [7:0] data_bus_out;
 wire we;
 
-// Clock Divider
-reg [15:0] clk_cnt = 16'b0;
-always @(posedge clk_27) begin
-    clk_cnt <= clk_cnt + 1'b1;
-end
-assign clk_6502 = clk_cnt[15];  // Super slow CPU clock
-
-// Reset counter
+// CPU Clock
+localparam integer CPU_HZ = 27_000_000;
+assign clk_6502 = clk_27;
 reg rst = 1'b1;
 reg [7:0] rst_cnt = 8'b0;
 always @(posedge clk_6502) begin
@@ -59,9 +57,9 @@ wire cs_rom  =  address_bus[15:13] == 3'b111;     // 0xE000-0xFFFF  ROM        8
 
 // I/O Space
 wire [2:0] io_slot = address_bus[9:7];
-wire cs_sys  = cs_io && io_slot == 3'd0;    // 0xC000: System Register (bank control)
+wire cs_acia = cs_io && io_slot == 3'd0;    // 0xC000: UART
 wire cs_gpio = cs_io && io_slot == 3'd1;    // 0xC080: GPIO (LEDs)
-wire cs_acia = cs_io && io_slot == 3'd2;    // 0xC100: UART
+wire cs_sys  = cs_io && io_slot == 3'd2;    // 0xC100: System Register (bank control)
 
 // Registered Chip-select Lines (delayed one cycle to match the registered reads)
 reg cs_ram_d, cs_bank_d, cs_rom_d;
@@ -83,13 +81,52 @@ always @(posedge clk_6502) begin
     ram_out <= ram[address_bus[14:0]];
 end
 
+// 6551 ACIA
+wire [7:0] acia_dout;
+wire       acia_irq_n;
+wire       acia_baud_clk;
+
+baud_nco #(.CLK_HZ(CPU_HZ), .BAUD(BAUD)) acia_baud (
+    .clk(clk_6502), .rst_n(~rst), .en_16x(acia_baud_clk)
+);
+
+acia6551 a1 (
+    .clk(clk_6502),
+    .rst_n(~rst),
+    .baud_clk(acia_baud_clk),
+
+    .cs_n(~cs_acia),
+    .rw_n(~we),
+    .rs(address_bus[1:0]),
+    .din(data_bus_out),
+    .dout(acia_dout),
+    .irq_n(acia_irq_n),
+
+    .rx(uart_rx),
+    .tx(uart_tx),
+
+    .rxc_in(1'b1),
+    .rxc_out(),
+    .rxc_oe(),
+
+    .rts_n(),
+    .cts_n(1'b0),
+    .dtr_n(),
+    .dcd_n(1'b1),
+    .dsr_n(1'b1)
+);
+
+// Register the ACIA read data one cycle to match the delayed read mux
+reg [7:0] acia_q;
+always @(posedge clk_6502) acia_q <= acia_dout;
+
 // Data Bus Read Mux
 always @(*) begin
     if (cs_ram_d) data_bus_in = ram_out;
     else if (cs_bank_d) data_bus_in = 8'h00;    // TODO: RAM bank
     else if (cs_sys_d) data_bus_in = 8'h00;     // TODO: system register
     else if (cs_gpio_d) data_bus_in = gpio_out;
-    else if (cs_acia_d) data_bus_in = 8'h00;    // TODO: UART
+    else if (cs_acia_d) data_bus_in = acia_q;
     else if (cs_rom_d) data_bus_in = rom_out;
     else data_bus_in = 8'b00;
 end
@@ -98,8 +135,6 @@ end
 always @(posedge clk_6502) begin
     if (we) begin
         if (cs_gpio) gpio <= data_bus_out;
-        // if (cs_sys)  sysreg <= data_bus_out;   // TODO: bank ctrl / rom paging
-        // if (cs_acia) ...                        // TODO: UART
     end
 end
 
