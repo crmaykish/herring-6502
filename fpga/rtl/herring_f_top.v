@@ -6,7 +6,9 @@ module herring_f_top #(
     output wire [5:0] led,
 
     input  wire       uart_rx,
-    output wire       uart_tx
+    output wire       uart_tx,
+
+    input  wire       btn_rst_n   // S1 button: manual reset (active-low)
 );
 
 wire clk_6502;
@@ -18,11 +20,25 @@ wire we;
 // CPU Clock
 localparam integer CPU_HZ = 27_000_000;
 assign clk_6502 = clk_27;
+
+// Synchronize the asynchronous reset button into the CPU clock domain.
+reg [1:0] btn_sync = 2'b11;   // idle high (S1 released)
+always @(posedge clk_6502) btn_sync <= {btn_sync[0], btn_rst_n};
+wire btn_reset = ~btn_sync[1];   // active-low button -> pressed = 1
+
+// Reset: power-on hold, re-armed by the manual reset button. While S1 is held the
+// CPU stays in reset; on release the counter re-runs the startup hold then frees it.
 reg rst = 1'b1;
 reg [7:0] rst_cnt = 8'b0;
 always @(posedge clk_6502) begin
-    if (rst_cnt == 8'd100) rst <= 1'b0;
-    else rst_cnt <= rst_cnt + 1'b1;
+    if (btn_reset) begin
+        rst_cnt <= 8'b0;
+        rst     <= 1'b1;
+    end else if (rst_cnt == 8'd100) begin
+        rst <= 1'b0;
+    end else begin
+        rst_cnt <= rst_cnt + 1'b1;
+    end
 end
 
 // ROM (8KB)

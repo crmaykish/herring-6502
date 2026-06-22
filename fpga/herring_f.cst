@@ -18,6 +18,10 @@ IO_PORT "led[3]" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
 IO_PORT "led[4]" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
 IO_PORT "led[5]" IO_TYPE=LVCMOS18 PULL_MODE=UP DRIVE=8;
 
+// S1 button -- manual reset (active-low, shorts to GND; bank 3 VCCIO is 1.8V)
+IO_LOC  "btn_rst_n" 3;
+IO_PORT "btn_rst_n" IO_TYPE=LVCMOS18 PULL_MODE=UP;
+
 // BL702 USB-UART bridge. FPGA TX = pin 17, FPGA RX = pin 18
 IO_LOC  "uart_tx" 17;
 IO_PORT "uart_tx" IO_TYPE=LVCMOS33 DRIVE=8;
