@@ -12,15 +12,26 @@ ROM_BIN  = ../firmware/build/monitor.bin
 ROM_HEX  = rom.hex
 
 # Re-synthesize when any source, constraint, or the ROM image changes
-SRCS = $(wildcard rtl/*.v) $(wildcard cores/verilog-6502/*.v) $(wildcard cores/verilog-65c51/rtl/*.v)
+SRCS = $(shell awk '/^add_file/ && $$2 ~ /\.v$$/ {print $$2}' build.tcl)
 INPUTS = build.tcl $(TOP).cst $(TOP).sdc $(ROM_HEX) $(SRCS)
 
 $(BIT): $(INPUTS)
 	$(GW) build.tcl
 
+# Always rebuild the monitor firmware so the ROM image tracks the latest source
+monitor-rom:
+	$(MAKE) -C ../firmware monitor
+
 # Convert the raw monitor binary into one-hex-byte-per-line for $readmemh
-$(ROM_HEX): $(ROM_BIN)
-	hexdump -v -e '1/1 "%02x\n"' $(ROM_BIN) > $(ROM_HEX)
+$(ROM_HEX): monitor-rom
+	@hexdump -v -e '1/1 "%02x\n"' $(ROM_BIN) > $(ROM_HEX).tmp
+	@if cmp -s $(ROM_HEX).tmp $(ROM_HEX); then \
+		rm -f $(ROM_HEX).tmp; \
+		echo "$(ROM_HEX): up to date"; \
+	else \
+		mv $(ROM_HEX).tmp $(ROM_HEX); \
+		echo "$(ROM_HEX): regenerated from $(ROM_BIN)"; \
+	fi
 
 # Fetch third-party cores into cores/
 cores:
@@ -36,6 +47,6 @@ flash: $(BIT)
 
 clean:
 	rm -rf impl
-	rm -f $(ROM_HEX) *.vvp *.vcd
+	rm -f $(ROM_HEX) $(ROM_HEX).tmp *.vvp *.vcd
 
-.PHONY: cores prog flash detect clean
+.PHONY: cores monitor-rom prog flash detect clean
