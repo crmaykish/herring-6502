@@ -16,8 +16,8 @@ clone_core() {
     git clone "$url" "$dest"
 }
 
-# Arlet Ottens' 6502 core
-clone_core verilog-6502 https://github.com/Arlet/verilog-6502.git
+# Arlet-derived 65C02 CPU core
+clone_core CoPro6502 https://github.com/hoglet67/CoPro6502.git
 
 # 65C51 ACIA core
 clone_core verilog-65c51 https://github.com/crmaykish/verilog-65c51.git

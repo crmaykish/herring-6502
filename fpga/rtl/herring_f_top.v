@@ -39,7 +39,7 @@ reg [7:0] gpio_out;
 always @(posedge clk_6502) gpio_out <= gpio;
 
 // CPU Core
-cpu c1(
+cpu_65c02 c1(
     .clk(clk_6502),
     .reset(rst),
     .AB(address_bus),
